@@ -9,9 +9,9 @@ void checkShaderStatus(unsigned int shader, bool isProgram, const char* opDesc) 
 		glGetShaderiv(shader, isProgram ? GL_LINK_STATUS : GL_COMPILE_STATUS, &succ);
 	if(!succ) {
 		if(isProgram)
-			glGetProgramInfoLog(shader, 512, NULL, infoLog);
+			glGetProgramInfoLog(shader, 512, nullptr, infoLog);
 		else
-			glGetShaderInfoLog(shader, 512, NULL, infoLog);
+			glGetShaderInfoLog(shader, 512, nullptr, infoLog);
 		std::cout << opDesc << " error:\n" << infoLog << std::endl;
 		throw std::runtime_error("Loading shaders failed.");
 	}
@@ -19,12 +19,12 @@ void checkShaderStatus(unsigned int shader, bool isProgram, const char* opDesc) 
 
 unsigned int loadShaders() {
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
 	glCompileShader(vertexShader);
 	checkShaderStatus(vertexShader, false, "Vertex shader compilation");
 	
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShader);
 	checkShaderStatus(fragmentShader, false, "Fragment shader compilation");
 	

@@ -1,7 +1,30 @@
 #version 330 core
 
+uniform sampler2DArray texArray;
+
+uniform float ambientLight;
+uniform float diffuseLight;
+uniform vec3 lightSrcDir;
+
+uniform vec4 fogColor;
+uniform float fogStart;
+uniform float fogEnd;
+
+in vec3 cameraCoords;
+in vec2 vertexUV;
+in flat int faceTexId;
+in vec3 normal;
+
 out vec4 fragColor;
 
 void main() {
-	fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-}
+	fragColor = texture(texArray, vec3(vertexUV, faceTexId));
+	
+	float light = ambientLight + diffuseLight*max(dot(lightSrcDir, normal), 0);
+	fragColor.rgb *= min(light, 1);
+	
+	float dist = length(cameraCoords);
+	if(dist > fogEnd) discard;
+	float fogFactor = clamp((fogEnd - dist)/(fogEnd - fogStart), 0.0, 1.0);
+	fragColor = mix(fogColor, fragColor, fogFactor);
+} 
