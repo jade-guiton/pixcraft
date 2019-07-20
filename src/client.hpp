@@ -8,6 +8,7 @@
 #include "glm.hpp"
 
 #include "block_renderer.hpp"
+#include "blocks.hpp"
 
 #define WINDOW_START_WIDTH 800
 #define WINDOW_START_HEIGHT 600

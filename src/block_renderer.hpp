@@ -3,12 +3,18 @@
 #include <stdexcept>
 #include <string>
 #include <cstddef>
+#include <cstdint>
+#include <vector>
+
+#include <iostream>
 
 #include "glfw.hpp"
 #include "glm.hpp"
 #include <stb_image.h>
 
 #include "shaders.hpp"
+#include "world.hpp"
+#include "blocks.hpp"
 
 #define TAU 6.28318531f
 
@@ -21,6 +27,19 @@ struct FaceData {
 } __attribute__((packed));
 // ^^^ It works without the __attribute__, but adding it allows sending less data to the GPU
 
+class RenderedChunk {
+public:
+	RenderedChunk();
+	void init(uint32_t faceVBO, uint32_t faceEBO);
+	
+	void load(Chunk& chunk);
+	void render();
+	
+private:
+	uint32_t VBO, VAO;
+	int faceCount;
+};
+
 class BlockRenderer {
 public:
 	void init();
@@ -28,5 +47,7 @@ public:
 	void render(glm::mat4 proj, glm::mat4 view);
 	
 private:
-	unsigned int program, VAO, textureArray;
+	uint32_t program, textureArray;
+	Chunk testChunk;
+	RenderedChunk testRenderedChunk;
 };

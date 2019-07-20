@@ -34,6 +34,8 @@ GameClient::GameClient()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	
+	BlockTypes::registerTypes();
+	
 	blockRenderer.init();
 	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
