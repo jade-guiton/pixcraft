@@ -1,3 +1,4 @@
 obj
 test.exe
+src/glad.cpp
 src/shaders_src.cpp

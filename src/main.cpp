@@ -3,7 +3,7 @@
 
 #include "glfw.hpp"
 
-#include "window.hpp"
+#include "client.hpp"
 
 void glfwErrorCallback(int error, const char* desc) {
 	std::cout << "GLFW error " << error << ": " << desc << std::endl;
@@ -14,10 +14,8 @@ int main() {
 	glfwInit();
 	
 	try {
-		GameWindow window;
-		while(!window.shouldClose()) {
-			window.update();
-		}
+		GameClient client;
+		client.mainLoop();
 	} catch(std::runtime_error& err) {
 		std::cout << "A runtime error occured: " << err.what() << std::endl;
 		glfwTerminate();

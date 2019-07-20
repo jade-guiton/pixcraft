@@ -1,5 +1,4 @@
-#ifndef SHADERS_HPP
-#define SHADERS_HPP
+#pragma once
 
 #include <iostream>
 
@@ -9,5 +8,3 @@ extern const char* vertexShaderSource;
 extern const char* fragmentShaderSource;
 
 unsigned int loadShaders();
-
-#endif
