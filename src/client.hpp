@@ -30,8 +30,9 @@ private:
 	BlockRenderer blockRenderer;
 	
 	double oldMouseX, oldMouseY;
-	
 	bool firstFrame;
+	double lastSecond;
+	int frameCounter, FPS;
 	
 	void update();
 	void render();

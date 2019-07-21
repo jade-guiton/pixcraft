@@ -12,7 +12,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	std::cout << "Window resized to " << width << "×" << height << std::endl;
 }
 
-GameClient::GameClient() : firstFrame(true) {
+GameClient::GameClient() : firstFrame(true), lastSecond(0.0), frameCounter(0), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -37,16 +37,20 @@ GameClient::GameClient() : firstFrame(true) {
 	
 	blockRenderer.init();
 	
-	int startAreaSize = 2;
+	glfwSetTime(0.0);
+	int startAreaSize = 4;
 	for(int32_t x = -startAreaSize; x <= startAreaSize; ++x) {
 		for(int32_t z = -startAreaSize; z <= startAreaSize; ++z) {
 			Chunk& chunk = world.genChunk(x, z);
 			blockRenderer.renderChunk(chunk, x, z);
 		}
 	}
+	std::cout << "Generation time: " << glfwGetTime() << std::endl;
 	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwGetCursorPos(window, &oldMouseX, &oldMouseY);
+	
+	glfwSetTime(0.0);
 }
 
 GameClient::~GameClient() {
@@ -60,6 +64,19 @@ void GameClient::mainLoop() {
 		update();
 		render();
 		firstFrame = false;
+		
+		frameCounter++;
+		double now = glfwGetTime();
+		if(now >= lastSecond + 1.0) {
+			FPS = frameCounter;
+			std::cout << "FPS: " << FPS << std::endl;
+			frameCounter = 0;
+			if(now >= lastSecond + 2.0) {
+				lastSecond = now;
+			} else {
+				lastSecond += 1.0;
+			}
+		}
 	}
 }
 
