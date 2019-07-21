@@ -43,6 +43,7 @@ private:
 
 class BlockRenderer {
 public:
+	BlockRenderer(int renderDist);
 	void init();
 	
 	void renderChunk(Chunk& chunk, int32_t x, int32_t z);
@@ -50,9 +51,8 @@ public:
 	
 private:
 	uint32_t program, faceVBO, faceEBO, textureArray;
-	static const int renderDist = 4;
-	static constexpr float fogEnd = renderDist * CHUNK_SIZE;
-	static constexpr float fogStart = fogEnd * 0.9f;
+	const int renderDist;
+	const float fogEnd, fogStart;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 };
