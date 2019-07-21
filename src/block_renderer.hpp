@@ -50,7 +50,7 @@ public:
 	
 private:
 	uint32_t program, faceVBO, faceEBO, textureArray;
-	static const int renderDist = 2;
+	static const int renderDist = 4;
 	static constexpr float fogEnd = renderDist * CHUNK_SIZE;
 	static constexpr float fogStart = fogEnd * 0.9f;
 	
