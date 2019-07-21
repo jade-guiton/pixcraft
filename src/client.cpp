@@ -37,8 +37,9 @@ GameClient::GameClient() : firstFrame(true) {
 	
 	blockRenderer.init();
 	
-	for(int32_t x = -1; x <= 1; ++x) {
-		for(int32_t z = -1; z <= 1; ++z) {
+	int startAreaSize = 2;
+	for(int32_t x = -startAreaSize; x <= startAreaSize; ++x) {
+		for(int32_t z = -startAreaSize; z <= startAreaSize; ++z) {
 			Chunk& chunk = world.genChunk(x, z);
 			blockRenderer.renderChunk(chunk, x, z);
 		}
