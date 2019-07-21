@@ -13,7 +13,8 @@ class World {
 public:
 	World();
 	
-	Chunk* getChunk(int32_t x, int32_t z);
+	bool isChunkLoaded(int32_t x, int32_t z);
+	Chunk& getChunk(int32_t x, int32_t z);
 	Chunk& genChunk(int32_t x, int32_t z);
 	
 	glm::vec3 playerPos, playerOrient;

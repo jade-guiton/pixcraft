@@ -30,7 +30,7 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 };
 
 
-RenderedChunk::RenderedChunk() : faceCount(0) {}
+RenderedChunk::RenderedChunk() : faceCount(0) { }
 
 void RenderedChunk::init(uint32_t faceVBO, uint32_t faceEBO) {
 	glGenVertexArrays(1, &VAO);
@@ -99,6 +99,9 @@ void RenderedChunk::render() {
 }
 
 
+BlockRenderer::BlockRenderer(int renderDist)
+	: renderDist(renderDist), fogEnd(renderDist * CHUNK_SIZE), fogStart(renderDist * CHUNK_SIZE * 0.9f) { }
+
 void BlockRenderer::init() {
 	program = loadShaders();
 	
@@ -134,7 +137,7 @@ void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	uint64_t key = getChunkId(x, z);
 	renderedChunks.erase(key);
 	renderedChunks[key].init(faceVBO, faceEBO);
-	renderedChunks[key].load(chunk);
+	renderedChunks.at(key).load(chunk);
 }
 
 void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t camChunkZ, const float skyColor[3]) {
