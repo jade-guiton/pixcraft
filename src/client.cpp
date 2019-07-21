@@ -13,12 +13,12 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 GameClient::GameClient()
-	: camPos(0.0f, 0.0f, 3.0f), camOrient(0.0f, 0.0f, 0.0f), firstFrame(true) {
+	: camPos(0.0f, 4.0f, 0.0f), camOrient(0.0f, 0.0f, 0.0f), firstFrame(true) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
-	window = glfwCreateWindow(WINDOW_START_WIDTH, WINDOW_START_HEIGHT, windowTitle, nullptr, nullptr);
+	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, windowTitle, nullptr, nullptr);
 	if(window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
 	glfwSetWindowUserPointer(window, (void*) this);
@@ -27,7 +27,7 @@ GameClient::GameClient()
 	if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
 		throw std::runtime_error("Failed to initialize GLAD");
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
-	windowResizeCallback(window, WINDOW_START_WIDTH, WINDOW_START_HEIGHT);
+	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	
 	glfwSwapInterval(-1);
 	
@@ -45,6 +45,8 @@ GameClient::GameClient()
 GameClient::~GameClient() {
 	glfwDestroyWindow(window);
 }
+
+constexpr float GameClient::SKY_COLOR[];
 
 void GameClient::mainLoop() {
 	while(!glfwWindowShouldClose(window)) {
@@ -93,10 +95,10 @@ void GameClient::render() {
 	glm::mat4 proj = glm::perspective(glm::radians(90.0f), ((float) width) / height, 0.001f, 1000.0f);
 	glm::mat4 view = globalToLocal(camPos, camOrient);
 	
-	glClearColor(0.3f, 0.4f, 0.4f, 1.0f);
+	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	blockRenderer.render(proj, view);
+	blockRenderer.render(proj, view, SKY_COLOR);
 	
 	glfwSwapBuffers(window);
 }

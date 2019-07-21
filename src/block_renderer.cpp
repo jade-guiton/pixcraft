@@ -138,18 +138,14 @@ void BlockRenderer::init() {
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 	
-	StoneBlock stoneBlock;
-	DirtBlock dirtBlock;
-	GrassBlock grassBlock;
-	testChunk.setBlock(0, 0, 0, stoneBlock);
-	testChunk.setBlock(1, 0, 0, dirtBlock);
-	testChunk.setBlock(1, 1, 0, grassBlock);
+	WorldGenerator worldGen;
+	worldGen.generateChunk(testChunk, 0, 0, 0);
 	
 	testRenderedChunk.init(faceVBO, faceEBO);
 	testRenderedChunk.load(testChunk);
 }
 
-void BlockRenderer::render(glm::mat4 proj, glm::mat4 view) {
+void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, const float skyColor[3]) {
 	glm::mat4 model = glm::mat4(1.0f);
 	
 	glUseProgram(program);
@@ -166,7 +162,7 @@ void BlockRenderer::render(glm::mat4 proj, glm::mat4 view) {
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
 	
-	glUniform4f(glGetUniformLocation(program, "fogColor"), 0.3f, 0.4f, 0.4f, 1.0f);
+	glUniform4f(glGetUniformLocation(program, "fogColor"), skyColor[0], skyColor[1], skyColor[2], 1.0f);
 	glUniform1f(glGetUniformLocation(program, "fogStart"), 10);
 	glUniform1f(glGetUniformLocation(program, "fogEnd"), 15);
 	
