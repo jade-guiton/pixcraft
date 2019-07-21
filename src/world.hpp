@@ -1,22 +1,24 @@
 #pragma once
 
-#include "blocks.hpp"
+#include <unordered_map>
 
-#define CHUNK_SIZE 16
-#define CHUNK_BLOCKS (CHUNK_SIZE*CHUNK_SIZE*CHUNK_SIZE)
-#define MAX_CHUNK_FACES (CHUNK_BLOCKS*3)
+#include "glm.hpp"
 
-#define BLOCK_IDX(x, y, z) (x + CHUNK_SIZE*y + CHUNK_SIZE*CHUNK_SIZE*z)
+#include "chunk.hpp"
+#include "worldgen.hpp"
 
-class Chunk {
+uint64_t getChunkId(int32_t x, int32_t z);
+
+class World {
 public:
-	Chunk();
+	World();
 	
-	Block* getBlock(uint8_t x, uint8_t y, uint8_t z);
-	bool isOpaqueCube(uint8_t x, uint8_t y, uint8_t z);
+	Chunk* getChunk(int32_t x, int32_t z);
+	Chunk& genChunk(int32_t x, int32_t z);
 	
-	void setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block);
+	glm::vec3 playerPos, playerOrient;
 	
 private:
-	BlockId blocks[CHUNK_BLOCKS];
+	WorldGenerator gen;
+	std::unordered_map<uint64_t, Chunk> loadedChunks;
 };

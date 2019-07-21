@@ -5,6 +5,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <unordered_map>
+
+#include <iostream>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -13,7 +16,6 @@
 #include "shaders.hpp"
 #include "world.hpp"
 #include "blocks.hpp"
-#include "worldgen.hpp"
 
 #define TAU 6.28318531f
 
@@ -43,10 +45,14 @@ class BlockRenderer {
 public:
 	void init();
 	
-	void render(glm::mat4 proj, glm::mat4 view, const float skyColor[3]);
+	void renderChunk(Chunk& chunk, int32_t x, int32_t z);
+	void render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t chamChunkZ, const float skyColor[3]);
 	
 private:
-	uint32_t program, textureArray;
-	Chunk testChunk;
-	RenderedChunk testRenderedChunk;
+	uint32_t program, faceVBO, faceEBO, textureArray;
+	static const int renderDist = 2;
+	static constexpr float fogEnd = renderDist * CHUNK_SIZE;
+	static constexpr float fogStart = fogEnd * 0.9f;
+	
+	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 };

@@ -26,9 +26,9 @@ private:
 	GLFWwindow* window;
 	int width, height;
 	
+	World world;
 	BlockRenderer blockRenderer;
 	
-	glm::vec3 camPos, camOrient;
 	double oldMouseX, oldMouseY;
 	
 	bool firstFrame;

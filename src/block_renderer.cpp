@@ -29,14 +29,6 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 	"placeholder", "stone", "dirt", "grass_side", "grass_top"
 };
 
-const FaceData testFaces[] = {
-	{ 0.0f, 0.0f, 0.0f, 0, 3 },
-	{ 0.0f, 0.0f, 0.0f, 1, 3 },
-	{ 0.0f, 0.0f, 0.0f, 2, 3 },
-	{ 0.0f, 0.0f, 0.0f, 3, 3 },
-	{ 0.0f, 0.0f, 0.0f, 4, 2 },
-	{ 0.0f, 0.0f, 0.0f, 5, 4 }
-};
 
 RenderedChunk::RenderedChunk() : faceCount(0) {}
 
@@ -73,7 +65,7 @@ void RenderedChunk::init(uint32_t faceVBO, uint32_t faceEBO) {
 void RenderedChunk::load(Chunk& chunk) {
 	std::vector<FaceData> faces;
 	for(uint8_t x = 0; x < CHUNK_SIZE; ++x) {
-		for(uint8_t y = 0; y < CHUNK_SIZE; ++y) {
+		for(uint8_t y = 0; y < CHUNK_HEIGHT; ++y) {
 			for(uint8_t z = 0; z < CHUNK_SIZE; ++z) {
 				Block* block = chunk.getBlock(x, y, z);
 				if(block == nullptr) continue;
@@ -110,7 +102,6 @@ void RenderedChunk::render() {
 void BlockRenderer::init() {
 	program = loadShaders();
 	
-	uint32_t faceVBO, faceEBO;
 	glGenBuffers(1, &faceVBO);
 	glGenBuffers(1, &faceEBO);
 	
@@ -137,20 +128,18 @@ void BlockRenderer::init() {
 		stbi_image_free(data);
 	}
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-	
-	WorldGenerator worldGen;
-	worldGen.generateChunk(testChunk, 0, 0, 0);
-	
-	testRenderedChunk.init(faceVBO, faceEBO);
-	testRenderedChunk.load(testChunk);
 }
 
-void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, const float skyColor[3]) {
-	glm::mat4 model = glm::mat4(1.0f);
-	
+void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
+	uint64_t key = getChunkId(x, z);
+	renderedChunks.erase(key);
+	renderedChunks[key].init(faceVBO, faceEBO);
+	renderedChunks[key].load(chunk);
+}
+
+void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t camChunkZ, const float skyColor[3]) {
 	glUseProgram(program);
 	
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
 	glUniformMatrix4fv(glGetUniformLocation(program, "sideTransforms"), 6, GL_FALSE, glm::value_ptr(sideTransforms[0]));
@@ -163,10 +152,21 @@ void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, const float skyColor[
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
 	
 	glUniform4f(glGetUniformLocation(program, "fogColor"), skyColor[0], skyColor[1], skyColor[2], 1.0f);
-	glUniform1f(glGetUniformLocation(program, "fogStart"), 10);
-	glUniform1f(glGetUniformLocation(program, "fogEnd"), 15);
+	glUniform1f(glGetUniformLocation(program, "fogStart"), fogStart);
+	glUniform1f(glGetUniformLocation(program, "fogEnd"), fogEnd);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-	testRenderedChunk.render();
+	
+	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
+		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
+			uint64_t key = getChunkId(x, z);
+			auto chunkIter = renderedChunks.find(key);
+			if(chunkIter != renderedChunks.end()) {
+				glm::mat4 model = glm::translate(id, ((float) CHUNK_SIZE) * glm::vec3(x, 0.0f, z));
+				glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+				chunkIter->second.render();
+			}
+		}
+	}
 }
