@@ -10,8 +10,6 @@
 #include "block_renderer.hpp"
 #include "blocks.hpp"
 
-#define WINDOW_START_WIDTH 800
-#define WINDOW_START_HEIGHT 600
 
 class GameClient {
 public:
@@ -21,6 +19,10 @@ public:
 	void mainLoop();
 	
 private:
+	static const int START_WIDTH = 800;
+	static const int START_HEIGHT = 600;
+	static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
+	
 	GLFWwindow* window;
 	int width, height;
 	

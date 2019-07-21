@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <vector>
 
-#include <iostream>
-
 #include "glfw.hpp"
 #include "glm.hpp"
 #include <stb_image.h>
@@ -15,6 +13,7 @@
 #include "shaders.hpp"
 #include "world.hpp"
 #include "blocks.hpp"
+#include "worldgen.hpp"
 
 #define TAU 6.28318531f
 
@@ -44,7 +43,7 @@ class BlockRenderer {
 public:
 	void init();
 	
-	void render(glm::mat4 proj, glm::mat4 view);
+	void render(glm::mat4 proj, glm::mat4 view, const float skyColor[3]);
 	
 private:
 	uint32_t program, textureArray;
