@@ -18,6 +18,12 @@ void Chunk::setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block) {
 	opaqueCubeCache[BLOCK_IDX(x, y, z)] = block.isOpaqueCube();
 }
 
+void Chunk::removeBlock(uint8_t x, uint8_t y, uint8_t z) {
+	if(INVALID_BLOCK_POS(x, y, z)) throw std::logic_error("Invalid block position in chunk");
+	blocks[BLOCK_IDX(x, y, z)] = 0;
+	opaqueCubeCache[BLOCK_IDX(x, y, z)] = false;
+}
+
 bool Chunk::isOpaqueCube(uint8_t x, uint8_t y, uint8_t z) {
 	return opaqueCubeCache[BLOCK_IDX(x, y, z)];
 }

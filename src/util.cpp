@@ -1,5 +1,9 @@
 #include "util.hpp"
 
+const int sideVectors[6][3] = {
+	{0,0,1}, {1,0,0}, {0,0,-1}, {-1,0,0}, {0,-1,0}, {0,1,0}
+};
+
 glm::mat4 globalToLocalRot(glm::vec3 orient) {
 	glm::mat4 mat = glm::mat4(1.0f);
 	mat = glm::rotate(mat, -orient.z, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -95,12 +99,12 @@ void Raycast::nextFace() {
 	if(tMaxX < tMaxY && tMaxX < tMaxZ) { // next face on X axis
 		tMaxX += tDeltaX;
 		x += stepX;
-		lastFace = 2 - stepX; // west or east faces
+		lastFace = 2 + stepX; // west or east faces
 	} else if(tMaxY < tMaxX && tMaxY < tMaxZ) { // next face on Y axis
 		dist = tMaxY;
 		tMaxY += tDeltaY;
 		y += stepY;
-		lastFace = 4 + (stepX+1)/2; // bottom or top faces
+		lastFace = 4 + (1-stepY)/2; // bottom or top faces
 	} else { // next face on Z axis
 		dist = tMaxZ;
 		tMaxZ += tDeltaZ;

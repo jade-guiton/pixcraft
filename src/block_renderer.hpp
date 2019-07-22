@@ -16,8 +16,7 @@
 #include "world.hpp"
 #include "blocks.hpp"
 #include "chunk.hpp"
-
-#define TAU 6.28318531f
+#include "util.hpp"
 
 struct FaceData {
 	float offsetX;
