@@ -1,13 +1,10 @@
 #include "block_renderer.hpp"
 
 const float faceVertices[] = {
-	-0.5f, -0.5f,  0.5f,  0.0, 0.0, // 0
-	 0.5f, -0.5f,  0.5f,  1.0, 0.0, // 1
-	-0.5f,  0.5f,  0.5f,  0.0, 1.0, // 2
-	 0.5f,  0.5f,  0.5f,  1.0, 1.0  // 3
-};
-const uint32_t faceIndices[] = {
-	0, 1, 3, 3, 2, 0
+	 0.5f, -0.5f,  0.5f,  1.0, 0.0,
+	 0.5f,  0.5f,  0.5f,  1.0, 1.0,
+	-0.5f, -0.5f,  0.5f,  0.0, 0.0,
+	-0.5f,  0.5f,  0.5f,  0.0, 1.0
 };
 
 const glm::mat4 id = glm::mat4(1.0f);
@@ -32,7 +29,7 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 
 RenderedChunk::RenderedChunk() : faceCount(0) { }
 
-void RenderedChunk::init(uint32_t faceVBO, uint32_t faceEBO) {
+void RenderedChunk::init(uint32_t faceVBO) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	
@@ -43,8 +40,6 @@ void RenderedChunk::init(uint32_t faceVBO, uint32_t faceEBO) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3*sizeof(float)));
 	glEnableVertexAttribArray(1);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, faceEBO);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	size_t faceDataSize = sizeof(FaceData);
@@ -94,7 +89,7 @@ void RenderedChunk::load(Chunk& chunk) {
 
 void RenderedChunk::render() {
 	glBindVertexArray(VAO);
-	glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, faceCount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faceCount);
 	glBindVertexArray(0);
 }
 
@@ -106,13 +101,8 @@ void BlockRenderer::init() {
 	program = loadShaders();
 	
 	glGenBuffers(1, &faceVBO);
-	glGenBuffers(1, &faceEBO);
-	
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(faceVertices), faceVertices, GL_STATIC_DRAW);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, faceEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faceIndices), faceIndices, GL_STATIC_DRAW);
 	
 	glGenTextures(1, &textureArray);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
@@ -137,7 +127,7 @@ void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	uint64_t key = getChunkId(x, z);
 	//renderedChunks.erase(key);
 	RenderedChunk& renderedChunk = renderedChunks[key]; // This initializes renderedChunks[key]
-	renderedChunk.init(faceVBO, faceEBO);
+	renderedChunk.init(faceVBO);
 	renderedChunk.load(chunk);
 }
 

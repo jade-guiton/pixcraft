@@ -32,7 +32,7 @@ struct FaceData {
 class RenderedChunk {
 public:
 	RenderedChunk();
-	void init(uint32_t faceVBO, uint32_t faceEBO);
+	void init(uint32_t faceVBO);
 	
 	void load(Chunk& chunk);
 	void render();
@@ -51,7 +51,7 @@ public:
 	void render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t chamChunkZ, const float skyColor[3]);
 	
 private:
-	uint32_t program, faceVBO, faceEBO, textureArray;
+	uint32_t program, faceVBO, textureArray;
 	const int renderDist;
 	const float fogEnd, fogStart;
 	
