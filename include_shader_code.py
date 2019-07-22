@@ -1,16 +1,15 @@
 with open("src/shaders_src.cpp", "w") as out:
 	out.write("#include \"shaders.hpp\"\n\n")
 	
-	with open("glsl/vertex.glsl") as f:
-		vertex_code = f.read()
-		out.write("const char* vertexShaderSource = R\"glsl(\n")
-		out.write(vertex_code)
-		out.write(")glsl\";\n")
+	def include(path, shaderName):
+		with open(path) as f:
+			code = f.read()
+			out.write("const char* {}ShaderSource = R\"glsl(\n".format(shaderName))
+			out.write(code)
+			out.write(")glsl\";\n\n")
 	
-	out.write("\n")
+	include("glsl/block_vertex.glsl", "blockVertex")
+	include("glsl/block_fragment.glsl", "blockFragment")
 	
-	with open("glsl/fragment.glsl") as f:
-		fragment_code = f.read()
-		out.write("const char* fragmentShaderSource = R\"glsl(\n")
-		out.write(fragment_code)
-		out.write(")glsl\";\n")
+	include("glsl/cursor_vertex.glsl", "cursorVertex")
+	include("glsl/cursor_fragment.glsl", "cursorFragment")

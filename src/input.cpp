@@ -1,9 +1,20 @@
 #include "input.hpp"
 
+InputManager::InputManager()
+	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false} { }
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	InputManager& input = *((InputManager*) glfwGetWindowUserPointer(window));
 	if(action == GLFW_PRESS) {
 		input.keyPressed(key);
+	}
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	InputManager& input = *((InputManager*) glfwGetWindowUserPointer(window));
+	button = (button == GLFW_MOUSE_BUTTON_1) ? 1 : ((button == GLFW_MOUSE_BUTTON_2) ? 2 : 0);
+	if(action == GLFW_PRESS && button != 0) {
+		input.mouseClicked(button);
 	}
 }
 
@@ -13,6 +24,7 @@ void InputManager::init(GLFWwindow* newWindow) {
 	glfwSetWindowUserPointer(window, (void*) this);
 	
 	glfwSetKeyCallback(window, keyCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 }
 
 void InputManager::capturingMouse(bool capturingMouse) {
@@ -27,6 +39,28 @@ void InputManager::capturingMouse(bool capturingMouse) {
 	}
 }
 
+void InputManager::mouseClicked(int button) {
+	_justClicked[button - 1] = true;
+}
+
+bool InputManager::justClicked(int button) {
+	return _justClicked[button - 1];
+}
+
+void InputManager::clearJustClicked() {
+	_justClicked[0] = false;
+	_justClicked[1] = false;
+}
+
+glm::vec2 InputManager::getMouseMovement() {
+	double newMouseX, newMouseY;
+	glfwGetCursorPos(window, &newMouseX, &newMouseY);
+	glm::vec2 mvt(newMouseX - oldMouseX, newMouseY - oldMouseY);
+	oldMouseX = newMouseX; oldMouseY = newMouseY;
+	return mouseSensitivity * mvt;
+}
+
+
 void InputManager::keyPressed(int key) {
 	_justPressed.insert(key);
 }
@@ -37,15 +71,6 @@ bool InputManager::justPressed(int key) {
 
 void InputManager::clearJustPressed() {
 	_justPressed.clear();
-}
-
-
-glm::vec2 InputManager::getMouseMovement() {
-	double newMouseX, newMouseY;
-	glfwGetCursorPos(window, &newMouseX, &newMouseY);
-	glm::vec2 mvt(newMouseX - oldMouseX, newMouseY - oldMouseY);
-	oldMouseX = newMouseX; oldMouseY = newMouseY;
-	return mouseSensitivity * mvt;
 }
 
 glm::vec3 InputManager::getMovement() {

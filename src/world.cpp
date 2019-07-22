@@ -23,3 +23,22 @@ Chunk& World::genChunk(int32_t x, int32_t z) {
 	gen.generateChunk(loadedChunks[key], x, z);
 	return loadedChunks.at(key);
 }
+
+Block* World::getBlock(int32_t x, int32_t y, int32_t z) {
+	int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
+	int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
+	if(!isChunkLoaded(chunkX, chunkZ)) return nullptr;
+	Chunk& chunk = getChunk(chunkX, chunkZ);
+	int32_t relX = x - CHUNK_SIZE*chunkX;
+	int32_t relZ = z - CHUNK_SIZE*chunkZ;
+	return chunk.getBlock(relX, y, relZ);
+}
+
+void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
+	int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
+	int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
+	Chunk& chunk = loadedChunks[getChunkId(chunkX, chunkZ)];
+	int32_t relX = x - CHUNK_SIZE*chunkX;
+	int32_t relZ = z - CHUNK_SIZE*chunkZ;
+	return chunk.setBlock(relX, y, relZ, block);
+}
