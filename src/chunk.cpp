@@ -6,7 +6,7 @@ Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
 	if(INVALID_BLOCK_POS(x, y, z)) return nullptr;
 	BlockId id = blocks[BLOCK_IDX(x, y, z)];
 	if(id != 0) {
-		return Block::fromId(id);
+		return &Block::fromId(id);
 	} else {
 		return nullptr;
 	}
@@ -14,7 +14,7 @@ Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
 
 void Chunk::setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block) {
 	if(INVALID_BLOCK_POS(x, y, z)) throw std::logic_error("Invalid block position in chunk");
-	blocks[BLOCK_IDX(x, y, z)] = block.getId();
+	blocks[BLOCK_IDX(x, y, z)] = block.id();
 	opaqueCubeCache[BLOCK_IDX(x, y, z)] = block.isOpaqueCube();
 }
 

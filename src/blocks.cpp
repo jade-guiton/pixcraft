@@ -2,65 +2,48 @@
 
 Block::~Block() { }
 
-bool Block::isOpaqueCube() {
-	return true;
-}
-
 uint8_t Block::getFaceTexture(uint8_t face) {
-	return 0; // placeholder texture
+	return _mainTexture;
 }
 
-BlockId Block::getId() {
-	return BlockTypes::getId(*this);
+BlockId Block::id() { return _id; }
+bool Block::isOpaqueCube() { return _isOpaqueCube; }
+uint8_t Block::mainTexture() { return _mainTexture; }
+
+Block& Block::fromId(BlockId id) {
+	return BlockRegistry::fromId(id);
 }
 
-Block* Block::fromId(BlockId id) {
-	return BlockTypes::fromId(id);
-}
 
-namespace BlockTypes {
+Block::Block() : _id(BlockRegistry::nextId()), _isOpaqueCube(true), _mainTexture(0) { }
+
+Block& Block::isOpaqueCube(bool isOpaqueCube) { _isOpaqueCube = isOpaqueCube; return *this; }
+Block& Block::mainTexture(uint8_t texture) { _mainTexture = texture; return *this; }
+
+
+namespace BlockRegistry {
 	namespace {
-		std::vector<Block* (*)(void)> creators;
-		std::unordered_map<std::type_index, BlockId> ids;
+		std::vector<std::unique_ptr<Block>> protoBlocks;
 		
-		template<class T>
-		Block* createBlock() {
-			return new T;
-		}
-		
-		template<class T>
-		void registerType() {
-			creators.push_back(&createBlock<T>);
-			BlockId id = (BlockId) creators.size();
-			ids[std::type_index(typeid(T))] = id;
+		Block& registerBlock(Block* block) {
+			protoBlocks.emplace_back(std::unique_ptr<Block>(block));
+			return *block;
 		}
 	}
 	
-	void registerTypes() {
-		registerType<StoneBlock>();
-		registerType<DirtBlock>();
-		registerType<GrassBlock>();
+	BlockId nextId() {
+		return protoBlocks.size() + 1;
 	}
 	
-	BlockId getId(Block& block) {
-		try {
-			return ids.at(std::type_index(typeid(block)));
-		} catch(std::out_of_range& err) {
-			throw std::runtime_error("Unregistered block type!");
-		}
+	void registerBlocks() {
+		registerBlock(new Block()).mainTexture(1); // stone
+		registerBlock(new Block()).mainTexture(2); // dirt
+		registerBlock(new GrassBlock()); // grass
 	}
 
-	Block* fromId(BlockId id) {
-		return creators[id - 1]();
+	Block& fromId(BlockId id) {
+		return *protoBlocks[id - 1];
 	}
-}
-
-uint8_t StoneBlock::getFaceTexture(uint8_t face) {
-	return 1;
-}
-
-uint8_t DirtBlock::getFaceTexture(uint8_t face) {
-	return 2;
 }
 
 uint8_t GrassBlock::getFaceTexture(uint8_t face) {

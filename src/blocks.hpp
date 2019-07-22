@@ -1,38 +1,45 @@
 #pragma once
 
 #include <vector>
-#include <typeinfo>
-#include <typeindex>
-#include <unordered_map>
 #include <cstdint>
 #include <stdexcept>
+#include <memory>
 
 typedef uint32_t BlockId;
 
-class Block {
-public:
-	virtual ~Block() = 0;
+class Block;
+
+namespace BlockRegistry {
+	BlockId nextId();
+	void registerBlocks();
 	
-	virtual bool isOpaqueCube();
+	Block& fromId(BlockId id);
+};
+
+class Block {
+	friend void BlockRegistry::registerBlocks();
+	
+public:
+	virtual ~Block();
+	
 	virtual uint8_t getFaceTexture(uint8_t face);
 	
-	BlockId getId();
-	static Block* fromId(BlockId id);
-};
-
-namespace BlockTypes {
-	void registerTypes();
+	BlockId id();
+	bool isOpaqueCube();
+	uint8_t mainTexture();
 	
-	BlockId getId(Block& block);
-	Block* fromId(BlockId id);
-};
+	static Block& fromId(BlockId id);
+	
+protected:
+	Block();
+	
+	Block& isOpaqueCube(bool isOpaqueCube);
+	Block& mainTexture(uint8_t texture);
 
-class StoneBlock : public Block {
-	uint8_t getFaceTexture(uint8_t face) override;
-};
-
-class DirtBlock : public Block {
-	uint8_t getFaceTexture(uint8_t face) override;
+private:
+	BlockId _id;
+	bool _isOpaqueCube;
+	int8_t _mainTexture;
 };
 
 class GrassBlock : public Block {

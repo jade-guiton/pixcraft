@@ -3,10 +3,9 @@
 WorldGenerator::WorldGenerator() { }
 
 void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ) {
-	StoneBlock stone; DirtBlock dirt; GrassBlock grass;
-	BlockId stoneId = stone.getId();
-	BlockId dirtId = dirt.getId();
-	BlockId grassId = grass.getId();
+	BlockId stoneId = 1;
+	BlockId dirtId = 2;
+	BlockId grassId = 3;
 	for(uint8_t relX = 0; relX < CHUNK_SIZE; relX++) {
 		for(uint8_t relZ = 0; relZ < CHUNK_SIZE; relZ++) {
 			int32_t x = chunkX*CHUNK_SIZE + relX;
