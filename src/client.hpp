@@ -25,7 +25,7 @@ private:
 	static const int START_HEIGHT = 600;
 	static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
 	
-	static const int RENDER_DIST = 5;
+	static const int RENDER_DIST = 6;
 	static const int LOADS_PER_FRAME = 1;
 	
 	GLFWwindow* window;
@@ -36,10 +36,9 @@ private:
 	
 	double oldMouseX, oldMouseY;
 	bool firstFrame;
-	double lastSecond;
-	int frameCounter, FPS;
+	int FPS;
 	
-	void update();
+	void update(float dt);
 	void render();
 	
 	friend void windowResizeCallback(GLFWwindow* window, int width, int height);

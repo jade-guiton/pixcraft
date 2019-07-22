@@ -1,10 +1,9 @@
 #include "chunk.hpp"
 
-Chunk::Chunk() : blocks() { }
+Chunk::Chunk() : blocks(), opaqueCubeCache() { }
 
 Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
-	if(x < 0 || x >= CHUNK_SIZE || y < 0 || y >= CHUNK_HEIGHT || z < 0 || z >= CHUNK_SIZE)
-		return nullptr;
+	if(INVALID_BLOCK_POS(x, y, z)) return nullptr;
 	BlockId id = blocks[BLOCK_IDX(x, y, z)];
 	if(id != 0) {
 		return Block::fromId(id);
@@ -13,11 +12,17 @@ Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
 	}
 }
 
-bool Chunk::isOpaqueCube(uint8_t x, uint8_t y, uint8_t z) {
-	Block* block = getBlock(x, y, z);
-	return block != nullptr && block->isOpaqueCube();
+void Chunk::setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block) {
+	if(INVALID_BLOCK_POS(x, y, z)) throw std::logic_error("Invalid block position in chunk");
+	blocks[BLOCK_IDX(x, y, z)] = block.getId();
+	opaqueCubeCache[BLOCK_IDX(x, y, z)] = block.isOpaqueCube();
 }
 
-void Chunk::setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block) {
-	blocks[BLOCK_IDX(x, y, z)] = block.getId();
+bool Chunk::isOpaqueCube(uint8_t x, uint8_t y, uint8_t z) {
+	return opaqueCubeCache[BLOCK_IDX(x, y, z)];
+}
+
+void Chunk::setBlockId(uint8_t x, uint8_t y, uint8_t z, BlockId id, bool isOpaqueCube) {
+	blocks[BLOCK_IDX(x, y, z)] = id;
+	opaqueCubeCache[BLOCK_IDX(x, y, z)] = isOpaqueCube;
 }

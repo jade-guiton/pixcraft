@@ -12,7 +12,8 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	std::cout << "Window resized to " << width << "×" << height << std::endl;
 }
 
-GameClient::GameClient() : blockRenderer(RENDER_DIST), firstFrame(true), lastSecond(0.0), frameCounter(0), FPS(0.0) {
+GameClient::GameClient()
+	: blockRenderer(RENDER_DIST), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -41,8 +42,6 @@ GameClient::GameClient() : blockRenderer(RENDER_DIST), firstFrame(true), lastSec
 	
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwGetCursorPos(window, &oldMouseX, &oldMouseY);
-	
-	glfwSetTime(0.0);
 }
 
 GameClient::~GameClient() {
@@ -52,13 +51,23 @@ GameClient::~GameClient() {
 constexpr float GameClient::SKY_COLOR[];
 
 void GameClient::mainLoop() {
+	glfwSetTime(0.0);
+	
+	int frameCounter = 0;
+	
+	float dt = 1 / 60.0;
+	double lastFrame, lastSecond, now;
 	while(!glfwWindowShouldClose(window)) {
-		update();
+		update(dt);
 		render();
-		firstFrame = false;
+		
+		now = glfwGetTime();
+		dt = now - lastFrame;
+		lastFrame = now;
+		
+		if(firstFrame) firstFrame = false;
 		
 		frameCounter++;
-		double now = glfwGetTime();
 		if(now >= lastSecond + 1.0) {
 			FPS = frameCounter;
 			std::cout << "FPS: " << FPS << std::endl;
@@ -69,22 +78,24 @@ void GameClient::mainLoop() {
 				lastSecond += 1.0;
 			}
 		}
+		
+		glfwSwapBuffers(window);
 	}
 }
 
-void GameClient::update() {
+void GameClient::update(float dt) {
 	glfwPollEvents();
 	
 	glm::mat4 planeRot = glm::mat4(1.0f);
 	planeRot = glm::rotate(planeRot, world.playerOrient.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	planeRot = glm::mat3(planeRot);
-	float speed = 0.2;
+	float speed = 50;
 	int dx = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
 	int dy = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
 	int dz = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
 	if(dx != 0 || dy != 0 || dz != 0) {
 		glm::vec4 mov = glm::vec4(glm::normalize(glm::vec3(dx, dy, dz)), 1.0f);
-		world.playerPos += speed * glm::vec3(planeRot * mov);
+		world.playerPos += dt * speed * glm::vec3(planeRot * mov);
 	}
 	
 	double sensitivity = 0.005;
@@ -104,15 +115,11 @@ void GameClient::update() {
 	while(iter.withinDistance(RENDER_DIST)) {
 		int x = iter.getX();
 		int z = iter.getZ();
-		if(firstFrame) {
-			std::cout << x << " " << z << std::endl;
-		} else {
-			if(!world.isChunkLoaded(x, z)) {
-				Chunk& chunk = world.genChunk(x, z);
-				blockRenderer.renderChunk(chunk, x, z);
-				loads++;
-				if(loads >= LOADS_PER_FRAME) break;
-			}
+		if(!world.isChunkLoaded(x, z)) {
+			Chunk& chunk = world.genChunk(x, z);
+			blockRenderer.renderChunk(chunk, x, z);
+			loads++;
+			if(loads >= LOADS_PER_FRAME) break;
 		}
 		iter.next();
 	}
@@ -128,6 +135,4 @@ void GameClient::render() {
 	int32_t camChunkX = floor(world.playerPos.x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(world.playerPos.z / CHUNK_SIZE);
 	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
-	
-	glfwSwapBuffers(window);
 }

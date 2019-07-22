@@ -16,6 +16,7 @@
 #include "shaders.hpp"
 #include "world.hpp"
 #include "blocks.hpp"
+#include "chunk.hpp"
 
 #define TAU 6.28318531f
 
