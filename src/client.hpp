@@ -11,6 +11,7 @@
 #include "block_renderer.hpp"
 #include "blocks.hpp"
 #include "util.hpp"
+#include "input.hpp"
 
 
 class GameClient {
@@ -28,13 +29,15 @@ private:
 	static const int RENDER_DIST = 7;
 	static const int LOADS_PER_FRAME = 2;
 	
-	GLFWwindow* window;
-	int width, height;
+	static constexpr float MVT_SPEED = 50.0f;
 	
+	GLFWwindow* window;
+	
+	InputManager input;
 	World world;
 	BlockRenderer blockRenderer;
 	
-	double oldMouseX, oldMouseY;
+	bool paused;
 	bool firstFrame;
 	int FPS;
 	

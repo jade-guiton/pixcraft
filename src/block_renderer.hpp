@@ -34,6 +34,8 @@ public:
 	RenderedChunk();
 	void init(uint32_t faceVBO);
 	
+	bool isInitialized();
+	
 	void load(Chunk& chunk);
 	void render();
 	

@@ -27,7 +27,7 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 };
 
 
-RenderedChunk::RenderedChunk() : faceCount(0) { }
+RenderedChunk::RenderedChunk() : faceCount(0), VBO(0), VAO(0) { }
 
 void RenderedChunk::init(uint32_t faceVBO) {
 	glGenVertexArrays(1, &VAO);
@@ -56,6 +56,8 @@ void RenderedChunk::init(uint32_t faceVBO) {
 	
 	glBindVertexArray(0);
 }
+
+bool RenderedChunk::isInitialized() { return VBO != 0; }
 
 void RenderedChunk::load(Chunk& chunk) {
 	std::vector<FaceData> faces;
@@ -124,9 +126,9 @@ void BlockRenderer::init() {
 
 void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	uint64_t key = getChunkId(x, z);
-	//renderedChunks.erase(key);
-	RenderedChunk& renderedChunk = renderedChunks[key]; // This initializes renderedChunks[key]
-	renderedChunk.init(faceVBO);
+	RenderedChunk& renderedChunk = renderedChunks[key];
+	if(!renderedChunk.isInitialized())
+		renderedChunk.init(faceVBO);
 	renderedChunk.load(chunk);
 }
 
