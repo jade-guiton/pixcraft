@@ -4,3 +4,5 @@ src/glad.cpp
 src/shaders_src.cpp
 *.sublime-project
 *.sublime-workspace
+gmon.out
+analysis.txt

@@ -75,7 +75,7 @@ void RenderedChunk::load(Chunk& chunk) {
 						int8_t x2 = x + sideVectors[side][0];
 						int8_t y2 = y + sideVectors[side][1];
 						int8_t z2 = z + sideVectors[side][2];
-						if(!chunk.isOpaqueCube(x2, y2, z2)) {
+						if(INVALID_BLOCK_POS(x2, y2, z2) || !chunk.isOpaqueCube(x2, y2, z2)) {
 							faces.push_back(FaceData {
 								(float) x, (float) y, (float) z, side, block->getFaceTexture(side)
 							});
@@ -135,9 +135,10 @@ void BlockRenderer::init() {
 
 void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	uint64_t key = getChunkId(x, z);
-	renderedChunks.erase(key);
-	renderedChunks[key].init(faceVBO, faceEBO);
-	renderedChunks.at(key).load(chunk);
+	//renderedChunks.erase(key);
+	RenderedChunk& renderedChunk = renderedChunks[key]; // This initializes renderedChunks[key]
+	renderedChunk.init(faceVBO, faceEBO);
+	renderedChunk.load(chunk);
 }
 
 void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t camChunkZ, const float skyColor[3]) {
