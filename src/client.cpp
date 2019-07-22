@@ -34,7 +34,7 @@ GameClient::GameClient()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	
-	BlockTypes::registerTypes();
+	BlockRegistry::registerBlocks();
 	
 	blockRenderer.init();
 	

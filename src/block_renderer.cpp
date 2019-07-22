@@ -77,7 +77,6 @@ void RenderedChunk::load(Chunk& chunk) {
 						}
 					}
 				}
-				delete block;
 			}
 		}
 	}
