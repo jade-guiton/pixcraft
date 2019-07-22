@@ -16,9 +16,6 @@ const glm::mat4 sideTransforms[6] = {
 	glm::rotate(id, TAU/4, glm::vec3(1.0f, 0.0f, 0.0f)),
 	glm::rotate(id, -TAU/4, glm::vec3(1.0f, 0.0f, 0.0f))
 };
-const int sideVectors[6][3] = {
-	{0,0,1}, {1,0,0}, {0,0,-1}, {-1,0,0}, {0,-1,0}, {0,1,0}
-};
 
 const size_t BLOCK_TEX_SIZE = 16;
 const size_t BLOCK_TEX_COUNT = 5;
@@ -27,7 +24,7 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 };
 
 
-RenderedChunk::RenderedChunk() : faceCount(0), VBO(0), VAO(0) { }
+RenderedChunk::RenderedChunk() : VBO(0), VAO(0), faceCount(0) { }
 
 void RenderedChunk::init(GlId faceVBO) {
 	glGenVertexArrays(1, &VAO);

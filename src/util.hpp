@@ -4,6 +4,10 @@
 
 #include "glm.hpp"
 
+extern const int sideVectors[6][3];
+
+#define TAU 6.28318531f
+
 glm::mat4 globalToLocalRot(glm::vec3 orient);
 glm::mat4 localToGlobalRot(glm::vec3 orient);
 glm::mat4 globalToLocal(glm::vec3 pos, glm::vec3 orient);

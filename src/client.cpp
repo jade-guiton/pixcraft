@@ -92,6 +92,30 @@ void GameClient::mainLoop() {
 	}
 }
 
+std::tuple<bool, int,int,int> GameClient::blockRaycast(bool offset) {
+	glm::vec3 dir = glm::vec3(localToGlobalRot(world.playerOrient) * glm::vec4(0.0, 0.0, -1.0, 1.0));
+	Raycast ray(world.playerPos, dir);
+	Block* hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
+	while(hit == nullptr && ray.getDistance() <= 5 && ray.getY() < 64) {
+		ray.nextFace();
+		hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
+	}
+	if(hit != nullptr) {
+		int32_t x = ray.getX();
+		int32_t y = ray.getY();
+		int32_t z = ray.getZ();
+		if(offset) {
+			int face = ray.getLastFace();
+			x += sideVectors[face][0];
+			y += sideVectors[face][1];
+			z += sideVectors[face][2];
+		}
+		return std::tuple<bool, int,int,int>(true, x, y, z);
+	} else {
+		return std::tuple<bool, int,int,int>(false, 0, 0, 0);
+	}
+}
+
 void GameClient::update(float dt) {
 	glfwPollEvents();
 	
@@ -102,9 +126,12 @@ void GameClient::update(float dt) {
 		world.playerPos += dt * MVT_SPEED * glm::vec3(yRot * glm::vec4(mvt, 1.0f));
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
-		if(!firstFrame) {
-			world.playerOrient.y -= mouseMvt.x;
-			world.playerOrient.x -= mouseMvt.y;
+		world.playerOrient.y -= mouseMvt.x;
+		world.playerOrient.x -= mouseMvt.y;
+		if(world.playerOrient.x < -TAU/4) {
+			world.playerOrient.x = -TAU/4;
+		} else if(world.playerOrient.x > TAU/4) {
+			world.playerOrient.x = TAU/4;
 		}
 	}
 	
@@ -114,21 +141,20 @@ void GameClient::update(float dt) {
 	}
 	input.clearJustPressed();
 	
-	if(input.justClicked(1)) {
-		glm::vec3 dir = glm::vec3(localToGlobalRot(world.playerOrient) * glm::vec4(0.0, 0.0, -1.0, 1.0));
-		Raycast ray(world.playerPos, dir);
-		Block* hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
-		while(hit == nullptr && ray.getDistance() <= 5 && ray.getY() < 64) {
-			ray.nextFace();
-			hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
-		}
-		if(hit != nullptr) {
-			int32_t x = ray.getX();
-			int32_t y = ray.getY();
-			int32_t z = ray.getZ();
-			world.setBlock(x, y, z, Block::fromId(1));
-			int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
-			int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
+	bool click1 = input.justClicked(1);
+	bool click2 = input.justClicked(2);
+	if(click1 || click2) {
+		bool hit;
+		int x, y, z;
+		std::tie(hit, x, y, z) = blockRaycast(!click1);
+		if(hit) {
+			int32_t chunkX, chunkZ;
+			std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
+			if(click2) {
+				world.setBlock(x, y, z, Block::fromId(1));
+			} else {
+				world.removeBlock(x, y, z);
+			}
 			Chunk& chunk = world.getChunk(chunkX, chunkZ);
 			blockRenderer.renderChunk(chunk, chunkX, chunkZ);
 		}

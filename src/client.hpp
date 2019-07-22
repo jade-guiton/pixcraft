@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <cmath>
+#include <tuple>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -44,6 +45,8 @@ private:
 	bool paused;
 	bool firstFrame;
 	int FPS;
+	
+	std::tuple<bool, int, int, int> blockRaycast(bool offset);
 	
 	void update(float dt);
 	void render();

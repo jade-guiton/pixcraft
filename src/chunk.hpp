@@ -18,6 +18,7 @@ public:
 	
 	Block* getBlock(uint8_t x, uint8_t y, uint8_t z);
 	void setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block);
+	void removeBlock(uint8_t x, uint8_t y, uint8_t z);
 	
 	// Warning: the following functions do not check that the given position is valid.
 	bool isOpaqueCube(uint8_t x, uint8_t y, uint8_t z);
