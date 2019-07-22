@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <string>
 #include <cstddef>
-#include <cstdint>
 #include <vector>
 #include <unordered_map>
 
@@ -32,7 +31,7 @@ struct FaceData {
 class RenderedChunk {
 public:
 	RenderedChunk();
-	void init(uint32_t faceVBO);
+	void init(GlId faceVBO);
 	
 	bool isInitialized();
 	
@@ -40,7 +39,7 @@ public:
 	void render();
 	
 private:
-	uint32_t VBO, VAO;
+	GlId VBO, VAO;
 	int faceCount;
 };
 
@@ -53,7 +52,7 @@ public:
 	void render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t chamChunkZ, const float skyColor[3]);
 	
 private:
-	uint32_t program, faceVBO, textureArray;
+	GlId program, faceVBO, textureArray;
 	const int renderDist;
 	const float fogEnd, fogStart;
 	

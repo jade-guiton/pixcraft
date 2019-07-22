@@ -8,6 +8,7 @@
 #include "glfw.hpp"
 #include "glm.hpp"
 
+#include "shaders.hpp"
 #include "block_renderer.hpp"
 #include "blocks.hpp"
 #include "util.hpp"
@@ -29,13 +30,16 @@ private:
 	static const int RENDER_DIST = 7;
 	static const int LOADS_PER_FRAME = 2;
 	
-	static constexpr float MVT_SPEED = 50.0f;
+	static constexpr float MVT_SPEED = 10.0f;
 	
 	GLFWwindow* window;
 	
 	InputManager input;
 	World world;
 	BlockRenderer blockRenderer;
+	
+	GlId cursorProgram;
+	GlId cursorVAO;
 	
 	bool paused;
 	bool firstFrame;

@@ -1,6 +1,6 @@
 #include "shaders.hpp"
 
-void checkShaderStatus(unsigned int shader, bool isProgram, const char* opDesc) {
+void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	int succ;
 	char infoLog[512];
 	if(isProgram)
@@ -17,18 +17,18 @@ void checkShaderStatus(unsigned int shader, bool isProgram, const char* opDesc) 
 	}
 }
 
-unsigned int loadShaders() {
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+GlId loadShaders(const char* vertexSrc, const char* fragmentSrc) {
+	GlId vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSrc, nullptr);
 	glCompileShader(vertexShader);
 	checkShaderStatus(vertexShader, false, "Vertex shader compilation");
 	
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+	GlId fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentSrc, nullptr);
 	glCompileShader(fragmentShader);
 	checkShaderStatus(fragmentShader, false, "Fragment shader compilation");
 	
-	unsigned int shaderProgram = glCreateProgram();
+	GlId shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
@@ -37,4 +37,12 @@ unsigned int loadShaders() {
 	glDeleteShader(fragmentShader);
 	
 	return shaderProgram;
+}
+
+GlId loadBlockShaders() {
+	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource);
+}
+
+GlId loadCursorShaders() {
+	return loadShaders(cursorVertexShaderSource, cursorFragmentShaderSource);
 }

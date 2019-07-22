@@ -29,7 +29,7 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 
 RenderedChunk::RenderedChunk() : faceCount(0), VBO(0), VAO(0) { }
 
-void RenderedChunk::init(uint32_t faceVBO) {
+void RenderedChunk::init(GlId faceVBO) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	
@@ -99,7 +99,7 @@ BlockRenderer::BlockRenderer(int renderDist)
 	: renderDist(renderDist), fogEnd(renderDist * CHUNK_SIZE), fogStart(renderDist * CHUNK_SIZE * 0.9f) { }
 
 void BlockRenderer::init() {
-	program = loadShaders();
+	program = loadBlockShaders();
 	
 	glGenBuffers(1, &faceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
@@ -164,4 +164,6 @@ void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, in
 			}
 		}
 	}
+	
+	glUseProgram(0);
 }

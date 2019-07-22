@@ -7,15 +7,19 @@
 
 class InputManager {
 public:
+	InputManager();
 	void init(GLFWwindow* window);
 	
 	void capturingMouse(bool capture);
 	
+	void mouseClicked(int button);
+	bool justClicked(int button);
+	void clearJustClicked();
+	glm::vec2 getMouseMovement();
+	
 	void keyPressed(int key);
 	bool justPressed(int key);
 	void clearJustPressed();
-	
-	glm::vec2 getMouseMovement();
 	glm::vec3 getMovement();
 	
 private:
@@ -27,4 +31,5 @@ private:
 	double oldMouseX, oldMouseY;
 	
 	std::unordered_set<int> _justPressed;
+	bool _justClicked[2];
 };

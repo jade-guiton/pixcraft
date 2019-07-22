@@ -7,6 +7,10 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	std::cout << "Window resized to " << width << "×" << height << std::endl;
 }
 
+const float cursorVertices[] = {
+	-10, 0, 10, 0, 0, -10, 0.0, 10
+};
+
 GameClient::GameClient()
 	: blockRenderer(RENDER_DIST), paused(false), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -27,6 +31,19 @@ GameClient::GameClient()
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	
+	cursorProgram = loadCursorShaders();
+	glGenVertexArrays(1, &cursorVAO);
+	GlId cursorVBO;
+	glGenBuffers(1, &cursorVBO);
+	
+	glBindVertexArray(cursorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cursorVertices), cursorVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
 	
 	input.init(window);
 	input.capturingMouse(!paused);
@@ -97,6 +114,27 @@ void GameClient::update(float dt) {
 	}
 	input.clearJustPressed();
 	
+	if(input.justClicked(1)) {
+		glm::vec3 dir = glm::vec3(localToGlobalRot(world.playerOrient) * glm::vec4(0.0, 0.0, -1.0, 1.0));
+		Raycast ray(world.playerPos, dir);
+		Block* hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
+		while(hit == nullptr && ray.getDistance() <= 5 && ray.getY() < 64) {
+			ray.nextFace();
+			hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
+		}
+		if(hit != nullptr) {
+			int32_t x = ray.getX();
+			int32_t y = ray.getY();
+			int32_t z = ray.getZ();
+			world.setBlock(x, y, z, Block::fromId(1));
+			int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
+			int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
+			Chunk& chunk = world.getChunk(chunkX, chunkZ);
+			blockRenderer.renderChunk(chunk, chunkX, chunkZ);
+		}
+	}
+	input.clearJustClicked();
+	
 	int32_t camChunkX = floor(world.playerPos.x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(world.playerPos.z / CHUNK_SIZE);
 	int loads = 0;
@@ -127,4 +165,17 @@ void GameClient::render() {
 	int32_t camChunkX = floor(world.playerPos.x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(world.playerPos.z / CHUNK_SIZE);
 	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
+	
+	glLineWidth(2.0f);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
+	glUseProgram(cursorProgram);
+	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
+	glBindVertexArray(cursorVAO);
+	
+	glDrawArrays(GL_LINES, 0, 4);
+	
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glDisable(GL_BLEND);
 }
