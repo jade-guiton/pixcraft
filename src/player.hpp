@@ -48,9 +48,9 @@ private:
 	static constexpr float RADIUS = 0.2;
 	
 	static constexpr float FLY_SPEED = 10.0f;
-	static constexpr float WALK_SPEED = 6.0f;
+	static constexpr float WALK_SPEED = 5.0f;
 	
-	static constexpr float GRAVITY = 9.8f;
-	static constexpr float JUMP_HEIGHT = 1.25f;
+	static constexpr float GRAVITY = 24.0f;
+	static constexpr float JUMP_HEIGHT = 1.1f;
 	static constexpr float JUMP_SPEED = sqrt(2*JUMP_HEIGHT*GRAVITY);
 };

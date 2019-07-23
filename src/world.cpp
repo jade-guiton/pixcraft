@@ -90,38 +90,79 @@ std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float
 	}
 }
 
-std::tuple<int,int,int> World::collideHorDisk(glm::vec3 pos, float radius, float horBarrier, float verBarrier) {
-	int hitX = 0;
-	int hitY = 0;
-	int hitZ = 0;
+bool World::hasBlocksInLine(int x, int z, float base, float height) {
+	int y1 = getBlockCoordAt(base);
+	int y2 = getBlockCoordAt(base + height);
+	for(int y = y1; y <= y2; ++y) {
+		if(hasBlock(x, y, z)) return true;
+	}
+	return false;
+}
+
+glm::vec2 World::collideCylHor(glm::vec3 center, float radius, float height) {
 	int blockX, blockY, blockZ;
-	std::tie(blockX, blockY, blockZ) = getBlockCoordsAt(pos);
-	bool inBlock = hasBlock(blockX, blockY, blockZ);
-	float relX = pos.x - blockX; // [-0.5, 0.5]
-	float relY = pos.y - blockY;
-	float relZ = pos.z - blockZ;
-	if(    (inBlock && relX <= -0.5 + horBarrier)
-		|| (hasBlock(blockX+1, blockY, blockZ) && intervalIntersect(pos.x, pos.x + radius, blockX+0.5, blockX+0.5+horBarrier))) {
-		hitX--;
-	}
-	if(    (inBlock && relX >=  0.5 - horBarrier)
-		|| (hasBlock(blockX-1, blockY, blockZ) && intervalIntersect(pos.x - radius, pos.x, blockX-0.5-horBarrier, blockX-0.5))) {
-		hitX++;
-	}
-	if(    (inBlock && relZ <= -0.5 + horBarrier)
-		|| (hasBlock(blockX, blockY, blockZ+1) && intervalIntersect(pos.z, pos.z + radius, blockZ+0.5, blockZ+0.5+horBarrier))) {
-		hitZ--;
-	}
-	if(    (inBlock && relX >=  0.5 - horBarrier)
-		|| (hasBlock(blockX, blockY, blockZ-1) && intervalIntersect(pos.z - radius, pos.z, blockZ-0.5-horBarrier, blockZ-0.5))) {
-		hitZ++;
-	}
-	if(inBlock) {
-		if(relY <= -0.5 + verBarrier) {
-			hitY--;
-		} else if(relY >= 0.5 - verBarrier) {
-			hitY++;
+	std::tie(blockX, blockY, blockZ) = getBlockCoordsAt(center);
+	
+	float relX = center.x - blockX; // [-0.5, 0.5]
+	float relZ = center.z - blockZ;
+	int dirX = (relX >= 0.5 - radius) - (relX <= -0.5 + radius); // are we overlapping with a neighbor cell, and which
+	int dirZ = (relZ >= 0.5 - radius) - (relZ <= -0.5 + radius);
+	bool collideX = dirX != 0 && hasBlocksInLine(blockX + dirX, blockZ, center.y, height); // are we colliding with a neighbor block
+	bool collideZ = dirZ != 0 && hasBlocksInLine(blockX, blockZ + dirZ, center.y, height);
+	
+	if(collideX || collideZ) {
+		glm::vec2 disp(0);
+		if(collideX)
+			disp.x = dirX*(0.5 - radius) - relX;
+		if(collideZ)
+			disp.y = dirZ*(0.5 - radius) - relZ;
+		return disp;
+	} else if(dirX != 0 && dirZ != 0 && hasBlocksInLine(blockX + dirX, blockZ + dirZ, center.y, height)) { // potentially colliding with diagonal block
+		glm::vec2 horCenter(center.x, center.z);
+		glm::vec2 corner(blockX + dirX*0.5, blockZ + dirZ*0.5);
+		float dist(glm::length(horCenter-corner));
+		if(dist <= radius) {
+			std::cout << dist << std::endl;
+			if(dist < 0.01) { // if somehow we're reaaaally close to the corner
+				float sideLen(radius / sqrt(2.0));
+				return glm::vec2(-dirX*sideLen, -dirZ*sideLen);
+			} else {
+				return (horCenter-corner) * (radius / dist - 1);
+			}
 		}
 	}
-	return std::tuple<int,int,int>(hitX, hitY, hitZ);
+	return glm::vec2(0);
 }
+
+float World::collideDiskVer(glm::vec3 center, float radius, float verBarrier) {
+	int blockX, blockY, blockZ;
+	std::tie(blockX, blockY, blockZ) = getBlockCoordsAt(center);
+	
+	float relX = center.x - blockX; // [-0.5, 0.5]
+	float relY = center.y - blockY;
+	float relZ = center.z - blockZ;
+	
+	bool inBlock = hasBlock(blockX, blockY, blockZ);
+	if(!inBlock) { // ADVANCED collision detection
+		int dirX = (relX >= 0.5 - radius) - (relX <= -0.5 + radius); // are we overlapping with a neighbor cell, and which
+		int dirZ = (relZ >= 0.5 - radius) - (relZ <= -0.5 + radius);
+		if(dirX != 0)
+			inBlock = inBlock || hasBlock(blockX + dirX, blockY, blockZ);
+		if(dirZ != 0)
+			inBlock = inBlock || hasBlock(blockX + dirX, blockY, blockZ);
+		if(!inBlock && dirX != 0 && dirZ != 0 && hasBlock(blockX + dirX, blockY, blockZ + dirZ)) { // ＡＤＶＡＮＣＥＤＥＲ
+			glm::vec2 horCenter(center.x, center.z);
+			glm::vec2 corner(blockX + dirX*0.5, blockZ + dirZ*0.5);
+			inBlock = glm::length(horCenter-corner) <= radius;
+		}
+	}
+	if(inBlock) {
+		if(relY >= 0.5 - verBarrier) {
+			return 0.5 - relY + 0.01;
+		} else if(relY <= -0.5 + verBarrier) {
+			return -0.5 - relY;
+		}
+	}
+	return 0.0;
+}
+

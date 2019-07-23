@@ -5,6 +5,8 @@
 #include <tuple>
 #include <vector>
 
+#include <iostream>
+
 #include "glm.hpp"
 
 #include "chunk.hpp"
@@ -37,15 +39,18 @@ public:
 	// if offset, the air block before the hit block is returned instead.
 	std::tuple<bool, int,int,int> raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset);
 	
-	// tests a horizontal disk with center pos and radius for collision with blocks; returns:
-	// { collideX, collideY, collideZ }
-	// for each coordinate, the return value is -1, 0, 1 corresponding to the direction in which the
-	// disk should move to stop colliding with the block. If the circle isn't colliding along this axis,
-	// or is colliding in two directions, 0 is returned.
-	// barrierSize corresponds to the "thickness" of the surface of a block; if the center is past the
-	// barrier, it is considered completely inside the block, and no collision is reported.
-	// Constraints: radius < 0.5, barrierSize < 0.5
-	std::tuple<int,int,int> collideHorDisk(glm::vec3 pos, float radius, float horBarrier, float verBarrier);
+	// tests if a vertical line collides with blocks
+	bool hasBlocksInLine(int x, int z, float y1, float height);
+	
+	// tests a cylinder with base (center, radius) for horizontal collision with blocks
+	// returns a horizontal vector, such that moving the cylinder by that vector would stop the horizontal collision
+	// constraint: radius < 0.5
+	glm::vec2 collideCylHor(glm::vec3 center, float radius, float height);
+	
+	// tests a given horizontal disk for vertical collision with blocks
+	// returns the vertical algebraic distance in which to move to stop the vertical collision
+	// verBarrier determines how far the center can venture inside a block for the collision to continue to be acknowledged
+	float collideDiskVer(glm::vec3 center, float radius, float verBarrier);
 	
 	std::vector<Player> players;
 	

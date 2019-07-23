@@ -60,68 +60,29 @@ void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 void Player::collide() {
 	if(!collidesWithBlocks()) return;
 	
+	float verBarrier = std::min(std::abs(ySpeed)/15, 0.5f);
+	
 	glm::vec3 feetPos = getFeetPos();
-	glm::vec3 bodyPos = getFeetPos();
-	bodyPos.y += HEIGHT / 2;
-	glm::vec3 headPos = getFeetPos();
-	headPos.y += HEIGHT;
-	
-	const float horBarrier = 0.0;
-	const float verBarrier = 0.4;
-	
-	int feetHitX, feetHitY, feetHitZ;
-	std::tie(feetHitX, feetHitY, feetHitZ) = world->collideHorDisk(feetPos, RADIUS, horBarrier, verBarrier);
-	if(feetHitY == 1) {
-		_pos = snapToEdge(feetPos, RADIUS, 0, 1, 0) + glm::vec3(0, EYE_HEIGHT, 0);
+	float verDispl = world->collideDiskVer(feetPos, RADIUS, verBarrier);
+	if(verDispl > 0) {
+		_pos.y += verDispl;
 		if(ySpeed < 0) {
 			ySpeed = 0.0;
 			onGround = true;
 		}
-		collide();
-		return;
 	}
 	
-	int headHitX, headHitY, headHitZ;
-	std::tie(headHitX, headHitY, headHitZ) = world->collideHorDisk(headPos, RADIUS, horBarrier, verBarrier);
-	if(headHitY == -1) {
-		_pos = snapToEdge(headPos, RADIUS, 0, 1, 0) + glm::vec3(0, EYE_HEIGHT - HEIGHT, 0);
-		if(ySpeed > 0) ySpeed = 0;
-		collide();
-		return;
-	}
-	
-	int bodyHitX, bodyHitY, bodyHitZ;
-	std::tie(bodyHitX, bodyHitY, bodyHitZ) = world->collideHorDisk(bodyPos, RADIUS, horBarrier, verBarrier);
-	
-	int dispX = collateCollisions(feetHitX, bodyHitX, headHitX);
-	int dispZ = collateCollisions(feetHitZ, bodyHitZ, headHitZ);
-	if(dispX != 0 || dispZ != 0) {
-		_pos = snapToEdge(_pos, RADIUS, dispX, 0, dispZ);
-		return;
-	}
-	
-	/*
-	int bodyHitX, bodyHitY, bodyHitZ;
-	std::tie(bodyHitX, bodyHitY, bodyHitZ) = world->collideHorDisk(bodyPos, RADIUS, 0.1);
-	if(bodyHitX != 0 || bodyHitZ != 0) {
-		_pos = snapToEdge(_pos, RADIUS, bodyHitX, 0, bodyHitZ);
-		return;
-	}
-	*/
-	
-	/*
-	int headHitX, headHitY, headHitZ;
-	std::tie(headHitX, headHitY, headHitZ) = world->collideHorDisk(headPos, RADIUS, 0.1);
-	if(headHitY == -1 || headHitX != 0 || headHitZ != 0) {
-		glm::vec3 newPos;
-		if(headHitY == -1) {
-			newPos = snapToEdge(headPos, RADIUS, 0, headHitY, 0);
-		} else {
-			newPos = snapToEdge(headPos, RADIUS, headHitX, 0, headHitZ);
+	glm::vec3 headPos = getFeetPos() + glm::vec3(0, HEIGHT, 0);
+	verDispl = world->collideDiskVer(headPos, RADIUS, verBarrier);
+	if(verDispl < 0) {
+		_pos.y += verDispl;
+		if(ySpeed > 0) {
+			ySpeed = 0.0;
 		}
-		newPos.y += EYE_HEIGHT - HEIGHT;
-		_pos = newPos;
-		return;
 	}
-	*/
+	
+	feetPos = getFeetPos();
+	glm::vec2 horDispl = world->collideCylHor(feetPos, RADIUS, HEIGHT);
+	_pos.x += horDispl.x;
+	_pos.z += horDispl.y;
 }
