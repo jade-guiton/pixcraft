@@ -5,6 +5,9 @@ const char windowTitle[] = "OpenGL Test 2";
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 	std::cout << "Window resized to " << width << "×" << height << std::endl;
+	
+	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
+	client.getTextRenderer().setViewport(width, height);
 }
 
 const float cursorVertices[] = {
@@ -20,6 +23,7 @@ GameClient::GameClient()
 	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, windowTitle, nullptr, nullptr);
 	if(window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
+	glfwSetWindowUserPointer(window, (void*) this);
 	
 	glfwMakeContextCurrent(window);
 	if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
@@ -52,11 +56,15 @@ GameClient::GameClient()
 	input.capturingMouse(!paused);
 	BlockRegistry::registerBlocks();
 	blockRenderer.init();
+	textRenderer.init();
+	
+	debugText = &textRenderer.createText("Loading debug...", 5, 5, 1.0, glm::vec4(1, 1, 1, 1));
 	
 	glfwSetTime(0.0);
 }
 
 GameClient::~GameClient() {
+	
 	glfwDestroyWindow(window);
 }
 
@@ -82,7 +90,6 @@ void GameClient::mainLoop() {
 		frameCounter++;
 		if(now >= lastSecond + 1.0) {
 			FPS = frameCounter;
-			std::cout << "FPS: " << FPS << std::endl;
 			frameCounter = 0;
 			if(now >= lastSecond + 2.0) {
 				lastSecond = now;
@@ -94,6 +101,9 @@ void GameClient::mainLoop() {
 		glfwSwapBuffers(window);
 	}
 }
+
+InputManager& GameClient::getInputManager() { return input; }
+TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
 void GameClient::update(float dt) {
 	glfwPollEvents();
@@ -160,9 +170,11 @@ void GameClient::render() {
 	
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_BLEND);
 	
-	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
+	glm::vec3 playerPos = player->pos();
+	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
+	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
 	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
 	
 	glLineWidth(2.0f);
@@ -171,10 +183,13 @@ void GameClient::render() {
 	glUseProgram(cursorProgram);
 	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
 	glBindVertexArray(cursorVAO);
-	
 	glDrawArrays(GL_LINES, 0, 4);
-	
 	glBindVertexArray(0);
 	glUseProgram(0);
-	glDisable(GL_BLEND);
+	
+	debugText->setText(std::to_string(FPS) + " FPS\n"
+		+ ("Pos: " + vec3ToString(playerPos)));
+	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	textRenderer.render();
 }

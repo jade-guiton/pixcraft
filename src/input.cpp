@@ -4,14 +4,16 @@ InputManager::InputManager()
 	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false} { }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	InputManager& input = *((InputManager*) glfwGetWindowUserPointer(window));
+	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
+	InputManager& input = client.getInputManager();
 	if(action == GLFW_PRESS) {
 		input.keyPressed(key);
 	}
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-	InputManager& input = *((InputManager*) glfwGetWindowUserPointer(window));
+	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
+	InputManager& input = client.getInputManager();
 	button = (button == GLFW_MOUSE_BUTTON_1) ? 1 : ((button == GLFW_MOUSE_BUTTON_2) ? 2 : 0);
 	if(action == GLFW_PRESS && button != 0) {
 		input.mouseClicked(button);
@@ -20,8 +22,6 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 
 void InputManager::init(GLFWwindow* newWindow) {
 	window = newWindow;
-	
-	glfwSetWindowUserPointer(window, (void*) this);
 	
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);

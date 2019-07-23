@@ -36,6 +36,14 @@ glm::mat4 localToGlobal(glm::vec3 pos, glm::vec3 orient) {
 }
 
 
+std::string vec3ToString(glm::vec3 pos) {
+	const size_t bufSize = 64;
+	char buffer[bufSize];
+	snprintf(buffer, bufSize, "(%7.2f; %7.2f; %7.2f)", pos.x, pos.y, pos.z);
+	return std::string(buffer);
+}
+
+
 SpiralIterator::SpiralIterator(int startX, int startZ)
 	: startX(startX), startZ(startZ), x(0), z(0), dx(1), dz(0) { }
 
