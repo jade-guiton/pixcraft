@@ -16,6 +16,7 @@
 #include "util.hpp"
 #include "input.hpp"
 #include "text.hpp"
+#include "player.hpp"
 
 
 class GameClient {

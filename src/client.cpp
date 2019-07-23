@@ -109,6 +109,21 @@ void GameClient::update(float dt) {
 	glfwPollEvents();
 	
 	if(!paused) {
+		if(input.justPressed(GLFW_KEY_F)) {
+			if(player->movementMode == MovementMode::flying) {
+				player->movementMode = MovementMode::normal;
+			} else {
+				player->movementMode = MovementMode::flying;
+			}
+		}
+		if(input.justPressed(GLFW_KEY_N)) {
+			if(player->movementMode == MovementMode::noClip) {
+				player->movementMode = MovementMode::normal;
+			} else {
+				player->movementMode = MovementMode::noClip;
+			}
+		}
+		
 		player->move(input.getMovementKeys(), dt);
 		player->collide();
 		
@@ -186,7 +201,8 @@ void GameClient::render() {
 	glUseProgram(0);
 	
 	debugText->setText(std::to_string(FPS) + " FPS\n"
-		+ ("Pos: " + vec3ToString(playerPos)));
+		+ ("Pos: " + vec3ToString(playerPos) + "\n")
+		+ (std::string("Mode: ") + movementModeNames[static_cast<int>(player->movementMode)]));
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textRenderer.render();
