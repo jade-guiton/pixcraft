@@ -5,12 +5,12 @@ const char* movementModeNames[3] = {
 };
 
 Player::Player(World& world, glm::vec3 pos)
-	: movementMode(MovementMode::normal), world(&world), _pos(pos), _orient(0.0), ySpeed(0.0), onGround(false) { }
+	: movementMode(MovementMode::normal), world(&world), _pos(pos), _orient(0.0), _speed(0.0), onGround(false) { }
 
 glm::vec3 Player::pos() { return _pos; }
 glm::vec3 Player::getFeetPos() { return _pos + glm::vec3(0, -EYE_HEIGHT, 0); }
 void Player::pos(glm::vec3 pos) { _pos = pos; }
-void Player::move(glm::vec3 dpos) { _pos += dpos; }
+glm::vec3 Player::speed() { return _speed; }
 
 glm::vec3 Player::orient() { return _orient; }
 void Player::orient(glm::vec3 orient) {
@@ -49,56 +49,59 @@ void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 	
 	int dx, dz; bool up, down;
 	std::tie(dx, dz, up, down) = mvtKeys;
-	float speed = getMaxHorSpeed();
+	float mvtSpeed = getMaxHorSpeed();
+	
 	if(canFly()) {
-		ySpeed = 0.0;
 		int dy = up - down;
 		if(dx != 0 || dy != 0 || dz != 0) {
-			glm::vec3 mvt = glm::normalize(glm::vec3(dx, dy, dz));
-			mvt = speed * glm::vec3(yRot * glm::vec4(mvt, 1.0f));
-			move(dt * mvt);
-			ySpeed = mvt.y;
+			_speed = glm::normalize(glm::vec3(dx, dy, dz));
+			_speed = mvtSpeed * glm::vec3(yRot * glm::vec4(_speed, 1.0f));
+		} else {
+			_speed = glm::vec3(0);
 		}
 	} else {
+		glm::vec3 horSpeed(0);
 		if(dx != 0 || dz != 0) {
-			glm::vec3 mvt = glm::normalize(glm::vec3(dx, 0, dz));
-			mvt = speed * glm::vec3(yRot * glm::vec4(mvt, 1.0f));
-			move(dt * mvt);
+			horSpeed = glm::normalize(glm::vec3(dx, 0, dz));
+			horSpeed = mvtSpeed * glm::vec3(yRot * glm::vec4(horSpeed, 1.0f));
+		} else {
+			horSpeed = glm::vec3(0);
 		}
+		_speed.x = horSpeed.x; _speed.z = horSpeed.z;
 		if(up && onGround) {
-			ySpeed = JUMP_SPEED;
+			_speed.y = JUMP_SPEED;
 		}
-		ySpeed -= dt*GRAVITY;
-		_pos.y += dt*ySpeed;
+		_speed.y -= dt*GRAVITY;
 	}
 	onGround = false;
-}
-
-void Player::collide() {
-	if(!collidesWithBlocks()) return;
 	
-	float verBarrier = std::max(std::min(std::abs(ySpeed)/40, 0.5f), 0.05f);
-	float horBarrier = std::max(std::min(getMaxHorSpeed()/40, 0.5f), 0.05f);
-	
-	if(ySpeed < 0) {
-		glm::vec3 feetPos = getFeetPos();
-		float verDispl = world->collideDiskVer(feetPos, RADIUS, verBarrier);
-		if(verDispl > 0) {
-			_pos.y += verDispl;
-			ySpeed = 0.0;
-			onGround = true;
+	glm::vec3 dpos = dt * _speed;
+	if(collidesWithBlocks()) {
+		float verBarrier = std::max(std::min(std::abs(_speed.y)/40, 0.5f), 0.05f);
+		float margin = 0.001;
+		
+		if(dpos.y < 0) {
+			glm::vec3 feetPos = getFeetPos() + glm::vec3(0, dpos.y, 0);
+			float verDispl = world->collideDiskVer(feetPos, RADIUS, verBarrier, margin);
+			if(verDispl > 0) {
+				dpos.y += verDispl;
+				_speed.y = 0.0;
+				onGround = true;
+			}
+		} else if(dpos.y > 0) {
+			glm::vec3 headPos = getFeetPos() + glm::vec3(0, dpos.y + HEIGHT, 0);
+			float verDispl = world->collideDiskVer(headPos, RADIUS, verBarrier, margin);
+			if(verDispl < 0) {
+				dpos.y += verDispl;
+				_speed.y = 0.0;
+			}
 		}
-	} else if(ySpeed > 0) {
-		glm::vec3 headPos = getFeetPos() + glm::vec3(0, HEIGHT, 0);
-		float verDispl = world->collideDiskVer(headPos, RADIUS, verBarrier);
-		if(verDispl < 0) {
-			_pos.y += verDispl;
-			ySpeed = 0.0;
-		}
+		
+		glm::vec3 feetPos = getFeetPos() + glm::vec3(dpos.x, 0, dpos.z);
+		glm::vec2 horDispl = world->collideCylHor(feetPos, RADIUS, HEIGHT, margin);
+		dpos.x += horDispl.x;
+		dpos.z += horDispl.y;
 	}
 	
-	glm::vec3 feetPos = getFeetPos();
-	glm::vec2 horDispl = world->collideCylHor(feetPos, RADIUS, HEIGHT, horBarrier);
-	_pos.x += horDispl.x;
-	_pos.z += horDispl.y;
+	_pos += dpos;
 }
