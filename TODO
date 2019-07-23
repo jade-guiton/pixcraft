@@ -1,5 +1,0 @@
-TODO
-- Move worldgen to another thread
-- Profile and improve rendering performance (right now, max render distance for 60 FPS is 5 chunks)
-- Add basic player physics
-- Add more interesting world gen, or entities, etc...
