@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <tuple>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -20,7 +21,7 @@ public:
 	void keyPressed(int key);
 	bool justPressed(int key);
 	void clearJustPressed();
-	glm::vec3 getMovement();
+	std::tuple<int,int,bool,bool> getMovementKeys();
 	
 private:
 	static constexpr float mouseSensitivity = 0.005f;

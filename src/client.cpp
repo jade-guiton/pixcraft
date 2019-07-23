@@ -49,7 +49,7 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
-	world.players.emplace_back(world, glm::vec3(8.0f, 40.0f, 8.0f));
+	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
 	player = &world.players.back();
 	
 	input.init(window);
@@ -109,41 +109,38 @@ void GameClient::update(float dt) {
 	glfwPollEvents();
 	
 	if(!paused) {
-		glm::mat4 yRot = glm::mat4(1.0f);
-		yRot = glm::rotate(yRot, player->orient().y, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::vec3 mvt = input.getMovement();
-		player->move(dt * MVT_SPEED * glm::vec3(yRot * glm::vec4(mvt, 1.0f)));
-		player->collideOut();
+		player->move(input.getMovementKeys(), dt);
+		player->collide();
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
+		
+		bool click1 = input.justClicked(1);
+		bool click2 = input.justClicked(2);
+		if(click1 || click2) {
+			bool hit;
+			int x, y, z;
+			std::tie(hit, x, y, z) = player->castRay(5, !click1);
+			if(hit) {
+				int32_t chunkX, chunkZ;
+				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
+				if(click2) {
+					world.setBlock(x, y, z, Block::fromId(1));
+				} else {
+					world.removeBlock(x, y, z);
+				}
+				Chunk& chunk = world.getChunk(chunkX, chunkZ);
+				blockRenderer.renderChunk(chunk, chunkX, chunkZ);
+			}
+		}
 	}
+	input.clearJustClicked();
 	
 	if(input.justPressed(GLFW_KEY_ESCAPE)) {
 		paused = !paused;
 		input.capturingMouse(!paused);
 	}
 	input.clearJustPressed();
-	
-	bool click1 = input.justClicked(1);
-	bool click2 = input.justClicked(2);
-	if(click1 || click2) {
-		bool hit;
-		int x, y, z;
-		std::tie(hit, x, y, z) = player->castRay(5, !click1);
-		if(hit) {
-			int32_t chunkX, chunkZ;
-			std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
-			if(click2) {
-				world.setBlock(x, y, z, Block::fromId(1));
-			} else {
-				world.removeBlock(x, y, z);
-			}
-			Chunk& chunk = world.getChunk(chunkX, chunkZ);
-			blockRenderer.renderChunk(chunk, chunkX, chunkZ);
-		}
-	}
-	input.clearJustClicked();
 	
 	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);

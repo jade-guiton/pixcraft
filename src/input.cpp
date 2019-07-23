@@ -73,13 +73,10 @@ void InputManager::clearJustPressed() {
 	_justPressed.clear();
 }
 
-glm::vec3 InputManager::getMovement() {
+std::tuple<int,int,bool,bool> InputManager::getMovementKeys() {
 	int dx = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
-	int dy = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
 	int dz = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-	if(dx != 0 || dy != 0 || dz != 0) {
-		return glm::normalize(glm::vec3(dx, dy, dz));
-	} else {
-		return glm::vec3(0, 0, 0);
-	}
+	bool up = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+	bool down = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+	return std::tuple<int,int,bool,bool>(dx, dz, up, down);
 }
