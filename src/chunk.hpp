@@ -16,6 +16,7 @@ class Chunk {
 public:
 	Chunk();
 	
+	bool hasBlock(uint8_t x, uint8_t y, uint8_t z);
 	Block* getBlock(uint8_t x, uint8_t y, uint8_t z);
 	void setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block);
 	void removeBlock(uint8_t x, uint8_t y, uint8_t z);

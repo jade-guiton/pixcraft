@@ -2,6 +2,11 @@
 
 Chunk::Chunk() : blocks(), opaqueCubeCache() { }
 
+bool Chunk::hasBlock(uint8_t x, uint8_t y, uint8_t z) {
+	if(INVALID_BLOCK_POS(x, y, z)) return false;
+	return blocks[BLOCK_IDX(x, y, z)] != 0;
+}
+
 Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
 	if(INVALID_BLOCK_POS(x, y, z)) return nullptr;
 	BlockId id = blocks[BLOCK_IDX(x, y, z)];

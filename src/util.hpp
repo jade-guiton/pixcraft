@@ -3,6 +3,7 @@
 #include <cmath>
 #include <string>
 #include <cstdio>
+#include <tuple>
 
 #include "glm.hpp"
 
@@ -60,3 +61,14 @@ private:
 	float tMaxX, tMaxY, tMaxZ;
 	int lastFace;
 };
+
+
+std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos);
+
+// Tests [x1; x2] and [y1; y2] for intersection (in a narrow sense)
+bool intervalIntersect(float x1, float x2, float y1, float y2);
+
+int clampInt(int x, int min, int max);
+
+glm::vec3 snapToEdge(glm::vec3 pos, float radius, int snapX, int snapY, int snapZ);
+int collateCollisions(int a, int b, int c);
