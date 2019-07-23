@@ -33,3 +33,5 @@ private:
 	std::unordered_set<int> _justPressed;
 	bool _justClicked[2];
 };
+
+#include "client.hpp"

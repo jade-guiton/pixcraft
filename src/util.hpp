@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include <string>
+#include <cstdio>
 
 #include "glm.hpp"
 
@@ -12,6 +14,8 @@ glm::mat4 globalToLocalRot(glm::vec3 orient);
 glm::mat4 localToGlobalRot(glm::vec3 orient);
 glm::mat4 globalToLocal(glm::vec3 pos, glm::vec3 orient);
 glm::mat4 localToGlobal(glm::vec3 pos, glm::vec3 orient);
+
+std::string vec3ToString(glm::vec3 pos);
 
 class SpiralIterator {
 public:

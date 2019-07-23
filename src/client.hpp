@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cmath>
 #include <tuple>
+#include <string>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -14,6 +15,7 @@
 #include "blocks.hpp"
 #include "util.hpp"
 #include "input.hpp"
+#include "text.hpp"
 
 
 class GameClient {
@@ -22,6 +24,9 @@ public:
 	~GameClient();
 	
 	void mainLoop();
+	
+	InputManager& getInputManager();
+	TextRenderer& getTextRenderer();
 	
 private:
 	static const int START_WIDTH = 800;
@@ -39,6 +44,9 @@ private:
 	World world;
 	Player* player;
 	BlockRenderer blockRenderer;
+	
+	TextRenderer textRenderer;
+	Text* debugText;
 	
 	GlId cursorProgram;
 	GlId cursorVAO;
