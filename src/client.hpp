@@ -36,8 +36,6 @@ private:
 	static const int RENDER_DIST = 6;
 	static const int LOADS_PER_FRAME = 2;
 	
-	static constexpr float MVT_SPEED = 8.0f;
-	
 	GLFWwindow* window;
 	
 	InputManager input;
