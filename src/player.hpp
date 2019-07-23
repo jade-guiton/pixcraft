@@ -12,6 +12,8 @@ class Player;
 
 enum class MovementMode { normal, flying, noClip };
 
+extern const char* movementModeNames[3];
+
 class Player {
 public:
 	Player(World& world, glm::vec3 pos);
@@ -30,6 +32,7 @@ public:
 	
 	bool canFly();
 	bool collidesWithBlocks();
+	float getMaxHorSpeed();
 	
 	void move(std::tuple<int,int,bool,bool> mvtKeys, float dt);
 	void collide();
@@ -47,10 +50,11 @@ private:
 	static constexpr float HEIGHT = 1.7;
 	static constexpr float RADIUS = 0.2;
 	
-	static constexpr float FLY_SPEED = 10.0f;
 	static constexpr float WALK_SPEED = 5.0f;
+	static constexpr float FLY_SPEED = 10.0f;
+	static constexpr float NOCLIP_SPEED = 30.0f;
 	
 	static constexpr float GRAVITY = 24.0f;
-	static constexpr float JUMP_HEIGHT = 1.1f;
+	static constexpr float JUMP_HEIGHT = 1.3f;
 	static constexpr float JUMP_SPEED = sqrt(2*JUMP_HEIGHT*GRAVITY);
 };
