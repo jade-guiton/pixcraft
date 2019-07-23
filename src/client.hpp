@@ -6,6 +6,7 @@
 #include <cmath>
 #include <tuple>
 #include <string>
+#include <sstream>
 
 #include "glfw.hpp"
 #include "glm.hpp"
