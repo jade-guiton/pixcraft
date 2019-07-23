@@ -3,12 +3,15 @@
 #include <unordered_map>
 #include <utility>
 #include <tuple>
+#include <vector>
 
 #include "glm.hpp"
 
 #include "chunk.hpp"
 #include "worldgen.hpp"
 #include "blocks.hpp"
+#include "util.hpp"
+#include "player.hpp"
 
 uint64_t getChunkId(int32_t x, int32_t z);
 
@@ -26,7 +29,9 @@ public:
 	void setBlock(int32_t x, int32_t y, int32_t z, Block& block);
 	void removeBlock(int32_t x, int32_t y, int32_t z);
 	
-	glm::vec3 playerPos, playerOrient;
+	std::tuple<bool, int,int,int> raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset);
+	
+	std::vector<Player> players;
 	
 private:
 	WorldGenerator gen;

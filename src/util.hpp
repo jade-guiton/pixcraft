@@ -35,9 +35,9 @@ int sign(float x);
 // From a world coordinate, returns the block it's inside's corresponding coordinate
 int getBlockCoordAt(float x);
 
-class Raycast {
+class Ray {
 public:
-	Raycast(glm::vec3 startPos, glm::vec3 dir);
+	Ray(glm::vec3 startPos, glm::vec3 dir);
 	
 	int getX();
 	int getY();
