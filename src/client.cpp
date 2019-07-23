@@ -125,7 +125,6 @@ void GameClient::update(float dt) {
 		}
 		
 		player->move(input.getMovementKeys(), dt);
-		player->collide();
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));

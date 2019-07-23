@@ -44,12 +44,12 @@ public:
 	// tests a cylinder with base (center, radius) for horizontal collision with blocks
 	// returns a horizontal vector, such that moving the cylinder by that vector would stop the horizontal collision
 	// constraint: radius < 0.5
-	glm::vec2 collideCylHor(glm::vec3 center, float radius, float height, float horBarrier);
+	glm::vec2 collideCylHor(glm::vec3 center, float radius, float height, float margin);
 	
 	// tests a given horizontal disk for vertical collision with blocks
 	// returns the vertical algebraic distance in which to move to stop the vertical collision
 	// verBarrier determines how far the center can venture inside a block for the collision to continue to be acknowledged
-	float collideDiskVer(glm::vec3 center, float radius, float verBarrier);
+	float collideDiskVer(glm::vec3 center, float radius, float verBarrier, float margin);
 	
 	std::vector<Player> players;
 	

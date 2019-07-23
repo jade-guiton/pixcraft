@@ -21,7 +21,7 @@ public:
 	glm::vec3 pos();
 	glm::vec3 getFeetPos();
 	void pos(glm::vec3 pos);
-	void move(glm::vec3 dpos);
+	glm::vec3 speed();
 	
 	glm::vec3 orient();
 	void orient(glm::vec3 orient);
@@ -35,7 +35,6 @@ public:
 	float getMaxHorSpeed();
 	
 	void move(std::tuple<int,int,bool,bool> mvtKeys, float dt);
-	void collide();
 	
 	MovementMode movementMode;
 	
@@ -43,7 +42,7 @@ private:
 	World* world;
 	glm::vec3 _pos;
 	glm::vec3 _orient;
-	float ySpeed;
+	glm::vec3 _speed;
 	bool onGround;
 	
 	static constexpr float EYE_HEIGHT = 1.6;
