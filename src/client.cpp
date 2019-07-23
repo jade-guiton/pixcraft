@@ -199,9 +199,12 @@ void GameClient::render() {
 	glBindVertexArray(0);
 	glUseProgram(0);
 	
-	debugText->setText(std::to_string(FPS) + " FPS\n"
-		+ ("Pos: " + vec3ToString(playerPos) + "\n")
-		+ (std::string("Mode: ") + movementModeNames[static_cast<int>(player->movementMode)]));
+	std::stringstream debugStream;
+	debugStream << FPS << " FPS" << std::endl;
+	debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
+	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode)] << std::endl;
+	debugStream << "Vertical speed: " << player->speed().y << std::endl;
+	debugText->setText(debugStream.str());
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textRenderer.render();
