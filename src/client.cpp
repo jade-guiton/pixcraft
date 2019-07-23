@@ -49,7 +49,7 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
-	world.players.emplace_back(glm::vec3(8.0f, 40.0f, 8.0f));
+	world.players.emplace_back(world, glm::vec3(8.0f, 40.0f, 8.0f));
 	player = &world.players.back();
 	
 	input.init(window);
@@ -113,6 +113,7 @@ void GameClient::update(float dt) {
 		yRot = glm::rotate(yRot, player->orient().y, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 mvt = input.getMovement();
 		player->move(dt * MVT_SPEED * glm::vec3(yRot * glm::vec4(mvt, 1.0f)));
+		player->collideOut();
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
@@ -129,7 +130,7 @@ void GameClient::update(float dt) {
 	if(click1 || click2) {
 		bool hit;
 		int x, y, z;
-		std::tie(hit, x, y, z) = world.raycast(player->pos(), player->dirVector(), 5, !click1);
+		std::tie(hit, x, y, z) = player->castRay(5, !click1);
 		if(hit) {
 			int32_t chunkX, chunkZ;
 			std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);

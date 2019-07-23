@@ -120,3 +120,42 @@ void Ray::nextFace() {
 		lastFace = 1 + stepZ;
 	}
 }
+
+
+std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos) {
+	return std::tuple<int,int,int>(getBlockCoordAt(pos.x), getBlockCoordAt(pos.y), getBlockCoordAt(pos.z));
+}
+
+bool intervalIntersect(float x1, float x2, float y1, float y2) {
+	return y1 < x2 && x1 < y2;
+}
+
+int clampInt(int x, int min, int max) {
+	if(x < min) return min;
+	if(x > max) return max;
+	return x;
+}
+
+glm::vec3 snapToEdge(glm::vec3 pos, float radius, int snapX, int snapY, int snapZ) {
+	const float yRadius = 0.001;
+	if(snapX == 1) {
+		pos.x = ceil(pos.x - radius + 0.5) + radius - 0.5;
+	} else if(snapX == -1) {
+		pos.x = floor(pos.x + radius + 0.5) - radius - 0.5;
+	}
+	if(snapY == 1) {
+		pos.y = ceil(pos.y - yRadius + 0.5) + yRadius - 0.5;
+	} else if(snapY == -1) {
+		pos.y = floor(pos.y + yRadius + 0.5) - yRadius - 0.5;
+	}
+	if(snapZ == 1) {
+		pos.z = ceil(pos.z - radius + 0.5) + radius - 0.5;
+	} else if(snapZ == -1) {
+		pos.z = floor(pos.z + radius + 0.5) - radius - 0.5;
+	}
+	return pos;
+}
+
+int collateCollisions(int a, int b, int c) {
+	return (a == 1 || b == 1 || c == 1) - (a == -1 || b == -1 || c == -1);
+}
