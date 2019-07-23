@@ -37,6 +37,7 @@ private:
 	
 	InputManager input;
 	World world;
+	Player* player;
 	BlockRenderer blockRenderer;
 	
 	GlId cursorProgram;

@@ -45,6 +45,9 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
+	world.players.emplace_back(glm::vec3(8.0f, 40.0f, 8.0f));
+	player = &world.players.back();
+	
 	input.init(window);
 	input.capturingMouse(!paused);
 	BlockRegistry::registerBlocks();
@@ -92,47 +95,17 @@ void GameClient::mainLoop() {
 	}
 }
 
-std::tuple<bool, int,int,int> GameClient::blockRaycast(bool offset) {
-	glm::vec3 dir = glm::vec3(localToGlobalRot(world.playerOrient) * glm::vec4(0.0, 0.0, -1.0, 1.0));
-	Raycast ray(world.playerPos, dir);
-	Block* hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
-	while(hit == nullptr && ray.getDistance() <= 5 && ray.getY() < 64) {
-		ray.nextFace();
-		hit = world.getBlock(ray.getX(), ray.getY(), ray.getZ());
-	}
-	if(hit != nullptr) {
-		int32_t x = ray.getX();
-		int32_t y = ray.getY();
-		int32_t z = ray.getZ();
-		if(offset) {
-			int face = ray.getLastFace();
-			x += sideVectors[face][0];
-			y += sideVectors[face][1];
-			z += sideVectors[face][2];
-		}
-		return std::tuple<bool, int,int,int>(true, x, y, z);
-	} else {
-		return std::tuple<bool, int,int,int>(false, 0, 0, 0);
-	}
-}
-
 void GameClient::update(float dt) {
 	glfwPollEvents();
 	
 	if(!paused) {
 		glm::mat4 yRot = glm::mat4(1.0f);
-		yRot = glm::rotate(yRot, world.playerOrient.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		yRot = glm::rotate(yRot, player->orient().y, glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 mvt = input.getMovement();
-		world.playerPos += dt * MVT_SPEED * glm::vec3(yRot * glm::vec4(mvt, 1.0f));
+		player->move(dt * MVT_SPEED * glm::vec3(yRot * glm::vec4(mvt, 1.0f)));
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
-		world.playerOrient.y -= mouseMvt.x;
-		world.playerOrient.x -= mouseMvt.y;
-		if(world.playerOrient.x < -TAU/4) {
-			world.playerOrient.x = -TAU/4;
-		} else if(world.playerOrient.x > TAU/4) {
-			world.playerOrient.x = TAU/4;
-		}
+		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
 	}
 	
 	if(input.justPressed(GLFW_KEY_ESCAPE)) {
@@ -146,7 +119,7 @@ void GameClient::update(float dt) {
 	if(click1 || click2) {
 		bool hit;
 		int x, y, z;
-		std::tie(hit, x, y, z) = blockRaycast(!click1);
+		std::tie(hit, x, y, z) = world.raycast(player->pos(), player->dirVector(), 5, !click1);
 		if(hit) {
 			int32_t chunkX, chunkZ;
 			std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
@@ -161,8 +134,8 @@ void GameClient::update(float dt) {
 	}
 	input.clearJustClicked();
 	
-	int32_t camChunkX = floor(world.playerPos.x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(world.playerPos.z / CHUNK_SIZE);
+	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
+	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
 	int loads = 0;
 	SpiralIterator iter(camChunkX, camChunkZ);
 	while(iter.withinDistance(RENDER_DIST)) {
@@ -183,13 +156,13 @@ void GameClient::render() {
 	glfwGetWindowSize(window, &width, &height);
 	float aspect = ((float) width) / height;
 	glm::mat4 proj = glm::perspective(glm::radians(90.0f), aspect, 0.001f, 1000.0f);
-	glm::mat4 view = globalToLocal(world.playerPos, world.playerOrient);
+	glm::mat4 view = globalToLocal(player->pos(), player->orient());
 	
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	int32_t camChunkX = floor(world.playerPos.x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(world.playerPos.z / CHUNK_SIZE);
+	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
+	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
 	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
 	
 	glLineWidth(2.0f);

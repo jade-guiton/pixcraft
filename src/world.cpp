@@ -6,8 +6,7 @@ uint64_t getChunkId(int32_t x, int32_t z) {
 	return ((uint64_t) x2) << 32 | ((uint64_t) z2);
 }
 
-World::World()
-	: playerPos(8.0f, 40.0f, 8.0f), playerOrient(0.0f, 0.0f, 0.0f) { }
+World::World() { }
 
 std::pair<int32_t,int32_t> World::getChunkAt(int32_t x, int32_t z) {
 	int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
@@ -56,4 +55,27 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
 	return chunk.removeBlock(relX, y, relZ);
+}
+
+std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset) {
+	Ray ray(pos, dir);
+	Block* hit = getBlock(ray.getX(), ray.getY(), ray.getZ());
+	while(hit == nullptr && ray.getDistance() <= maxDist && ray.getY() < 64) {
+		ray.nextFace();
+		hit = getBlock(ray.getX(), ray.getY(), ray.getZ());
+	}
+	if(hit != nullptr) {
+		int32_t x = ray.getX();
+		int32_t y = ray.getY();
+		int32_t z = ray.getZ();
+		if(offset) {
+			int face = ray.getLastFace();
+			x += sideVectors[face][0];
+			y += sideVectors[face][1];
+			z += sideVectors[face][2];
+		}
+		return std::tuple<bool, int,int,int>(true, x, y, z);
+	} else {
+		return std::tuple<bool, int,int,int>(false, 0, 0, 0);
+	}
 }

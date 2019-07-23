@@ -67,7 +67,7 @@ int getBlockCoordAt(float x) {
 	return (int) round(x);
 }
 
-Raycast::Raycast(glm::vec3 startPos, glm::vec3 dir)
+Ray::Ray(glm::vec3 startPos, glm::vec3 dir)
 	: tDeltaX(1 / abs(dir.x)), tDeltaY(1 / abs(dir.y)), tDeltaZ(1 / abs(dir.z)),
 	  stepX(sign(dir.x)), stepY(sign(dir.y)), stepZ(sign(dir.z)),
 	  x(getBlockCoordAt(startPos.x)), y(getBlockCoordAt(startPos.y)), z(getBlockCoordAt(startPos.z)),
@@ -89,13 +89,13 @@ Raycast::Raycast(glm::vec3 startPos, glm::vec3 dir)
 	}
 }
 
-int Raycast::getX() { return x; }
-int Raycast::getY() { return y; }
-int Raycast::getZ() { return z; }
-float Raycast::getDistance() { return dist; }
-int Raycast::getLastFace() { return lastFace; }
+int Ray::getX() { return x; }
+int Ray::getY() { return y; }
+int Ray::getZ() { return z; }
+float Ray::getDistance() { return dist; }
+int Ray::getLastFace() { return lastFace; }
 
-void Raycast::nextFace() {
+void Ray::nextFace() {
 	if(tMaxX < tMaxY && tMaxX < tMaxZ) { // next face on X axis
 		tMaxX += tDeltaX;
 		x += stepX;
