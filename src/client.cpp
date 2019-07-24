@@ -83,6 +83,10 @@ void GameClient::mainLoop() {
 		
 		now = glfwGetTime();
 		dt = now - lastFrame;
+		if(dt > 1 / 30.0) {
+			std::cout << "Can't keep up!" << std::endl;
+			dt = 1/60.0;
+		}
 		lastFrame = now;
 		
 		if(firstFrame) firstFrame = false;
@@ -147,6 +151,8 @@ void GameClient::update(float dt) {
 				blockRenderer.renderChunk(chunk, chunkX, chunkZ);
 			}
 		}
+	} else {
+		player->move(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
 	input.clearJustClicked();
 	
