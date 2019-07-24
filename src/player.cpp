@@ -77,7 +77,7 @@ void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 	
 	glm::vec3 dpos = dt * _speed;
 	if(collidesWithBlocks()) {
-		float verBarrier = std::max(std::min(std::abs(_speed.y)/40, 0.5f), 0.05f);
+		float verBarrier = std::max(std::min(std::abs(_speed.y)/30, 0.5f), 0.05f);
 		float margin = 0.001;
 		
 		if(dpos.y < 0) {
