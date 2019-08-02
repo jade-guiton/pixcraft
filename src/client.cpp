@@ -15,7 +15,7 @@ const float cursorVertices[] = {
 };
 
 GameClient::GameClient()
-	: blockRenderer(RENDER_DIST), paused(false), firstFrame(true), FPS(0.0) {
+	: chunkRenderer(RENDER_DIST), paused(false), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -55,7 +55,7 @@ GameClient::GameClient()
 	input.init(window);
 	input.capturingMouse(!paused);
 	BlockRegistry::registerBlocks();
-	blockRenderer.init();
+	chunkRenderer.init();
 	textRenderer.init();
 	hotbar.init();
 	
@@ -149,7 +149,7 @@ void GameClient::update(float dt) {
 					world.removeBlock(x, y, z);
 				}
 				Chunk& chunk = world.getChunk(chunkX, chunkZ);
-				blockRenderer.renderChunk(chunk, chunkX, chunkZ);
+				chunkRenderer.prerenderChunk(chunk, chunkX, chunkZ);
 			}
 		}
 	} else {
@@ -172,7 +172,7 @@ void GameClient::update(float dt) {
 		int z = iter.getZ();
 		if(!world.isChunkLoaded(x, z)) {
 			Chunk& chunk = world.genChunk(x, z);
-			blockRenderer.renderChunk(chunk, x, z);
+			chunkRenderer.prerenderChunk(chunk, x, z);
 			loads++;
 			if(loads >= LOADS_PER_FRAME) break;
 		}
@@ -194,7 +194,7 @@ void GameClient::render() {
 	glm::vec3 playerPos = player->pos();
 	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
-	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
+	chunkRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
 	
 	glLineWidth(2.0f);
 	glEnable(GL_BLEND);
