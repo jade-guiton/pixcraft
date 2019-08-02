@@ -39,6 +39,7 @@ namespace BlockRegistry {
 		registerBlock(new Block()).mainTexture(1); // stone
 		registerBlock(new Block()).mainTexture(2); // dirt
 		registerBlock(new GrassBlock()); // grass
+		registerBlock(new TrunkBlock()); // grass
 	}
 
 	Block& fromId(BlockId id) {
@@ -54,4 +55,8 @@ uint8_t GrassBlock::getFaceTexture(uint8_t face) {
 	} else {
 		return 3;
 	}
+}
+
+uint8_t TrunkBlock::getFaceTexture(uint8_t face) {
+	return face >= 4 ? 6 : 5;
 }

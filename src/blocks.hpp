@@ -45,3 +45,7 @@ private:
 class GrassBlock : public Block {
 	uint8_t getFaceTexture(uint8_t face) override;
 };
+
+class TrunkBlock : public Block {
+	uint8_t getFaceTexture(uint8_t face) override;
+};

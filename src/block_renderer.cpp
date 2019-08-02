@@ -18,9 +18,9 @@ const glm::mat4 sideTransforms[6] = {
 };
 
 const size_t BLOCK_TEX_SIZE = 16;
-const size_t BLOCK_TEX_COUNT = 5;
+const size_t BLOCK_TEX_COUNT = 7;
 const char* textureFiles[BLOCK_TEX_COUNT] = {
-	"placeholder", "stone", "dirt", "grass_side", "grass_top"
+	"placeholder", "stone", "dirt", "grass_side", "grass_top", "trunk_side", "trunk_inside"
 };
 
 
