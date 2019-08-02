@@ -10,9 +10,9 @@
 
 #include "glfw.hpp"
 #include "glm.hpp"
-#include <stb_image.h>
 
 #include "shaders.hpp"
+#include "textures.hpp"
 #include "world.hpp"
 #include "blocks.hpp"
 #include "chunk.hpp"
@@ -67,5 +67,5 @@ public:
 	void stopRendering();
 	
 private:
-	GlId program, faceVBO, textureArray;
+	GlId program, faceVBO;
 };
