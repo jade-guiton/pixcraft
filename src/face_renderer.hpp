@@ -27,33 +27,42 @@ struct FaceData {
 } __attribute__((packed));
 // ^^^ It works without the __attribute__, but adding it allows sending less data to the GPU
 
-class RenderedChunk {
+class FaceRenderer;
+
+class FaceBuffer {
 public:
-	RenderedChunk();
-	void init(GlId faceVBO);
-	
+	FaceBuffer();
+	void init(FaceRenderer& faceRenderer, int capacity);
 	bool isInitialized();
 	
-	void load(Chunk& chunk);
+	void load(std::vector<FaceData>& faces);
+	
 	void render();
 	
 private:
-	GlId VBO, VAO;
-	int faceCount;
+	GlId VAO, VBO;
+	int capacity, faceCount;
 };
 
-class BlockRenderer {
+struct RenderParams {
+	float skyColor[3];
+	
+	bool fog;
+	float fogStart;
+	float fogEnd;
+};
+
+class FaceRenderer {
 public:
-	BlockRenderer(int renderDist);
+	FaceRenderer();
 	void init();
 	
-	void renderChunk(Chunk& chunk, int32_t x, int32_t z);
-	void render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t chamChunkZ, const float skyColor[3]);
+	void bindFaceAttributes();
+	
+	void startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params);
+	void render(FaceBuffer& buffer, glm::mat4 model);
+	void stopRendering();
 	
 private:
 	GlId program, faceVBO, textureArray;
-	const int renderDist;
-	const float fogEnd, fogStart;
-	
-	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 };

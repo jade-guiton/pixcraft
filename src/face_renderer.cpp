@@ -1,4 +1,4 @@
-#include "block_renderer.hpp"
+#include "face_renderer.hpp"
 
 const float faceVertices[] = {
 	 0.5f, -0.5f,  0.5f,  1.0, 0.0,
@@ -24,23 +24,22 @@ const char* textureFiles[BLOCK_TEX_COUNT] = {
 };
 
 
-RenderedChunk::RenderedChunk() : VBO(0), VAO(0), faceCount(0) { }
+FaceBuffer::FaceBuffer()
+	: VAO(0), VBO(0), capacity(0), faceCount(0) { }
 
-void RenderedChunk::init(GlId faceVBO) {
+void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	
 	glBindVertexArray(VAO);
 	
-	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (0));
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3*sizeof(float)));
-	glEnableVertexAttribArray(1);
+	faceRenderer.bindFaceAttributes();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	size_t faceDataSize = sizeof(FaceData);
-	glBufferData(GL_ARRAY_BUFFER, faceDataSize*MAX_CHUNK_FACES, nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, faceDataSize*newCapacity, nullptr, GL_STATIC_DRAW);
+	capacity = newCapacity;
+	
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, faceDataSize, (void*) offsetof(FaceData, offsetX));
 	glVertexAttribDivisor(2, 1);
 	glEnableVertexAttribArray(2);
@@ -54,48 +53,25 @@ void RenderedChunk::init(GlId faceVBO) {
 	glBindVertexArray(0);
 }
 
-bool RenderedChunk::isInitialized() { return VBO != 0; }
+bool FaceBuffer::isInitialized() { return VAO != 0; }
 
-void RenderedChunk::load(Chunk& chunk) {
-	std::vector<FaceData> faces;
-	for(uint8_t x = 0; x < CHUNK_SIZE; ++x) {
-		for(uint8_t y = 0; y < CHUNK_HEIGHT; ++y) {
-			for(uint8_t z = 0; z < CHUNK_SIZE; ++z) {
-				Block* block = chunk.getBlock(x, y, z);
-				if(block == nullptr) continue;
-				
-				if(block->isOpaqueCube()) {
-					for(uint8_t side = 0; side < 6; ++side) {
-						int8_t x2 = x + sideVectors[side][0];
-						int8_t y2 = y + sideVectors[side][1];
-						int8_t z2 = z + sideVectors[side][2];
-						if(INVALID_BLOCK_POS(x2, y2, z2) || !chunk.isOpaqueCube(x2, y2, z2)) {
-							faces.push_back(FaceData {
-								(float) x, (float) y, (float) z, side, block->getFaceTexture(side)
-							});
-						}
-					}
-				}
-			}
-		}
-	}
-	
+void FaceBuffer::load(std::vector<FaceData>& faces) {
 	faceCount = faces.size();
+	if(faceCount > capacity) throw std::logic_error("Too many faces loaded into FaceBuffer");
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, faceCount * sizeof(FaceData), faces.data());
 }
 
-void RenderedChunk::render() {
+void FaceBuffer::render() {
 	glBindVertexArray(VAO);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faceCount);
 	glBindVertexArray(0);
 }
 
 
-BlockRenderer::BlockRenderer(int renderDist)
-	: renderDist(renderDist), fogEnd(renderDist * CHUNK_SIZE), fogStart(renderDist * CHUNK_SIZE * 0.9f) { }
+FaceRenderer::FaceRenderer() { }
 
-void BlockRenderer::init() {
+void FaceRenderer::init() {
 	program = loadBlockShaders();
 	
 	glGenBuffers(1, &faceVBO);
@@ -121,15 +97,16 @@ void BlockRenderer::init() {
 	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
-void BlockRenderer::renderChunk(Chunk& chunk, int32_t x, int32_t z) {
-	uint64_t key = getChunkId(x, z);
-	RenderedChunk& renderedChunk = renderedChunks[key];
-	if(!renderedChunk.isInitialized())
-		renderedChunk.init(faceVBO);
-	renderedChunk.load(chunk);
+void FaceRenderer::bindFaceAttributes() {
+	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3*sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
-void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t camChunkZ, const float skyColor[3]) {
+void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
 	glUseProgram(program);
 	
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -143,24 +120,20 @@ void BlockRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, in
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
 	
-	glUniform4f(glGetUniformLocation(program, "fogColor"), skyColor[0], skyColor[1], skyColor[2], 1.0f);
-	glUniform1f(glGetUniformLocation(program, "fogStart"), fogStart);
-	glUniform1f(glGetUniformLocation(program, "fogEnd"), fogEnd);
+	glUniform4f(glGetUniformLocation(program, "fogColor"), params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
+	glUniform1f(glGetUniformLocation(program, "fogStart"), params.fogStart);
+	glUniform1f(glGetUniformLocation(program, "fogEnd"), params.fogEnd);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+}
+
+void FaceRenderer::render(FaceBuffer& buffer, glm::mat4 model) {
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	
-	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
-		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
-			uint64_t key = getChunkId(x, z);
-			auto chunkIter = renderedChunks.find(key);
-			if(chunkIter != renderedChunks.end()) {
-				glm::mat4 model = glm::translate(id, ((float) CHUNK_SIZE) * glm::vec3(x, 0.0f, z));
-				glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-				chunkIter->second.render();
-			}
-		}
-	}
-	
+	buffer.render();
+}
+
+void FaceRenderer::stopRendering() {
 	glUseProgram(0);
 }

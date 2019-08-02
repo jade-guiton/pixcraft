@@ -12,7 +12,7 @@
 #include "glm.hpp"
 
 #include "shaders.hpp"
-#include "block_renderer.hpp"
+#include "chunk_renderer.hpp"
 #include "blocks.hpp"
 #include "util.hpp"
 #include "input.hpp"
@@ -44,7 +44,7 @@ private:
 	InputManager input;
 	World world;
 	Player* player;
-	BlockRenderer blockRenderer;
+	ChunkRenderer chunkRenderer;
 	Hotbar hotbar;
 	
 	TextRenderer textRenderer;
