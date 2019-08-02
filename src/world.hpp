@@ -22,6 +22,7 @@ class World {
 public:
 	World();
 	
+	static bool isValidHeight(int32_t y);
 	static std::pair<int32_t, int32_t> getChunkAt(int32_t x, int32_t z);
 	
 	bool isChunkLoaded(int32_t x, int32_t z);

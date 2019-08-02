@@ -15,7 +15,7 @@ const float cursorVertices[] = {
 };
 
 GameClient::GameClient()
-	: blockRenderer(RENDER_DIST), paused(false), firstFrame(true), FPS(0.0) {
+	: chunkRenderer(faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -52,11 +52,13 @@ GameClient::GameClient()
 	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
 	player = &world.players.back();
 	
+	BlockRegistry::registerBlocks();
+	faceRenderer.init();
+	textRenderer.init();
+	hotbar.init();
+	
 	input.init(window);
 	input.capturingMouse(!paused);
-	BlockRegistry::registerBlocks();
-	blockRenderer.init();
-	textRenderer.init();
 	
 	debugText = &textRenderer.createText("Loading debug...", 5, 5, 1.0, glm::vec4(1, 1, 1, 1));
 	
@@ -133,28 +135,40 @@ void GameClient::update(float dt) {
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
 		
+		int scroll = input.justScrolled();
+		if(scroll > 0) {
+			for(int i = 0; i < scroll; i++) {
+				hotbar.next();
+			}
+		} else if(scroll < 0) {
+			for(int i = 0; i < -scroll; i++) {
+				hotbar.previous();
+			}
+		}
+		
 		bool click1 = input.justClicked(1);
 		bool click2 = input.justClicked(2);
 		if(click1 || click2) {
 			bool hit;
 			int x, y, z;
 			std::tie(hit, x, y, z) = player->castRay(5, !click1);
-			if(hit) {
+			if(hit && World::isValidHeight(y)) {
 				int32_t chunkX, chunkZ;
 				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
 				if(click2) {
-					world.setBlock(x, y, z, Block::fromId(5));
+					world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
 					world.removeBlock(x, y, z);
 				}
 				Chunk& chunk = world.getChunk(chunkX, chunkZ);
-				blockRenderer.renderChunk(chunk, chunkX, chunkZ);
+				chunkRenderer.prerenderChunk(chunk, chunkX, chunkZ);
 			}
 		}
 	} else {
 		player->move(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
 	input.clearJustClicked();
+	input.clearJustScrolled();
 	
 	if(input.justPressed(GLFW_KEY_ESCAPE)) {
 		paused = !paused;
@@ -171,7 +185,7 @@ void GameClient::update(float dt) {
 		int z = iter.getZ();
 		if(!world.isChunkLoaded(x, z)) {
 			Chunk& chunk = world.genChunk(x, z);
-			blockRenderer.renderChunk(chunk, x, z);
+			chunkRenderer.prerenderChunk(chunk, x, z);
 			loads++;
 			if(loads >= LOADS_PER_FRAME) break;
 		}
@@ -180,21 +194,38 @@ void GameClient::update(float dt) {
 }
 
 void GameClient::render() {
+	// Compute some rendering data based on player position
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	float aspect = ((float) width) / height;
+	glm::vec3 playerPos = player->pos();
 	glm::mat4 proj = glm::perspective(glm::radians(90.0f), aspect, 0.001f, 1000.0f);
-	glm::mat4 view = globalToLocal(player->pos(), player->orient());
+	glm::mat4 view = globalToLocal(playerPos, player->orient());
+	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
+	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
 	
+	// Clear screen
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_BLEND);
 	
-	glm::vec3 playerPos = player->pos();
-	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
-	blockRenderer.render(proj, view, camChunkX, camChunkZ, SKY_COLOR);
+	// Start the face rendering
+	RenderParams params = {
+		{ SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2] },
+		true, true,
+		FOG_START, FOG_END
+	};
+	faceRenderer.startRendering(proj, view, params);
+	chunkRenderer.render(camChunkX, camChunkZ);
 	
+	params.applyView = false;
+	params.applyFog = false;
+	faceRenderer.setParams(params);
+	hotbar.render();
+	
+	faceRenderer.stopRendering();
+	
+	// Draw cursor
 	glLineWidth(2.0f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
@@ -205,13 +236,13 @@ void GameClient::render() {
 	glBindVertexArray(0);
 	glUseProgram(0);
 	
+	// Draw debug data
 	std::stringstream debugStream;
 	debugStream << FPS << " FPS" << std::endl;
 	debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
 	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode)] << std::endl;
 	debugStream << "Vertical speed: " << player->speed().y << std::endl;
 	debugText->setText(debugStream.str());
-	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textRenderer.render();
 }

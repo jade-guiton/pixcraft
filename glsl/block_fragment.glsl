@@ -6,6 +6,7 @@ uniform float ambientLight;
 uniform float diffuseLight;
 uniform vec3 lightSrcDir;
 
+uniform bool applyFog;
 uniform vec4 fogColor;
 uniform float fogStart;
 uniform float fogEnd;
@@ -23,8 +24,10 @@ void main() {
 	float light = ambientLight + diffuseLight*max(dot(lightSrcDir, normal), 0);
 	fragColor.rgb *= min(light, 1);
 	
-	float dist = length(cameraCoords);
-	if(dist > fogEnd) discard;
-	float fogFactor = clamp((fogEnd - dist)/(fogEnd - fogStart), 0.0, 1.0);
-	fragColor = mix(fogColor, fragColor, fogFactor);
+	if(applyFog) {
+		float dist = length(cameraCoords);
+		if(dist > fogEnd) discard;
+		float fogFactor = clamp((fogEnd - dist)/(fogEnd - fogStart), 0.0, 1.0);
+		fragColor = mix(fogColor, fragColor, fogFactor);
+	}
 } 

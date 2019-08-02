@@ -23,6 +23,10 @@ public:
 	void clearJustPressed();
 	std::tuple<int,int,bool,bool> getMovementKeys();
 	
+	void scrolled(int offset);
+	int justScrolled();
+	void clearJustScrolled();
+	
 private:
 	static constexpr float mouseSensitivity = 0.005f;
 	
@@ -33,6 +37,8 @@ private:
 	
 	std::unordered_set<int> _justPressed;
 	bool _justClicked[2];
+	
+	int _justScrolled;
 };
 
 #include "client.hpp"

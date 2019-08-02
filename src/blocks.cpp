@@ -46,6 +46,10 @@ namespace BlockRegistry {
 	Block& fromId(BlockId id) {
 		return *protoBlocks[id - 1];
 	}
+	
+	unsigned int registeredIds() {
+		return protoBlocks.size();
+	}
 }
 
 uint8_t GrassBlock::getFaceTexture(uint8_t face) {
