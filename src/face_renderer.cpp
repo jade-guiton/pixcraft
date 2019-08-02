@@ -16,12 +16,6 @@ const glm::mat3 sideTransforms[6] = {
 	glm::mat3(glm::rotate(glm::mat4(1.0f), -TAU/4, glm::vec3(1.0f, 0.0f, 0.0f)))
 };
 
-const size_t BLOCK_TEX_SIZE = 16;
-const size_t BLOCK_TEX_COUNT = 5;
-const char* textureFiles[BLOCK_TEX_COUNT] = {
-	"placeholder", "stone", "dirt", "grass_side", "grass_top"
-};
-
 
 FaceBuffer::FaceBuffer()
 	: VAO(0), VBO(0), capacity(0), faceCount(0) { }
@@ -77,23 +71,7 @@ void FaceRenderer::init() {
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(faceVertices), faceVertices, GL_STATIC_DRAW);
 	
-	glGenTextures(1, &textureArray);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
-	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, BLOCK_TEX_SIZE, BLOCK_TEX_SIZE, BLOCK_TEX_COUNT, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true);
-	for(size_t i = 0; i < BLOCK_TEX_COUNT; ++i) {
-		std::string filename = "res/" + std::string(textureFiles[i]) + ".png";
-		unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-		if(!data) throw std::runtime_error("Failed to load block texture");
-		if(width != BLOCK_TEX_SIZE || height != BLOCK_TEX_SIZE) throw std::runtime_error("Block texture has incorrect dimensions");
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, BLOCK_TEX_SIZE, BLOCK_TEX_SIZE, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
-		stbi_image_free(data);
-	}
-	glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+	TextureManager::loadTextures();
 }
 
 void FaceRenderer::bindFaceAttributes() {
@@ -129,8 +107,7 @@ void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams p
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
 	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
+	TextureManager::bindTextureArray();
 }
 
 void FaceRenderer::render(FaceBuffer& buffer, glm::mat4 model) {
