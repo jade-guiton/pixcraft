@@ -13,6 +13,3 @@ with open("src/shaders_src.cpp", "w") as out:
 	
 	include("glsl/cursor_vertex.glsl", "cursorVertex")
 	include("glsl/cursor_fragment.glsl", "cursorFragment")
-	
-	include("glsl/hotbar_vertex.glsl", "hotbarVertex")
-	include("glsl/hotbar_fragment.glsl", "hotbarFragment")

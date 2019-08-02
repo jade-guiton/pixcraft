@@ -7,14 +7,13 @@ const float faceVertices[] = {
 	-0.5f,  0.5f,  0.5f,  0.0, 1.0
 };
 
-const glm::mat4 id = glm::mat4(1.0f);
-const glm::mat4 sideTransforms[6] = {
-	glm::mat4(1.0f),
-	glm::rotate(id, TAU/4, glm::vec3(0.0f, 1.0f, 0.0f)),
-	glm::rotate(id, TAU/2, glm::vec3(0.0f, 1.0f, 0.0f)),
-	glm::rotate(id, -TAU/4, glm::vec3(0.0f, 1.0f, 0.0f)),
-	glm::rotate(id, TAU/4, glm::vec3(1.0f, 0.0f, 0.0f)),
-	glm::rotate(id, -TAU/4, glm::vec3(1.0f, 0.0f, 0.0f))
+const glm::mat3 sideTransforms[6] = {
+	glm::mat3(1.0f),
+	glm::mat3(glm::rotate(glm::mat4(1.0f), TAU/4, glm::vec3(0.0f, 1.0f, 0.0f))),
+	glm::mat3(glm::rotate(glm::mat4(1.0f), TAU/2, glm::vec3(0.0f, 1.0f, 0.0f))),
+	glm::mat3(glm::rotate(glm::mat4(1.0f), -TAU/4, glm::vec3(0.0f, 1.0f, 0.0f))),
+	glm::mat3(glm::rotate(glm::mat4(1.0f), TAU/4, glm::vec3(1.0f, 0.0f, 0.0f))),
+	glm::mat3(glm::rotate(glm::mat4(1.0f), -TAU/4, glm::vec3(1.0f, 0.0f, 0.0f)))
 };
 
 const size_t BLOCK_TEX_SIZE = 16;
@@ -106,12 +105,22 @@ void FaceRenderer::bindFaceAttributes() {
 	glEnableVertexAttribArray(1);
 }
 
+void FaceRenderer::setParams(RenderParams params) {
+	glUniform1i(glGetUniformLocation(program, "applyView"), params.applyView);
+	glUniform1i(glGetUniformLocation(program, "applyFog"), params.applyFog);
+	glUniform4f(glGetUniformLocation(program, "fogColor"), params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
+	glUniform1f(glGetUniformLocation(program, "fogStart"), params.fogStart);
+	glUniform1f(glGetUniformLocation(program, "fogEnd"), params.fogEnd);
+}
+
 void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
 	glUseProgram(program);
 	
+	setParams(params);
+	
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
-	glUniformMatrix4fv(glGetUniformLocation(program, "sideTransforms"), 6, GL_FALSE, glm::value_ptr(sideTransforms[0]));
+	glUniformMatrix3fv(glGetUniformLocation(program, "sideTransforms"), 6, GL_FALSE, glm::value_ptr(sideTransforms[0]));
 	
 	glUniform1i(glGetUniformLocation(program, "tex"), 0);
 	
@@ -119,10 +128,6 @@ void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams p
 	glUniform1f(glGetUniformLocation(program, "diffuseLight"), 0.3);
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
-	
-	glUniform4f(glGetUniformLocation(program, "fogColor"), params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
-	glUniform1f(glGetUniformLocation(program, "fogStart"), params.fogStart);
-	glUniform1f(glGetUniformLocation(program, "fogEnd"), params.fogEnd);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
