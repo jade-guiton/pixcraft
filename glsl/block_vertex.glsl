@@ -25,6 +25,6 @@ void main() {
 	gl_Position = proj * cameraSpace;
 	vertexUV = attrUV;
 	faceTexId = instTexId;
-	normal = mat3(model) * sideTransform * vec3(0, 0, 1);
+	normal = normalize(mat3(model) * sideTransform * vec3(0, 0, 1));
 	if(!applyView) normal = mat3(inverse(view)) * normal;
 }
