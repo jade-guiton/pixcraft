@@ -198,12 +198,16 @@ void GameClient::render() {
 	
 	// Start the face rendering
 	RenderParams params = {
-		SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2],
-		true, FOG_START, FOG_END
+		{ SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2] },
+		true, true,
+		FOG_START, FOG_END
 	};
 	faceRenderer.startRendering(proj, view, params);
-	
 	chunkRenderer.render(camChunkX, camChunkZ);
+	
+	params.applyView = false;
+	params.applyFog = false;
+	faceRenderer.setParams(params);
 	hotbar.render();
 	
 	faceRenderer.stopRendering();

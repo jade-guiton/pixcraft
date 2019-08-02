@@ -47,7 +47,9 @@ private:
 struct RenderParams {
 	float skyColor[3];
 	
-	bool fog;
+	bool applyView;
+	bool applyFog;
+	
 	float fogStart;
 	float fogEnd;
 };
@@ -59,6 +61,7 @@ public:
 	
 	void bindFaceAttributes();
 	
+	void setParams(RenderParams params);
 	void startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params);
 	void render(FaceBuffer& buffer, glm::mat4 model);
 	void stopRendering();

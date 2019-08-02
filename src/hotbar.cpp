@@ -21,6 +21,8 @@ void Hotbar::setBlock(BlockId blockId) {
 }
 
 void Hotbar::render() {
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 70, 0));
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), 0.1f, glm::vec3(0, 1, 0));
+	model = glm::translate(model, glm::vec3(0.35, -0.25, -0.25));
+	model = glm::scale(model, glm::vec3(0.2, 0.2, 0.2));
 	faceRenderer.render(buffer, model);
 }
