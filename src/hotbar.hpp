@@ -1,20 +1,24 @@
 #pragma once
 
+#include <vector>
+#include <cstdint>
+
 #include "glfw.hpp"
 #include "glm.hpp"
 
 #include "blocks.hpp"
-#include "shaders.hpp"
+#include "face_renderer.hpp"
 
 class Hotbar {
 public:
-	Hotbar();
+	Hotbar(FaceRenderer& renderer);
 	void init();
 	
 	void setBlock(BlockId blockId);
 	
-	void render(glm::mat4 proj);
+	void render();
 	
 private:
-	GlId program, VBO, textureArray;
+	FaceRenderer& faceRenderer;
+	FaceBuffer buffer;
 };
