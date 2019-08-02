@@ -14,7 +14,7 @@ namespace BlockRegistry {
 	void registerBlocks();
 	
 	Block& fromId(BlockId id);
-	int registeredIds();
+	unsigned int registeredIds();
 };
 
 class Block {

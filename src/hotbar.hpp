@@ -14,11 +14,16 @@ public:
 	Hotbar(FaceRenderer& renderer);
 	void init();
 	
-	void setBlock(BlockId blockId);
+	void previous();
+	void next();
+	BlockId held();
 	
 	void render();
 	
 private:
+	BlockId _held;
 	FaceRenderer& faceRenderer;
 	FaceBuffer buffer;
+	
+	void prerender();
 };

@@ -52,12 +52,13 @@ GameClient::GameClient()
 	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
 	player = &world.players.back();
 	
-	input.init(window);
-	input.capturingMouse(!paused);
 	BlockRegistry::registerBlocks();
 	faceRenderer.init();
 	textRenderer.init();
 	hotbar.init();
+	
+	input.init(window);
+	input.capturingMouse(!paused);
 	
 	debugText = &textRenderer.createText("Loading debug...", 5, 5, 1.0, glm::vec4(1, 1, 1, 1));
 	
@@ -134,6 +135,17 @@ void GameClient::update(float dt) {
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
 		
+		int scroll = input.justScrolled();
+		if(scroll > 0) {
+			for(int i = 0; i < scroll; i++) {
+				hotbar.next();
+			}
+		} else if(scroll < 0) {
+			for(int i = 0; i < -scroll; i++) {
+				hotbar.previous();
+			}
+		}
+		
 		bool click1 = input.justClicked(1);
 		bool click2 = input.justClicked(2);
 		if(click1 || click2) {
@@ -144,7 +156,7 @@ void GameClient::update(float dt) {
 				int32_t chunkX, chunkZ;
 				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
 				if(click2) {
-					world.setBlock(x, y, z, Block::fromId(1));
+					world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
 					world.removeBlock(x, y, z);
 				}
@@ -156,6 +168,7 @@ void GameClient::update(float dt) {
 		player->move(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
 	input.clearJustClicked();
+	input.clearJustScrolled();
 	
 	if(input.justPressed(GLFW_KEY_ESCAPE)) {
 		paused = !paused;

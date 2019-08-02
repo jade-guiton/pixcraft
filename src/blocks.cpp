@@ -45,7 +45,7 @@ namespace BlockRegistry {
 		return *protoBlocks[id - 1];
 	}
 	
-	int registeredIds() {
+	unsigned int registeredIds() {
 		return protoBlocks.size();
 	}
 }
