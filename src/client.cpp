@@ -57,6 +57,7 @@ GameClient::GameClient()
 	BlockRegistry::registerBlocks();
 	blockRenderer.init();
 	textRenderer.init();
+	hotbar.init();
 	
 	debugText = &textRenderer.createText("Loading debug...", 5, 5, 1.0, glm::vec4(1, 1, 1, 1));
 	
@@ -204,6 +205,8 @@ void GameClient::render() {
 	glDrawArrays(GL_LINES, 0, 4);
 	glBindVertexArray(0);
 	glUseProgram(0);
+	
+	hotbar.render(proj);
 	
 	std::stringstream debugStream;
 	debugStream << FPS << " FPS" << std::endl;
