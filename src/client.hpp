@@ -11,14 +11,15 @@
 #include "glfw.hpp"
 #include "glm.hpp"
 
-#include "shaders.hpp"
-#include "chunk_renderer.hpp"
-#include "blocks.hpp"
 #include "util.hpp"
+#include "blocks.hpp"
+#include "shaders.hpp"
+#include "face_renderer.hpp"
+#include "chunk_renderer.hpp"
+#include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
 #include "player.hpp"
-#include "hotbar.hpp"
 
 
 class GameClient {
@@ -37,6 +38,8 @@ private:
 	static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
 	
 	static const int RENDER_DIST = 6;
+	static constexpr float FOG_END = RENDER_DIST * CHUNK_SIZE;
+	static constexpr float FOG_START = FOG_END * 0.9f;
 	static const int LOADS_PER_FRAME = 2;
 	
 	GLFWwindow* window;
@@ -44,6 +47,8 @@ private:
 	InputManager input;
 	World world;
 	Player* player;
+	
+	FaceRenderer faceRenderer;
 	ChunkRenderer chunkRenderer;
 	Hotbar hotbar;
 	

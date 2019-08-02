@@ -39,12 +39,8 @@ void RenderedChunk::render(FaceRenderer& faceRenderer, int32_t x, int32_t z) {
 }
 
 
-ChunkRenderer::ChunkRenderer(int renderDist)
-	: renderDist(renderDist), fogEnd(renderDist * CHUNK_SIZE), fogStart(renderDist * CHUNK_SIZE * 0.9f) { }
-
-void ChunkRenderer::init() {
-	faceRenderer.init();
-}
+ChunkRenderer::ChunkRenderer(FaceRenderer& renderer, int renderDist)
+	: faceRenderer(renderer), renderDist(renderDist) { }
 
 void ChunkRenderer::prerenderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	uint64_t key = getChunkId(x, z);
@@ -54,13 +50,7 @@ void ChunkRenderer::prerenderChunk(Chunk& chunk, int32_t x, int32_t z) {
 	renderedChunk.load(chunk);
 }
 
-void ChunkRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t camChunkZ, const float skyColor[3]) {
-	RenderParams params = {
-		skyColor[0], skyColor[1], skyColor[2],
-		true, fogStart, fogEnd
-	};
-	faceRenderer.startRendering(proj, view, params);
-	
+void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
 		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
 			uint64_t key = getChunkId(x, z);
@@ -70,6 +60,4 @@ void ChunkRenderer::render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, in
 			}
 		}
 	}
-	
-	faceRenderer.stopRendering();
 }

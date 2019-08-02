@@ -33,16 +33,14 @@ private:
 
 class ChunkRenderer {
 public:
-	ChunkRenderer(int renderDist);
-	void init();
+	ChunkRenderer(FaceRenderer& renderer, int renderDist);
 	
 	void prerenderChunk(Chunk& chunk, int32_t x, int32_t z);
-	void render(glm::mat4 proj, glm::mat4 view, int32_t camChunkX, int32_t chamChunkZ, const float skyColor[3]);
+	void render(int32_t camChunkX, int32_t chamChunkZ);
 	
 private:
-	FaceRenderer faceRenderer;
+	FaceRenderer& faceRenderer;
 	const int renderDist;
-	const float fogEnd, fogStart;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 };
