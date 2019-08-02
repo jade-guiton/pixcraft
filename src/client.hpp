@@ -18,6 +18,7 @@
 #include "input.hpp"
 #include "text.hpp"
 #include "player.hpp"
+#include "hotbar.hpp"
 
 
 class GameClient {
@@ -44,6 +45,7 @@ private:
 	World world;
 	Player* player;
 	BlockRenderer blockRenderer;
+	Hotbar hotbar;
 	
 	TextRenderer textRenderer;
 	Text* debugText;

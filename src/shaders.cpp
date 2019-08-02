@@ -46,3 +46,7 @@ GlId loadBlockShaders() {
 GlId loadCursorShaders() {
 	return loadShaders(cursorVertexShaderSource, cursorFragmentShaderSource);
 }
+
+GlId loadHotbarShaders() {
+	return loadShaders(hotbarVertexShaderSource, hotbarFragmentShaderSource);
+}

@@ -18,7 +18,7 @@ out vec3 normal;
 
 void main() {
 	mat4 sideTransform = sideTransforms[instSide];
-	vec4 cameraSpace = view * model * (vec4(instOffset, 0.0) + sideTransform * vec4(attrPos.x, attrPos.y, attrPos.z, 1.0));
+	vec4 cameraSpace = view * model * (vec4(instOffset, 0.0) + sideTransform * vec4(attrPos, 1.0));
 	cameraCoords = cameraSpace.xyz;
 	gl_Position = proj * cameraSpace;
 	vertexUV = attrUV;
