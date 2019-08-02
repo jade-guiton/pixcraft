@@ -39,7 +39,8 @@ namespace BlockRegistry {
 		registerBlock(new Block()).mainTexture(1); // stone
 		registerBlock(new Block()).mainTexture(2); // dirt
 		registerBlock(new GrassBlock()); // grass
-		registerBlock(new TrunkBlock()); // grass
+		registerBlock(new TrunkBlock()); // tree trunk
+		registerBlock(new Block()).mainTexture(7); // leaves
 	}
 
 	Block& fromId(BlockId id) {

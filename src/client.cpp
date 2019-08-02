@@ -143,7 +143,7 @@ void GameClient::update(float dt) {
 				int32_t chunkX, chunkZ;
 				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
 				if(click2) {
-					world.setBlock(x, y, z, Block::fromId(4));
+					world.setBlock(x, y, z, Block::fromId(5));
 				} else {
 					world.removeBlock(x, y, z);
 				}
