@@ -8,6 +8,10 @@ uint64_t getChunkId(int32_t x, int32_t z) {
 
 World::World() { }
 
+bool World::isValidHeight(int32_t y) {
+	return 0 <= y && y < CHUNK_HEIGHT;
+}
+
 std::pair<int32_t,int32_t> World::getChunkAt(int32_t x, int32_t z) {
 	int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
 	int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
@@ -61,6 +65,7 @@ void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
 void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	int chunkX, chunkZ;
 	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
+	if(!isChunkLoaded(chunkX, chunkZ)) return;
 	Chunk& chunk = loadedChunks[getChunkId(chunkX, chunkZ)];
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
@@ -70,7 +75,7 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset) {
 	Ray ray(pos, dir);
 	bool hit = hasBlock(ray.getX(), ray.getY(), ray.getZ());
-	while(!hit && ray.getDistance() <= maxDist && ray.getY() < 64) {
+	while(!hit && ray.getDistance() <= maxDist) {
 		ray.nextFace();
 		hit = hasBlock(ray.getX(), ray.getY(), ray.getZ());
 	}
