@@ -139,7 +139,7 @@ void GameClient::update(float dt) {
 			bool hit;
 			int x, y, z;
 			std::tie(hit, x, y, z) = player->castRay(5, !click1);
-			if(hit) {
+			if(hit && World::isValidHeight(y)) {
 				int32_t chunkX, chunkZ;
 				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
 				if(click2) {

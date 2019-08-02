@@ -11,9 +11,9 @@
 #include "glfw.hpp"
 #include "glm.hpp"
 
+#include "blocks.hpp"
 #include "shaders.hpp"
 #include "block_renderer.hpp"
-#include "blocks.hpp"
 #include "util.hpp"
 #include "input.hpp"
 #include "text.hpp"
