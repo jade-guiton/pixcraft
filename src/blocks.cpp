@@ -15,7 +15,7 @@ Block& Block::fromId(BlockId id) {
 }
 
 
-Block::Block() : _id(BlockRegistry::nextId()), _isOpaqueCube(true), _mainTexture(0) { }
+Block::Block() : _id(BlockRegistry::nextId()), _isOpaqueCube(true), _mainTexture(TEX(PLACEHOLDER)) { }
 
 Block& Block::isOpaqueCube(bool isOpaqueCube) { _isOpaqueCube = isOpaqueCube; return *this; }
 Block& Block::mainTexture(uint8_t texture) { _mainTexture = texture; return *this; }
@@ -36,11 +36,11 @@ namespace BlockRegistry {
 	}
 	
 	void registerBlocks() {
-		registerBlock(new Block()).mainTexture(1); // stone
-		registerBlock(new Block()).mainTexture(2); // dirt
+		registerBlock(new Block()).mainTexture(TEX(STONE)); // stone
+		registerBlock(new Block()).mainTexture(TEX(DIRT)); // dirt
 		registerBlock(new GrassBlock()); // grass
 		registerBlock(new TrunkBlock()); // tree trunk
-		registerBlock(new Block()).mainTexture(7); // leaves
+		registerBlock(new Block()).mainTexture(TEX(LEAVES)); // leaves
 	}
 
 	Block& fromId(BlockId id) {
@@ -54,14 +54,14 @@ namespace BlockRegistry {
 
 uint8_t GrassBlock::getFaceTexture(uint8_t face) {
 	if(face == 4) {
-		return 2;
+		return TEX(DIRT);
 	} else if(face == 5) {
-		return 4;
+		return TEX(GRASS_TOP);
 	} else {
-		return 3;
+		return TEX(GRASS_SIDE);
 	}
 }
 
 uint8_t TrunkBlock::getFaceTexture(uint8_t face) {
-	return face >= 4 ? 6 : 5;
+	return face >= 4 ? TEX(TRUNK_INSIDE) : TEX(TRUNK_SIDE);
 }
