@@ -15,4 +15,7 @@ public:
 
 private:
 	OpenSimplexNoise noiseGen;
+	
+	uint8_t getTerrainHeight(int32_t x, int32_t z);
+	void generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, int8_t relX, int8_t relY);
 };
