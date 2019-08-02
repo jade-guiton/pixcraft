@@ -1,7 +1,8 @@
 #include "input.hpp"
 
 InputManager::InputManager()
-	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false} { }
+	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false},
+	  _justScrolled(0) { }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
@@ -20,11 +21,20 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 	}
 }
 
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
+	InputManager& input = client.getInputManager();
+	if(yoffset != 0) {
+		input.scrolled(yoffset);
+	}
+}
+
 void InputManager::init(GLFWwindow* newWindow) {
 	window = newWindow;
 	
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 }
 
 void InputManager::capturingMouse(bool capturingMouse) {
@@ -80,3 +90,8 @@ std::tuple<int,int,bool,bool> InputManager::getMovementKeys() {
 	bool down = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 	return std::tuple<int,int,bool,bool>(dx, dz, up, down);
 }
+
+void InputManager::scrolled(int offset) { _justScrolled += offset; }
+
+int InputManager::justScrolled() { return _justScrolled; }
+void InputManager::clearJustScrolled() { _justScrolled = 0; }
