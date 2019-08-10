@@ -18,6 +18,7 @@ namespace BlockRegistry {
 	extern const BlockId GRASS_ID;
 	extern const BlockId TRUNK_ID;
 	extern const BlockId LEAVES_ID;
+	extern const BlockId WATER_ID;
 };
 
 class Block {

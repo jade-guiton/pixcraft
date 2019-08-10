@@ -14,6 +14,7 @@ namespace TextureManager {
 	REQ_TEX(TRUNK_SIDE, "trunk_side");
 	REQ_TEX(TRUNK_INSIDE, "trunk_inside");
 	REQ_TEX(LEAVES, "leaves");
+	REQ_TEX(WATER, "water");
 	
 	void loadTextures();
 	void bindTextureArray();

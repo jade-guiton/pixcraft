@@ -16,7 +16,7 @@ private:
 	uint64_t seed;
 	OpenSimplexNoise terrainHeightNoise;
 	
-	static const uint8_t WATER_LEVEL = 29;
+	static const uint8_t WATER_LEVEL = 30;
 	
 	uint8_t getTerrainHeight(int32_t x, int32_t z);
 	
