@@ -19,7 +19,7 @@ void Hotbar::previous() {
 }
 
 void Hotbar::next() {
-	if(_held < BlockRegistry::registeredIds()) _held++;
+	if(_held < BlockRegistry::registeredCount()) _held++;
 	prerender();
 }
 

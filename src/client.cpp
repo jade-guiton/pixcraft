@@ -64,7 +64,6 @@ GameClient::GameClient()
 	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
 	player = &world.players.back();
 	
-	BlockRegistry::registerBlocks();
 	faceRenderer.init();
 	textRenderer.init();
 	hotbar.init();

@@ -9,22 +9,18 @@ WorldGenerator::WorldGenerator()
 	: seed(generateSeed()), terrainHeightNoise(getFeatureSeed(seed, FeatureType::terrainHeight)) { }
 
 void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ) {
-	BlockId stoneId = 1;
-	BlockId dirtId = 2;
-	BlockId grassId = 3;
 	for(uint8_t relX = 0; relX < CHUNK_SIZE; relX++) {
 		for(uint8_t relZ = 0; relZ < CHUNK_SIZE; relZ++) {
 			int32_t x = chunkX*CHUNK_SIZE + relX;
 			int32_t z = chunkZ*CHUNK_SIZE + relZ;
 			uint8_t h = getTerrainHeight(x, z);
 			for(uint8_t y = 0; y < h - 1; y++) {
-				chunk.setBlockId(relX, y, relZ, stoneId, true);
+				chunk.setBlockId(relX, y, relZ, BlockRegistry::STONE_ID, true);
 			}
-			chunk.setBlockId(relX, h-1, relZ, dirtId, true);
-			chunk.setBlockId(relX, h, relZ, grassId, true);
+			chunk.setBlockId(relX, h-1, relZ, BlockRegistry::DIRT_ID, true);
+			chunk.setBlockId(relX, h, relZ, BlockRegistry::GRASS_ID, true);
 		}
 	}
-	//generateTree(chunk, chunkX, chunkZ, CHUNK_SIZE/2, CHUNK_SIZE/2);
 	
 	std::vector<float> trees = distributeObjects(getFeatureSeed(seed, FeatureType::trees),
 		chunkX*CHUNK_SIZE - 0.5, chunkZ*CHUNK_SIZE - 0.5, CHUNK_SIZE, 8, 2.5);
@@ -45,7 +41,7 @@ void WorldGenerator::generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, 
 	uint8_t h = getTerrainHeight(chunkX*CHUNK_SIZE + rootX, chunkZ*CHUNK_SIZE + rootZ) + 1;
 	if(!INVALID_BLOCK_POS(rootX, 0, rootZ)) {
 		for(int y = h; y <= h + 3; ++y) {
-			chunk.setBlockId(rootX, y, rootZ, 4, true);
+			chunk.setBlockId(rootX, y, rootZ, BlockRegistry::TRUNK_ID, true);
 		}
 	}
 	for(int y = h + 2; y <= h + 4; ++y) {
@@ -55,7 +51,7 @@ void WorldGenerator::generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, 
 					int d = abs(relX - rootX) + abs(relZ - rootZ);
 					bool place = (y <= h + 3) ? (d >= 1 && d <= 3) : (d <= 1);
 					if(place) {
-						chunk.setBlockId(relX, y, relZ, 5, true);
+						chunk.setBlockId(relX, y, relZ, BlockRegistry::LEAVES_ID, true);
 					}
 				}
 			}
