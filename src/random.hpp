@@ -3,21 +3,26 @@
 #include <cstdint>
 #include <ctime>
 #include <random>
+#include <vector>
+#include <cmath>
 
-#include "OpenSimplexNoise.hpp"
 #include "wyhash.h"
 
-class Random {
-public:
-	Random();
-	Random(uint64_t seed);
-	
-	static uint64_t generateSeed();
-	uint64_t getSeed();
-	
-	double getNoise(double x, double z);
+#include "util.hpp"
 
-private:
-	uint64_t seed;
-	OpenSimplexNoise noiseGen;
+extern const std::vector<float> poissonDiskTiles[256];
+
+uint64_t generateSeed();
+
+enum class FeatureType {
+	terrainHeight,
+	trees
 };
+
+uint64_t getFeatureSeed(uint64_t seed, FeatureType feature);
+
+uint64_t randFromPosition(uint64_t seed, int32_t x, int32_t z);
+
+// Samples a Poisson-disk distribution with radius minDist, returning the interleaved coordinates of a number of points,
+// such that objects with a given size placed at these points overlap the square with corner (minX, minZ) and size chunkSize.
+std::vector<float> distributeObjects(uint64_t seed, float minX, float minZ, float chunkSize, float minDist, float size);

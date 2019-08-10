@@ -1,11 +1,5 @@
 #include "world.hpp"
 
-uint64_t getChunkId(int32_t x, int32_t z) {
-	uint32_t x2 = (uint32_t) x;
-	uint32_t z2 = (uint32_t) z;
-	return ((uint64_t) x2) << 32 | ((uint64_t) z2);
-}
-
 World::World() { }
 
 bool World::isValidHeight(int32_t y) {
@@ -19,15 +13,15 @@ std::pair<int32_t,int32_t> World::getChunkAt(int32_t x, int32_t z) {
 }
 
 bool World::isChunkLoaded(int32_t x, int32_t z) {
-	return loadedChunks.count(getChunkId(x, z)) == 1;
+	return loadedChunks.count(packCoords(x, z)) == 1;
 }
 
 Chunk& World::getChunk(int32_t x, int32_t z) {
-	return loadedChunks.at(getChunkId(x, z));
+	return loadedChunks.at(packCoords(x, z));
 }
 
 Chunk& World::genChunk(int32_t x, int32_t z) {
-	uint64_t key = getChunkId(x, z);
+	uint64_t key = packCoords(x, z);
 	loadedChunks.erase(key);
 	gen.generateChunk(loadedChunks[key], x, z);
 	return loadedChunks.at(key);
@@ -56,7 +50,7 @@ Block* World::getBlock(int32_t x, int32_t y, int32_t z) {
 void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
 	int chunkX, chunkZ;
 	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	Chunk& chunk = loadedChunks[getChunkId(chunkX, chunkZ)];
+	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
 	return chunk.setBlock(relX, y, relZ, block);
@@ -66,7 +60,7 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	int chunkX, chunkZ;
 	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
 	if(!isChunkLoaded(chunkX, chunkZ)) return;
-	Chunk& chunk = loadedChunks[getChunkId(chunkX, chunkZ)];
+	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
 	return chunk.removeBlock(relX, y, relZ);

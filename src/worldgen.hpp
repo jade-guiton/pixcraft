@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <cmath>
 
+#include "OpenSimplexNoise.hpp"
+
 #include "blocks.hpp"
 #include "chunk.hpp"
 #include "random.hpp"
@@ -14,7 +16,8 @@ public:
 	void generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ);
 
 private:
-	Random rand;
+	uint64_t seed;
+	OpenSimplexNoise terrainHeightNoise;
 	
 	uint8_t getTerrainHeight(int32_t x, int32_t z);
 	

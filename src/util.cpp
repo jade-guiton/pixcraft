@@ -125,3 +125,9 @@ void Ray::nextFace() {
 std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos) {
 	return std::tuple<int,int,int>(getBlockCoordAt(pos.x), getBlockCoordAt(pos.y), getBlockCoordAt(pos.z));
 }
+
+uint64_t packCoords(int32_t x, int32_t z) {
+	uint32_t x2 = (uint32_t) x;
+	uint32_t z2 = (uint32_t) z;
+	return ((uint64_t) x2) << 32 | ((uint64_t) z2);
+}
