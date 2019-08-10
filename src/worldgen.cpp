@@ -17,8 +17,13 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 			for(uint8_t y = 0; y < h - 1; y++) {
 				chunk.setBlockId(relX, y, relZ, BlockRegistry::STONE_ID, true);
 			}
-			chunk.setBlockId(relX, h-1, relZ, BlockRegistry::DIRT_ID, true);
-			chunk.setBlockId(relX, h, relZ, BlockRegistry::GRASS_ID, true);
+			if(h > WATER_LEVEL) {
+				chunk.setBlockId(relX, h-1, relZ, BlockRegistry::DIRT_ID, true);
+				chunk.setBlockId(relX, h, relZ, BlockRegistry::GRASS_ID, true);
+			} else {
+				chunk.setBlockId(relX, h-1, relZ, BlockRegistry::DIRT_ID, true);
+				chunk.setBlockId(relX, h, relZ, BlockRegistry::DIRT_ID, true);
+			}
 		}
 	}
 	
@@ -34,11 +39,12 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 }
 
 uint8_t WorldGenerator::getTerrainHeight(int32_t x, int32_t z) {
-	return 28 + floor(8 * terrainHeightNoise.Evaluate(x / 20.0, z / 20.0));
+	return 32 + round(8 * terrainHeightNoise.Evaluate(x / 20.0, z / 20.0));
 }
 
 void WorldGenerator::generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, int8_t rootX, int8_t rootZ) {
 	uint8_t h = getTerrainHeight(chunkX*CHUNK_SIZE + rootX, chunkZ*CHUNK_SIZE + rootZ) + 1;
+	if(h <= WATER_LEVEL) return;
 	if(!INVALID_BLOCK_POS(rootX, 0, rootZ)) {
 		for(int y = h; y <= h + 3; ++y) {
 			chunk.setBlockId(rootX, y, rootZ, BlockRegistry::TRUNK_ID, true);
