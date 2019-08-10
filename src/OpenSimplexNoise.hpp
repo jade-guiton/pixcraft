@@ -83,7 +83,7 @@ protected:
 	};
 	static StaticConstructor staticConstructor;
 	
-	FORCE_INLINE static int FastFloor(double x);
+	FORCE_INLINE static inline int FastFloor(double x);
 	
 public:
 	OpenSimplexNoise();
