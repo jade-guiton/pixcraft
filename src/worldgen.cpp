@@ -1,7 +1,7 @@
 #include "worldgen.hpp"
 
 WorldGenerator::WorldGenerator()
-	: seed(WorldGenerator::newSeed()), noiseGen((int64_t) seed) { }
+	: random(42) { }
 
 void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ) {
 	BlockId stoneId = 1;
@@ -22,18 +22,8 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 	generateTree(chunk, chunkX, chunkZ, CHUNK_SIZE/2, CHUNK_SIZE/2);
 }
 
-uint64_t WorldGenerator::newSeed() {
-	/*
-	uint64_t a = (uint64_t) time(nullptr);
-	std::random_device rand;
-	uint64_t b = ((uint64_t) rand()) << 32 | ((uint64_t) rand());
-	return wyhash64(a, b);
-	*/
-	return 42;
-}
-
 uint8_t WorldGenerator::getTerrainHeight(int32_t x, int32_t z) {
-	return 28 + floor(8 * noiseGen.Evaluate(x / 20.0, z / 20.0));
+	return 28 + floor(8 * rand.getNoise(x / 20.0, z / 20.0));
 }
 
 void WorldGenerator::generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, int8_t rootX, int8_t rootZ) {
