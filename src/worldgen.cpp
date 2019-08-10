@@ -24,7 +24,7 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 				chunk.setBlockId(relX, h-1, relZ, BlockRegistry::DIRT_ID, true);
 				chunk.setBlockId(relX, h, relZ, BlockRegistry::DIRT_ID, true);
 				for(uint8_t y = h+1; y <= WATER_LEVEL; ++y) {
-					chunk.setBlockId(relX, y, relZ, BlockRegistry::WATER_ID, true);
+					chunk.setBlockId(relX, y, relZ, BlockRegistry::WATER_ID, false);
 				}
 			}
 		}

@@ -21,6 +21,10 @@ namespace BlockRegistry {
 	extern const BlockId WATER_ID;
 };
 
+enum class BlockRendering {
+	opaqueCube, transparentCube, translucentCube
+};
+
 class Block {
 	friend BlockId BlockRegistry::registerBlock(Block* block);
 	
@@ -30,18 +34,18 @@ public:
 	
 	virtual uint8_t getFaceTexture(uint8_t face);
 	
-	Block* isOpaqueCube(bool isOpaqueCube);
+	Block* rendering(BlockRendering rendering);
 	Block* mainTexture(uint8_t texture);
 	
 	BlockId id();
-	bool isOpaqueCube();
+	BlockRendering rendering();
 	uint8_t mainTexture();
 	
 	static Block& fromId(BlockId id);
 
 private:
 	BlockId _id;
-	bool _isOpaqueCube;
+	BlockRendering _rendering;
 	int8_t _mainTexture;
 	
 	void setId(BlockId id);

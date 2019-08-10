@@ -25,6 +25,10 @@ public:
 	std::vector<FaceData> faces;
 	
 	void prerender();
+	void eraseFaces(int8_t x, int8_t y, int8_t z);
+	void erasePlaneX(int8_t x);
+	void erasePlaneZ(int8_t z);
+	
 	void render();
 	
 private:
