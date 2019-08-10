@@ -18,6 +18,9 @@ namespace TextureManager {
 	REQ_TEX(DIRT, "dirt");
 	REQ_TEX(GRASS_TOP, "grass_top");
 	REQ_TEX(GRASS_SIDE, "grass_side");
+	REQ_TEX(TRUNK_SIDE, "trunk_side");
+	REQ_TEX(TRUNK_INSIDE, "trunk_inside");
+	REQ_TEX(LEAVES, "leaves");
 	
 	void loadTextures();
 	void bindTextureArray();

@@ -16,8 +16,6 @@
 class World;
 #include "player.hpp"
 
-uint64_t getChunkId(int32_t x, int32_t z);
-
 class World {
 public:
 	World();

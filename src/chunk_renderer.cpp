@@ -43,7 +43,7 @@ ChunkRenderer::ChunkRenderer(FaceRenderer& renderer, int renderDist)
 	: faceRenderer(renderer), renderDist(renderDist) { }
 
 void ChunkRenderer::prerenderChunk(Chunk& chunk, int32_t x, int32_t z) {
-	uint64_t key = getChunkId(x, z);
+	uint64_t key = packCoords(x, z);
 	RenderedChunk& renderedChunk = renderedChunks[key];
 	if(!renderedChunk.isInitialized())
 		renderedChunk.init(faceRenderer);
@@ -53,7 +53,7 @@ void ChunkRenderer::prerenderChunk(Chunk& chunk, int32_t x, int32_t z) {
 void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
 		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
-			uint64_t key = getChunkId(x, z);
+			uint64_t key = packCoords(x, z);
 			auto chunkIter = renderedChunks.find(key);
 			if(chunkIter != renderedChunks.end()) {
 				chunkIter->second.render(faceRenderer, x, z);
