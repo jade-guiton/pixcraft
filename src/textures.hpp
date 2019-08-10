@@ -1,12 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <stdexcept>
-
-#include <stb_image.h>
-#include "glfw.hpp"
-
 #define TEX(name) (TextureManager::name)
 #define REQ_TEX(name, filename) const unsigned int name = require(filename)
 

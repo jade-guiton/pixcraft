@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdexcept>
-
 #include "blocks.hpp"
 
 #define CHUNK_SIZE 16

@@ -1,25 +1,16 @@
 #pragma once
 
-#include <iostream>
-#include <stdexcept>
-#include <cstdint>
-#include <cmath>
 #include <tuple>
-#include <string>
-#include <sstream>
 
 #include "glfw.hpp"
-#include "glm.hpp"
 
-#include "util.hpp"
-#include "blocks.hpp"
-#include "shaders.hpp"
 #include "face_renderer.hpp"
 #include "chunk_renderer.hpp"
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
 #include "player.hpp"
+#include "world.hpp"
 
 
 class GameClient {

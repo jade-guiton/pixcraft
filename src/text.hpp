@@ -2,9 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <stdexcept>
-
-#include <iostream>
 
 #include "glm.hpp"
 #include "glfw.hpp"

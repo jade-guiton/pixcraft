@@ -40,5 +40,3 @@ private:
 	
 	int _justScrolled;
 };
-
-#include "client.hpp"

@@ -1,5 +1,7 @@
 #include "input.hpp"
 
+#include "client.hpp"
+
 InputManager::InputManager()
 	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false},
 	  _justScrolled(0) { }

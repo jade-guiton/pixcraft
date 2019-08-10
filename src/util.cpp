@@ -1,5 +1,8 @@
 #include "util.hpp"
 
+#include <cmath>
+#include <cstdio>
+
 const int sideVectors[6][3] = {
 	{0,0,1}, {1,0,0}, {0,0,-1}, {-1,0,0}, {0,-1,0}, {0,1,0}
 };

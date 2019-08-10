@@ -1,22 +1,9 @@
 #pragma once
 
-#include <stdexcept>
-#include <string>
-#include <cstddef>
 #include <vector>
-#include <unordered_map>
-
-#include <iostream>
 
 #include "glfw.hpp"
 #include "glm.hpp"
-
-#include "shaders.hpp"
-#include "textures.hpp"
-#include "world.hpp"
-#include "blocks.hpp"
-#include "chunk.hpp"
-#include "util.hpp"
 
 struct FaceData {
 	float offsetX;

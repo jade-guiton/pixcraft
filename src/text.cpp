@@ -1,6 +1,8 @@
 #define GLT_IMPLEMENTATION
 #include "text.hpp"
 
+#include <stdexcept>
+
 Text::Text(std::string str, float x, float y, float scale, glm::vec4 color)
 	: x(x), y(y), scale(scale), color(color) {
 	text = gltCreateText();

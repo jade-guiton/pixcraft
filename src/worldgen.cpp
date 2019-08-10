@@ -1,5 +1,10 @@
 #include "worldgen.hpp"
 
+#include <cmath>
+
+#include "blocks.hpp"
+#include "random.hpp"
+
 WorldGenerator::WorldGenerator()
 	: seed(generateSeed()), terrainHeightNoise(getFeatureSeed(seed, FeatureType::terrainHeight)) { }
 

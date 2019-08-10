@@ -1,11 +1,6 @@
 #pragma once
 
-#include <vector>
 #include <cstdint>
-#include <stdexcept>
-#include <memory>
-
-#include "textures.hpp"
 
 typedef uint32_t BlockId;
 
