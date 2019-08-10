@@ -35,11 +35,11 @@ void Hotbar::render() {
 void Hotbar::prerender() {
 	Block& block = Block::fromId(_held);
 	
-	std::vector<FaceData> faces;
+	buffer.faces.clear();
 	for(uint8_t side = 0; side < 6; ++side) {
-		faces.push_back(FaceData {
+		buffer.faces.push_back(FaceData {
 			0, 0, 0, side, block.getFaceTexture(side)
 		});
 	}
-	buffer.load(faces);
+	buffer.prerender();
 }

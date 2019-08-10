@@ -47,7 +47,6 @@ GameClient::GameClient()
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
 	
 	cursorProgram = loadCursorShaders();
 	glGenVertexArrays(1, &cursorVAO);
@@ -171,8 +170,7 @@ void GameClient::update(float dt) {
 				} else {
 					world.removeBlock(x, y, z);
 				}
-				Chunk& chunk = world.getChunk(chunkX, chunkZ);
-				chunkRenderer.prerenderChunk(chunk, chunkX, chunkZ);
+				chunkRenderer.updateBlock(world, x, y, z);
 			}
 		}
 	} else {
@@ -195,8 +193,8 @@ void GameClient::update(float dt) {
 		int x = iter.getX();
 		int z = iter.getZ();
 		if(!world.isChunkLoaded(x, z)) {
-			Chunk& chunk = world.genChunk(x, z);
-			chunkRenderer.prerenderChunk(chunk, x, z);
+			world.genChunk(x, z);
+			chunkRenderer.prerenderChunk(world, x, z);
 			loads++;
 			if(loads >= LOADS_PER_FRAME) break;
 		}
@@ -218,7 +216,8 @@ void GameClient::render() {
 	// Clear screen
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// Start the face rendering
 	RenderParams params = {
@@ -238,7 +237,6 @@ void GameClient::render() {
 	
 	// Draw cursor
 	glLineWidth(2.0f);
-	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 	glUseProgram(cursorProgram);
 	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);

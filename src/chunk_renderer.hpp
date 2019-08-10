@@ -4,26 +4,36 @@
 
 #include <stb_image.h>
 
-#include "chunk.hpp"
+#include "world.hpp"
 #include "face_renderer.hpp"
 
 class RenderedChunk {
 public:
-	void init(FaceRenderer& faceRenderer);
+	void init(FaceRenderer& faceRenderer, World& world, int32_t chunkX, int32_t chunkZ);
 	bool isInitialized();
 	
-	void load(Chunk& chunk);
-	void render(FaceRenderer& faceRenderer, int32_t x, int32_t z);
+	void prerender();
+	void updateBlock(int8_t relX, int8_t y, int8_t relZ);
+	void updatePlaneX(int8_t relX);
+	void updatePlaneZ(int8_t relZ);
+	
+	void render(FaceRenderer& faceRenderer);
 	
 private:
 	FaceBuffer buffer;
+	World* world;
+	int32_t chunkX, chunkZ;
+	
+	void prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t relZ);
 };
 
 class ChunkRenderer {
 public:
 	ChunkRenderer(FaceRenderer& renderer, int renderDist);
 	
-	void prerenderChunk(Chunk& chunk, int32_t x, int32_t z);
+	void prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ);
+	void updateBlock(World& world, int32_t x, int8_t y, int32_t z);
+	
 	void render(int32_t camChunkX, int32_t chamChunkZ);
 	
 private:
@@ -31,4 +41,6 @@ private:
 	const int renderDist;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
+	
+	void updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z);
 };

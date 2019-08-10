@@ -30,6 +30,8 @@ public:
 	void setBlock(int32_t x, int32_t y, int32_t z, Block& block);
 	void removeBlock(int32_t x, int32_t y, int32_t z);
 	
+	bool isOpaqueCube(int32_t x, int32_t y, int32_t z);
+	
 	// sends a ray from pos in dir, on maxDist, and tests for block collisions; returns a tuple with:
 	// { hit?, hitBlockX, hitBlockY, hitBlockZ }
 	// if offset, the air block before the hit block is returned instead.

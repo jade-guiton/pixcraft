@@ -22,7 +22,7 @@ namespace BlockRegistry {
 	const BlockId DIRT_ID = registerBlock((new Block())->mainTexture(TEX(DIRT)));
 	const BlockId GRASS_ID = registerBlock(new GrassBlock());
 	const BlockId TRUNK_ID = registerBlock(new TrunkBlock());
-	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES)));
+	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES))->isOpaqueCube(false));
 	const BlockId WATER_ID = registerBlock((new Block())->mainTexture(TEX(WATER)));
 
 	Block& fromId(BlockId id) {
