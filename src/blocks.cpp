@@ -23,6 +23,7 @@ namespace BlockRegistry {
 	const BlockId GRASS_ID = registerBlock(new GrassBlock());
 	const BlockId TRUNK_ID = registerBlock(new TrunkBlock());
 	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES)));
+	const BlockId WATER_ID = registerBlock((new Block())->mainTexture(TEX(WATER)));
 
 	Block& fromId(BlockId id) {
 		return *protoBlocks[id - 1];
