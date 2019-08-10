@@ -22,7 +22,7 @@ Block* Chunk::getBlock(uint8_t x, uint8_t y, uint8_t z) {
 void Chunk::setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block) {
 	if(INVALID_BLOCK_POS(x, y, z)) throw std::logic_error("Invalid block position in chunk");
 	blocks[BLOCK_IDX(x, y, z)] = block.id();
-	opaqueCubeCache[BLOCK_IDX(x, y, z)] = block.isOpaqueCube();
+	opaqueCubeCache[BLOCK_IDX(x, y, z)] = block.rendering() == BlockRendering::opaqueCube;
 }
 
 void Chunk::removeBlock(uint8_t x, uint8_t y, uint8_t z) {

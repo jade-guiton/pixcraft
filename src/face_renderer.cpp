@@ -64,6 +64,42 @@ void FaceBuffer::prerender() {
 	glBufferSubData(GL_ARRAY_BUFFER, 0, faceCount * sizeof(FaceData), faces.data());
 }
 
+void FaceBuffer::eraseFaces(int8_t x, int8_t y, int8_t z) {
+	size_t i = 0;
+	while(i < faces.size()) {
+		FaceData& face = faces[i];
+		if(face.offsetX == (float) x && face.offsetY == (float) y && face.offsetZ == (float) z) {
+			faces.erase(faces.begin() + i);
+		} else {
+			i++;
+		}
+	}
+}
+
+void FaceBuffer::erasePlaneX(int8_t x) {
+	size_t i = 0;
+	while(i < faces.size()) {
+		FaceData& face = faces[i];
+		if(face.offsetX == (float) x) {
+			faces.erase(faces.begin() + i);
+		} else {
+			i++;
+		}
+	}
+}
+
+void FaceBuffer::erasePlaneZ(int8_t z) {
+	size_t i = 0;
+	while(i < faces.size()) {
+		FaceData& face = faces[i];
+		if(face.offsetZ == (float) z) {
+			faces.erase(faces.begin() + i);
+		} else {
+			i++;
+		}
+	}
+}
+
 void FaceBuffer::render() {
 	glBindVertexArray(VAO);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faces.size());

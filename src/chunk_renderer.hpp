@@ -18,9 +18,11 @@ public:
 	void updatePlaneZ(int8_t relZ);
 	
 	void render(FaceRenderer& faceRenderer);
+	void renderTranslucent(FaceRenderer& faceRenderer);
 	
 private:
 	FaceBuffer buffer;
+	FaceBuffer translucentBuffer;
 	World* world;
 	int32_t chunkX, chunkZ;
 	

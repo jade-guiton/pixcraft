@@ -22,8 +22,8 @@ namespace BlockRegistry {
 	const BlockId DIRT_ID = registerBlock((new Block())->mainTexture(TEX(DIRT)));
 	const BlockId GRASS_ID = registerBlock(new GrassBlock());
 	const BlockId TRUNK_ID = registerBlock(new TrunkBlock());
-	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES))->isOpaqueCube(false));
-	const BlockId WATER_ID = registerBlock((new Block())->mainTexture(TEX(WATER)));
+	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES))->rendering(BlockRendering::transparentCube));
+	const BlockId WATER_ID = registerBlock((new Block())->mainTexture(TEX(WATER))->rendering(BlockRendering::translucentCube));
 
 	Block& fromId(BlockId id) {
 		return *protoBlocks[id - 1];
@@ -40,7 +40,7 @@ uint8_t Block::getFaceTexture(uint8_t face) {
 }
 
 BlockId Block::id() { return _id; }
-bool Block::isOpaqueCube() { return _isOpaqueCube; }
+BlockRendering Block::rendering() { return _rendering; }
 uint8_t Block::mainTexture() { return _mainTexture; }
 
 Block& Block::fromId(BlockId id) {
@@ -48,10 +48,10 @@ Block& Block::fromId(BlockId id) {
 }
 
 
-Block::Block() : _id((BlockId) -1), _isOpaqueCube(true), _mainTexture(TEX(PLACEHOLDER)) { }
+Block::Block() : _id((BlockId) -1), _rendering(BlockRendering::opaqueCube), _mainTexture(TEX(PLACEHOLDER)) { }
 void Block::setId(BlockId id) { _id = id; }
 
-Block* Block::isOpaqueCube(bool isOpaqueCube) { _isOpaqueCube = isOpaqueCube; return this; }
+Block* Block::rendering(BlockRendering rendering) { _rendering = rendering; return this; }
 Block* Block::mainTexture(uint8_t texture) { _mainTexture = texture; return this; }
 
 

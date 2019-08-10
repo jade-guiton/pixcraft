@@ -16,6 +16,7 @@
 
 void RenderedChunk::init(FaceRenderer& faceRenderer, World& world2, int32_t chunkX2, int32_t chunkZ2) {
 	buffer.init(faceRenderer, MAX_CHUNK_FACES);
+	translucentBuffer.init(faceRenderer, MAX_CHUNK_FACES);
 	world = &world2;
 	chunkX = chunkX2; chunkZ = chunkZ2;
 }
@@ -26,6 +27,7 @@ void RenderedChunk::prerender() {
 	Chunk& chunk = world->getChunk(chunkX, chunkZ);
 	
 	buffer.faces.clear();
+	translucentBuffer.faces.clear();
 	for(uint8_t x = 0; x < CHUNK_SIZE; ++x) {
 		for(uint8_t y = 0; y < CHUNK_HEIGHT; ++y) {
 			for(uint8_t z = 0; z < CHUNK_SIZE; ++z) {
@@ -35,64 +37,58 @@ void RenderedChunk::prerender() {
 	}
 	
 	buffer.prerender();
+	translucentBuffer.prerender();
 }
 
 void RenderedChunk::updateBlock(int8_t relX, int8_t y, int8_t relZ) {
-	size_t i = 0;
-	while(i < buffer.faces.size()) {
-		FaceData& face = buffer.faces[i];
-		if(face.offsetX == (float) relX && face.offsetY == (float) y && face.offsetZ == (float) relZ) {
-			buffer.faces.erase(buffer.faces.begin() + i);
-		} else {
-			i++;
-		}
-	}
+	buffer.eraseFaces(relX, y, relZ);
+	translucentBuffer.eraseFaces(relX, y, relZ);
+	
 	Chunk& chunk = world->getChunk(chunkX, chunkZ);
 	prerenderBlock(chunk, relX, y, relZ);
+	
 	buffer.prerender();
+	translucentBuffer.prerender();
 }
 
 void RenderedChunk::updatePlaneX(int8_t relX) {
-	size_t i = 0;
-	while(i < buffer.faces.size()) {
-		FaceData& face = buffer.faces[i];
-		if(face.offsetX == (float) relX) {
-			buffer.faces.erase(buffer.faces.begin() + i);
-		} else {
-			i++;
-		}
-	}
+	buffer.erasePlaneX(relX);
+	translucentBuffer.erasePlaneX(relX);
+	
 	Chunk& chunk = world->getChunk(chunkX, chunkZ);
 	for(uint8_t y = 0; y < CHUNK_HEIGHT; ++y) {
 		for(uint8_t relZ = 0; relZ < CHUNK_SIZE; ++relZ) {
 			prerenderBlock(chunk, relX, y, relZ);
 		}
 	}
+	
 	buffer.prerender();
+	translucentBuffer.prerender();
 }
 
 void RenderedChunk::updatePlaneZ(int8_t relZ) {
-	size_t i = 0;
-	while(i < buffer.faces.size()) {
-		FaceData& face = buffer.faces[i];
-		if(face.offsetZ == (float) relZ) {
-			buffer.faces.erase(buffer.faces.begin() + i);
-		} else {
-			i++;
-		}
-	}
+	buffer.erasePlaneZ(relZ);
+	translucentBuffer.erasePlaneZ(relZ);
+	
 	Chunk& chunk = world->getChunk(chunkX, chunkZ);
 	for(uint8_t y = 0; y < CHUNK_HEIGHT; ++y) {
 		for(uint8_t relX = 0; relX < CHUNK_SIZE; ++relX) {
 			prerenderBlock(chunk, relX, y, relZ);
 		}
 	}
+	
 	buffer.prerender();
+	translucentBuffer.prerender();
 }
 
 void RenderedChunk::render(FaceRenderer& faceRenderer) {
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), ((float) CHUNK_SIZE) * glm::vec3(chunkX, 0.0f, chunkZ));
 	faceRenderer.render(buffer, model);
+}
+
+void RenderedChunk::renderTranslucent(FaceRenderer& faceRenderer) {
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), ((float) CHUNK_SIZE) * glm::vec3(chunkX, 0.0f, chunkZ));
+	faceRenderer.render(translucentBuffer, model);
 }
 
 
@@ -116,9 +112,14 @@ void RenderedChunk::prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t r
 				|| (!chunk.isOpaqueCube(x2, y2, z2) && block != chunk.getBlock(x2, y2, z2));
 		}
 		if(renderFace) {
-			buffer.faces.push_back(FaceData {
+			FaceData face = {
 				(float) relX, (float) y, (float) relZ, side, block->getFaceTexture(side)
-			});
+			};
+			if(block->rendering() == BlockRendering::translucentCube) {
+				translucentBuffer.faces.push_back(face);
+			} else {
+				buffer.faces.push_back(face);
+			}
 		}
 	}
 }
@@ -165,13 +166,23 @@ void ChunkRenderer::updateBlock(World& world, int32_t x, int8_t y, int32_t z) {
 void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
 		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
-			uint64_t key = packCoords(x, z);
-			auto chunkIter = renderedChunks.find(key);
+			auto chunkIter = renderedChunks.find(packCoords(x, z));
 			if(chunkIter != renderedChunks.end()) {
 				chunkIter->second.render(faceRenderer);
 			}
 		}
 	}
+	
+	glDepthMask(GL_FALSE);
+	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
+		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
+			auto chunkIter = renderedChunks.find(packCoords(x, z));
+			if(chunkIter != renderedChunks.end()) {
+				chunkIter->second.renderTranslucent(faceRenderer);
+			}
+		}
+	}
+	glDepthMask(GL_TRUE);
 }
 
 void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z) {
