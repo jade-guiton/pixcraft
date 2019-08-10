@@ -1,5 +1,7 @@
 #include "chunk.hpp"
 
+#include <stdexcept>
+
 Chunk::Chunk() : blocks(), opaqueCubeCache() { }
 
 bool Chunk::hasBlock(uint8_t x, uint8_t y, uint8_t z) {

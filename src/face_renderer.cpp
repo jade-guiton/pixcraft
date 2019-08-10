@@ -1,5 +1,13 @@
 #include "face_renderer.hpp"
 
+#include <stdexcept>
+#include <string>
+#include <cstddef>
+
+#include "shaders.hpp"
+#include "textures.hpp"
+#include "util.hpp"
+
 const float faceVertices[] = {
 	 0.5f, -0.5f,  0.5f,  1.0, 0.0,
 	 0.5f,  0.5f,  0.5f,  1.0, 1.0,

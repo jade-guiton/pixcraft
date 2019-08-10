@@ -1,5 +1,7 @@
 #include "shaders.hpp"
 
+#include <iostream>
+
 void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	int succ;
 	char infoLog[512];

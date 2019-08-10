@@ -1,5 +1,17 @@
 #include "client.hpp"
 
+#include <iostream>
+#include <stdexcept>
+#include <cstdint>
+#include <cmath>
+#include <sstream>
+
+#include "glm.hpp"
+
+#include "util.hpp"
+#include "blocks.hpp"
+#include "shaders.hpp"
+
 const char windowTitle[] = "OpenGL Test 2";
 
 void windowResizeCallback(GLFWwindow* window, int width, int height) {

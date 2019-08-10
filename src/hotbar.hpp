@@ -1,11 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <cstdint>
-
-#include "glfw.hpp"
-#include "glm.hpp"
-
 #include "blocks.hpp"
 #include "face_renderer.hpp"
 

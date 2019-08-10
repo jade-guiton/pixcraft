@@ -1,5 +1,9 @@
 #include "world.hpp"
 
+#include <cmath>
+
+#include "util.hpp"
+
 World::World() { }
 
 bool World::isValidHeight(int32_t y) {

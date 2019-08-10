@@ -4,14 +4,12 @@
 #include <utility>
 #include <tuple>
 #include <vector>
-#include <cmath>
 
 #include "glm.hpp"
 
 #include "chunk.hpp"
 #include "worldgen.hpp"
 #include "blocks.hpp"
-#include "util.hpp"
 
 class World;
 #include "player.hpp"

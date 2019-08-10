@@ -1,5 +1,12 @@
 #include "textures.hpp"
 
+#include <vector>
+#include <string>
+#include <stdexcept>
+
+#include <stb_image.h>
+#include "glfw.hpp"
+
 namespace TextureManager {
 	namespace {
 		const unsigned int SIZE = 16;

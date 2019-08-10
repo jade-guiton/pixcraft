@@ -1,22 +1,10 @@
 #pragma once
 
-#include <stdexcept>
-#include <string>
-#include <cstddef>
-#include <vector>
 #include <unordered_map>
 
-#include <iostream>
-
-#include "glfw.hpp"
-#include "glm.hpp"
 #include <stb_image.h>
 
-#include "shaders.hpp"
-#include "world.hpp"
-#include "blocks.hpp"
 #include "chunk.hpp"
-#include "util.hpp"
 #include "face_renderer.hpp"
 
 class RenderedChunk {

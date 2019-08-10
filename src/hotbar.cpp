@@ -1,5 +1,10 @@
 #include "hotbar.hpp"
 
+#include <vector>
+#include <cstdint>
+
+#include "glm.hpp"
+
 Hotbar::Hotbar(FaceRenderer& renderer)
 	: _held(1), faceRenderer(renderer) { }
 

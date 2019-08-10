@@ -2,10 +2,8 @@
 
 #include <tuple>
 #include <cmath>
-#include <algorithm>
-#include "glm.hpp"
 
-#include "util.hpp"
+#include "glm.hpp"
 
 class Player;
 #include "world.hpp"

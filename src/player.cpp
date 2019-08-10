@@ -1,5 +1,9 @@
 #include "player.hpp"
 
+#include <algorithm>
+
+#include "util.hpp"
+
 const char* movementModeNames[3] = {
 	"Normal", "Flying", "Noclip"
 };

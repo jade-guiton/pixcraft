@@ -1,5 +1,10 @@
 #include "blocks.hpp"
 
+#include <vector>
+#include <memory>
+
+#include "textures.hpp"
+
 Block::~Block() { }
 
 uint8_t Block::getFaceTexture(uint8_t face) {

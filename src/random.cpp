@@ -1,5 +1,9 @@
 #include "random.hpp"
 
+#include <ctime>
+#include <random>
+#include <cmath>
+
 uint64_t generateSeed() {
 	uint64_t a = static_cast<uint64_t>(time(nullptr));
 	std::random_device rand;

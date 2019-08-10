@@ -1,16 +1,13 @@
 #pragma once
 
-#include <cmath>
 #include <string>
-#include <cstdio>
 #include <tuple>
-#include <utility>
 
 #include "glm.hpp"
 
-extern const int sideVectors[6][3];
-
 #define TAU 6.28318531f
+
+extern const int sideVectors[6][3];
 
 glm::mat4 globalToLocalRot(glm::vec3 orient);
 glm::mat4 localToGlobalRot(glm::vec3 orient);

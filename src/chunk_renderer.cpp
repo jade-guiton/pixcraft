@@ -1,5 +1,14 @@
 #include "chunk_renderer.hpp"
 
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "glm.hpp"
+
+#include "blocks.hpp"
+#include "util.hpp"
+
 void RenderedChunk::init(FaceRenderer& faceRenderer) {
 	buffer.init(faceRenderer, MAX_CHUNK_FACES);
 }

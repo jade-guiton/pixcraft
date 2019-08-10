@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "glfw.hpp"
 
 extern const char* blockVertexShaderSource;
