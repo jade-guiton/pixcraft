@@ -63,5 +63,6 @@ private:
 	int lastFace;
 };
 
-
 std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos);
+
+uint64_t packCoords(int32_t x, int32_t z);
