@@ -70,6 +70,16 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	return chunk.removeBlock(relX, y, relZ);
 }
 
+bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
+	int chunkX, chunkZ;
+	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
+	if(!isChunkLoaded(chunkX, chunkZ)) return false;
+	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
+	int32_t relX = x - CHUNK_SIZE*chunkX;
+	int32_t relZ = z - CHUNK_SIZE*chunkZ;
+	return chunk.isOpaqueCube(relX, y, relZ);
+}
+
 std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset) {
 	Ray ray(pos, dir);
 	bool hit = hasBlock(ray.getX(), ray.getY(), ray.getZ());

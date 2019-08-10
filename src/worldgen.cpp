@@ -60,7 +60,7 @@ void WorldGenerator::generateTree(Chunk& chunk, int32_t chunkX, int32_t chunkZ, 
 					int d = abs(relX - rootX) + abs(relZ - rootZ);
 					bool place = (y <= h + 3) ? (d >= 1 && d <= 3) : (d <= 1);
 					if(place) {
-						chunk.setBlockId(relX, y, relZ, BlockRegistry::LEAVES_ID, true);
+						chunk.setBlockId(relX, y, relZ, BlockRegistry::LEAVES_ID, false);
 					}
 				}
 			}

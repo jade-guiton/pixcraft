@@ -26,7 +26,7 @@ const glm::mat3 sideTransforms[6] = {
 
 
 FaceBuffer::FaceBuffer()
-	: VAO(0), VBO(0), capacity(0), faceCount(0) { }
+	: VAO(0), VBO(0), capacity(0) { }
 
 void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	glGenVertexArrays(1, &VAO);
@@ -39,6 +39,7 @@ void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	size_t faceDataSize = sizeof(FaceData);
 	glBufferData(GL_ARRAY_BUFFER, faceDataSize*newCapacity, nullptr, GL_STATIC_DRAW);
+	faces.reserve(newCapacity);
 	capacity = newCapacity;
 	
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, faceDataSize, (void*) offsetof(FaceData, offsetX));
@@ -56,8 +57,8 @@ void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 
 bool FaceBuffer::isInitialized() { return VAO != 0; }
 
-void FaceBuffer::load(std::vector<FaceData>& faces) {
-	faceCount = faces.size();
+void FaceBuffer::prerender() {
+	size_t faceCount = faces.size();
 	if(faceCount > capacity) throw std::logic_error("Too many faces loaded into FaceBuffer");
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, faceCount * sizeof(FaceData), faces.data());
@@ -65,7 +66,7 @@ void FaceBuffer::load(std::vector<FaceData>& faces) {
 
 void FaceBuffer::render() {
 	glBindVertexArray(VAO);
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faceCount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faces.size());
 	glBindVertexArray(0);
 }
 

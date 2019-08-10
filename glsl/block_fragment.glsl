@@ -21,6 +21,8 @@ out vec4 fragColor;
 void main() {
 	fragColor = texture(texArray, vec3(vertexUV, faceTexId));
 	
+	if(fragColor.a == 0) discard;
+	
 	float light = ambientLight + diffuseLight*max(dot(lightSrcDir, normal), 0);
 	fragColor.rgb *= min(light, 1);
 	

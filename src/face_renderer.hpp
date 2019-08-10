@@ -22,13 +22,14 @@ public:
 	void init(FaceRenderer& faceRenderer, int capacity);
 	bool isInitialized();
 	
-	void load(std::vector<FaceData>& faces);
+	std::vector<FaceData> faces;
 	
+	void prerender();
 	void render();
 	
 private:
 	GlId VAO, VBO;
-	int capacity, faceCount;
+	int capacity;
 };
 
 struct RenderParams {

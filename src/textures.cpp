@@ -23,7 +23,7 @@ namespace TextureManager {
 		glGenTextures(1, &textureArray);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureArray);
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, SIZE, SIZE, textureFiles.size(), 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
 		int width, height, nrChannels;
@@ -33,7 +33,10 @@ namespace TextureManager {
 			unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 			if(!data) throw std::runtime_error("Failed to load block texture");
 			if(width != SIZE || height != SIZE) throw std::runtime_error("Block texture has incorrect dimensions");
-			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, SIZE, SIZE, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
+			if(nrChannels == 3)
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, SIZE, SIZE, 1, GL_RGB, GL_UNSIGNED_BYTE, data);
+			else if(nrChannels == 4)
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, SIZE, SIZE, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 			stbi_image_free(data);
 		}
 		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
