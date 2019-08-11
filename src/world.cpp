@@ -103,11 +103,16 @@ std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float
 	}
 }
 
-bool World::hasBlocksInLine(int x, int z, float base, float height) {
+bool World::hasSolidBlock(int32_t x, int32_t y, int32_t z) {
+	Block* block = getBlock(x, y, z);
+	return block != nullptr && block->collision() == BlockCollision::solidCube;
+}
+
+bool World::hasSolidBlocksInLine(int x, int z, float base, float height) {
 	int y1 = getBlockCoordAt(base);
 	int y2 = getBlockCoordAt(base + height);
 	for(int y = y1; y <= y2; ++y) {
-		if(hasBlock(x, y, z)) return true;
+		if(hasSolidBlock(x, y, z)) return true;
 	}
 	return false;
 }
@@ -119,11 +124,11 @@ glm::vec2 World::collideCylHor(glm::vec3 center, float radius, float height, flo
 	float relX = center.x - blockX; // [-0.5, 0.5]
 	float relZ = center.z - blockZ;
 	
-	if(!hasBlocksInLine(blockX, blockZ, center.y, height)) {
+	if(!hasSolidBlocksInLine(blockX, blockZ, center.y, height)) {
 		int dirX = (relX >= 0.5 - radius) - (relX <= -0.5 + radius); // are we overlapping with a neighbor cell, and which
 		int dirZ = (relZ >= 0.5 - radius) - (relZ <= -0.5 + radius);
-		bool collideX = dirX != 0 && hasBlocksInLine(blockX + dirX, blockZ, center.y, height); // are we colliding with a neighbor block
-		bool collideZ = dirZ != 0 && hasBlocksInLine(blockX, blockZ + dirZ, center.y, height);
+		bool collideX = dirX != 0 && hasSolidBlocksInLine(blockX + dirX, blockZ, center.y, height); // are we colliding with a neighbor block
+		bool collideZ = dirZ != 0 && hasSolidBlocksInLine(blockX, blockZ + dirZ, center.y, height);
 		
 		if(collideX || collideZ) {
 			glm::vec2 disp(0);
@@ -132,7 +137,7 @@ glm::vec2 World::collideCylHor(glm::vec3 center, float radius, float height, flo
 			if(collideZ)
 				disp.y = dirZ*(0.5 - radius - margin) - relZ;
 			return disp;
-		} else if(dirX != 0 && dirZ != 0 && hasBlocksInLine(blockX + dirX, blockZ + dirZ, center.y, height)) { // potentially colliding with diagonal block
+		} else if(dirX != 0 && dirZ != 0 && hasSolidBlocksInLine(blockX + dirX, blockZ + dirZ, center.y, height)) { // potentially colliding with diagonal block
 			glm::vec2 horCenter(center.x, center.z);
 			glm::vec2 corner(blockX + dirX*0.5, blockZ + dirZ*0.5);
 			float dist(glm::length(horCenter-corner));
@@ -154,8 +159,8 @@ glm::vec2 World::collideCylHor(glm::vec3 center, float radius, float height, flo
 		int inBarZ = std::abs(relZ) >= 0.5 - coreSize;
 		
 		if(inBarX || inBarZ) {
-			bool blocksOnX = hasBlocksInLine(blockX + dirX, blockZ, center.y, height);
-			bool blocksOnZ = hasBlocksInLine(blockX, blockZ + dirZ, center.y, height);
+			bool blocksOnX = hasSolidBlocksInLine(blockX + dirX, blockZ, center.y, height);
+			bool blocksOnZ = hasSolidBlocksInLine(blockX, blockZ + dirZ, center.y, height);
 			
 			bool preferX = inBarX && !inBarZ;
 			bool preferZ = inBarZ && !inBarX;
@@ -193,15 +198,15 @@ float World::collideDiskVer(glm::vec3 center, float radius, float verBarrier, fl
 	float relY = center.y - blockY;
 	float relZ = center.z - blockZ;
 	
-	bool inBlock = hasBlock(blockX, blockY, blockZ);
+	bool inBlock = hasSolidBlock(blockX, blockY, blockZ);
 	if(!inBlock) { // ADVANCED collision detection
 		int dirX = (relX >= 0.5 - radius) - (relX <= -0.5 + radius); // are we overlapping with a neighbor cell, and which
 		int dirZ = (relZ >= 0.5 - radius) - (relZ <= -0.5 + radius);
 		if(dirX != 0)
-			inBlock = inBlock || hasBlock(blockX + dirX, blockY, blockZ);
+			inBlock = inBlock || hasSolidBlock(blockX + dirX, blockY, blockZ);
 		if(dirZ != 0)
-			inBlock = inBlock || hasBlock(blockX, blockY, blockZ + dirZ);
-		if(!inBlock && dirX != 0 && dirZ != 0 && hasBlock(blockX + dirX, blockY, blockZ + dirZ)) { // ＡＤＶＡＮＣＥＤＥＲ
+			inBlock = inBlock || hasSolidBlock(blockX, blockY, blockZ + dirZ);
+		if(!inBlock && dirX != 0 && dirZ != 0 && hasSolidBlock(blockX + dirX, blockY, blockZ + dirZ)) { // ＡＤＶＡＮＣＥＤＥＲ
 			glm::vec2 horCenter(center.x, center.z);
 			glm::vec2 corner(blockX + dirX*0.5, blockZ + dirZ*0.5);
 			inBlock = glm::length(horCenter-corner) <= radius;
