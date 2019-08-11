@@ -27,7 +27,7 @@ public:
 	void rotate(glm::vec3 dorient);
 	
 	glm::vec3 dirVector();
-	std::tuple<bool, int,int,int> castRay(float maxDist, bool offset);
+	std::tuple<bool, int,int,int> castRay(float maxDist, bool offset, bool hitFluids);
 	
 	bool canFly();
 	bool collidesWithBlocks();

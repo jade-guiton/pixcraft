@@ -35,7 +35,7 @@ public:
 	// sends a ray from pos in dir, on maxDist, and tests for block collisions; returns a tuple with:
 	// { hit?, hitBlockX, hitBlockY, hitBlockZ }
 	// if offset, the air block before the hit block is returned instead.
-	std::tuple<bool, int,int,int> raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset);
+	std::tuple<bool, int,int,int> raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset, bool hitFluids);
 	
 	bool hasSolidBlock(int32_t x, int32_t y, int32_t z);
 	
