@@ -47,6 +47,6 @@ private:
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 	
-	void updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z);
-	void updateBlock(World& world, int32_t x, int8_t y, int32_t z);
+	void updateSingleBlock(World& world, int32_t x, int32_t y, int32_t z);
+	void updateBlock(World& world, int32_t x, int32_t y, int32_t z);
 };
