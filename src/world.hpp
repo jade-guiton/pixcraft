@@ -37,8 +37,10 @@ public:
 	// if offset, the air block before the hit block is returned instead.
 	std::tuple<bool, int,int,int> raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset);
 	
+	bool hasSolidBlock(int32_t x, int32_t y, int32_t z);
+	
 	// tests if a vertical line collides with blocks
-	bool hasBlocksInLine(int x, int z, float y1, float height);
+	bool hasSolidBlocksInLine(int x, int z, float y1, float height);
 	
 	// tests a cylinder with base (center, radius) for horizontal collision with blocks
 	// returns a horizontal vector, such that moving the cylinder by that vector would stop the horizontal collision

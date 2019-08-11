@@ -25,6 +25,10 @@ enum class BlockRendering {
 	opaqueCube, transparentCube, translucentCube
 };
 
+enum class BlockCollision {
+	solidCube, fluidCube, air
+};
+
 class Block {
 	friend BlockId BlockRegistry::registerBlock(Block* block);
 	
@@ -36,10 +40,12 @@ public:
 	
 	Block* rendering(BlockRendering rendering);
 	Block* mainTexture(uint8_t texture);
+	Block* collision(BlockCollision collision);
 	
 	BlockId id();
 	BlockRendering rendering();
 	uint8_t mainTexture();
+	BlockCollision collision();
 	
 	static Block& fromId(BlockId id);
 
@@ -47,6 +53,7 @@ private:
 	BlockId _id;
 	BlockRendering _rendering;
 	int8_t _mainTexture;
+	BlockCollision _collision;
 	
 	void setId(BlockId id);
 };
