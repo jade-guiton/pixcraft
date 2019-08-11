@@ -19,7 +19,7 @@ namespace BlockRegistry {
 	BlockId registerBlock(Block* block) {
 		BlockId id = protoBlocks.size() + 1;
 		block->setId(id);
-		protoBlocks.emplace_back(std::unique_ptr<Block>(block));
+		protoBlocks.emplace_back(block);
 		return id;
 	}
 	
