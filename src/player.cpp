@@ -57,6 +57,10 @@ std::pair<glm::vec3, glm::vec3> Player::getBoundingBox() {
 	return std::pair<glm::vec3, glm::vec3>(feetPos - hor, feetPos + hor + ver);
 }
 
+bool Player::isInsideBlock(int32_t x, int32_t y, int32_t z) {
+	return cylinderBlockCollision(getFeetPos(), RADIUS, HEIGHT, x, y, z);
+}
+
 int Player::getUnderwaterLevel() {
 	glm::vec3 c1, c2;
 	std::tie(c1, c2) = getBoundingBox();

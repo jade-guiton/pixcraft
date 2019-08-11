@@ -169,7 +169,8 @@ void GameClient::update(float dt) {
 			std::tie(hit, x, y, z) = player->castRay(5, !click1, false);
 			if(hit && World::isValidHeight(y)) {
 				if(click2) {
-					world.setBlock(x, y, z, Block::fromId(hotbar.held()));
+					if(!world.hasSolidBlock(x, y, z) && !world.containsPlayers(x, y, z))
+						world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
 					world.removeBlock(x, y, z);
 				}

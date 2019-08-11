@@ -140,3 +140,18 @@ std::pair<int32_t, int32_t> unpackCoords(uint64_t v) {
 	int32_t z = (int32_t) ((uint32_t) v);
 	return std::pair<int32_t, int32_t>(x, z);
 }
+
+bool cylinderBlockCollision(glm::vec3 center, float radius, float height, int32_t x, int32_t y, int32_t z) {
+	float relY = center.y - y;
+	if(relY > 0.5 || relY < -0.5 - height) return false;
+	float relX = center.x - x;
+	if(relX < -0.5 - radius || relX > 0.5 + radius) return false;
+	float relZ = center.z - z;
+	if(relZ < -0.5 - radius || relZ > 0.5 + radius) return false;
+	if((-0.5 <= relX && relX <= 0.5) || (-0.5 <= relZ && relZ <= 0.5)) return true;
+	// if we reach here, we are in one of the corners and need to check.
+	float cornerX = (relX >= 0) - 0.5f;
+	float cornerZ = (relZ >= 0) - 0.5f;
+	float dist2 = (relX - cornerX)*(relX - cornerX) + (relZ - cornerZ)*(relZ - cornerZ);
+	return dist2 <= radius*radius;
+}
