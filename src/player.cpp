@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "util.hpp"
+#include "blocks.hpp"
 
 const char* movementModeNames[3] = {
 	"Normal", "Flying", "Noclip"
@@ -47,6 +48,41 @@ float Player::getMaxHorSpeed() {
 	}
 }
 
+std::pair<glm::vec3, glm::vec3> Player::getBoundingBox() {
+	glm::vec3 feetPos = getFeetPos();
+	glm::vec3 hor = glm::vec3(RADIUS, 0, RADIUS);
+	glm::vec3 ver = glm::vec3(0, HEIGHT, 0);
+	return std::pair<glm::vec3, glm::vec3>(feetPos - hor, feetPos + hor + ver);
+}
+
+int Player::getUnderwaterLevel() {
+	glm::vec3 c1, c2;
+	std::tie(c1, c2) = getBoundingBox();
+	int minX, minY, minZ;
+	std::tie(minX, minY, minZ) = getBlockCoordsAt(c1);
+	int maxX, maxY, maxZ;
+	std::tie(maxX, maxY, maxZ) = getBlockCoordsAt(c2);
+	int waterLevel = 0;
+	for(int32_t y = minY; y <= maxY; ++y) {
+		for(int32_t x = minX; x <= maxX; ++x) {
+			for(int32_t z = minZ; z <= maxZ; ++z) {
+				Block* block = world->getBlock(x, y, z);
+				if(block != nullptr && block->collision() == BlockCollision::fluidCube) {
+					waterLevel = y;
+					break;
+				}
+			}
+			if(waterLevel == y) {
+				break;
+			}
+		}
+	}
+	if(waterLevel == 0) return 0;
+	float relWaterLevel = waterLevel + 0.5 - c1.y;
+	int level = 1 + (relWaterLevel >= 1.1);
+	return level;
+}
+
 void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 	glm::mat4 yRot = glm::mat4(1.0f);
 	yRot = glm::rotate(yRot, _orient.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -72,10 +108,21 @@ void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 			horSpeed = glm::vec3(0);
 		}
 		_speed.x = horSpeed.x; _speed.z = horSpeed.z;
-		if(up && onGround) {
-			_speed.y = JUMP_SPEED;
+		int underwaterLevel = getUnderwaterLevel();
+		if(up) {
+			if(onGround && underwaterLevel < 2) {
+				_speed.y = JUMP_SPEED;
+			}
+			if(underwaterLevel == 2 && _speed.y <= SWIM_SPEED) { // above waist
+				_speed.y += dt*SWIM_ACCEL;
+				if(_speed.y >= SWIM_SPEED) _speed.y = SWIM_SPEED;
+			}
 		}
-		_speed.y -= dt*GRAVITY;
+		if(underwaterLevel > 0) {
+			_speed.y -= dt*(GRAVITY - BUOYANCY);
+		} else {
+			_speed.y -= dt*GRAVITY;
+		}
 	}
 	onGround = false;
 	

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <utility>
 #include <cmath>
 
 #include "glm.hpp"
@@ -32,6 +33,9 @@ public:
 	bool collidesWithBlocks();
 	float getMaxHorSpeed();
 	
+	std::pair<glm::vec3, glm::vec3> getBoundingBox();
+	int getUnderwaterLevel();
+	
 	void move(std::tuple<int,int,bool,bool> mvtKeys, float dt);
 	
 	MovementMode movementMode;
@@ -50,8 +54,11 @@ private:
 	static constexpr float WALK_SPEED = 5.0f;
 	static constexpr float FLY_SPEED = 10.0f;
 	static constexpr float NOCLIP_SPEED = 30.0f;
+	static constexpr float SWIM_SPEED = 5.0f;
+	static constexpr float SWIM_ACCEL = 40.0f;
 	
-	static constexpr float GRAVITY = 24.0f;
+	static constexpr float GRAVITY = 32.0f;
+	static constexpr float BUOYANCY = 20.0f;
 	static constexpr float JUMP_HEIGHT = 1.3f;
 	static constexpr float JUMP_SPEED = sqrt(2*JUMP_HEIGHT*GRAVITY);
 };
