@@ -33,6 +33,9 @@ class ChunkRenderer {
 public:
 	ChunkRenderer(FaceRenderer& renderer, int renderDist);
 	
+	bool isChunkRendered(int32_t chunkX, int32_t chunkZ);
+	size_t renderedChunkCount();
+	
 	void prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ);
 	void updateBlocks(World& world);
 	

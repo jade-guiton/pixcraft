@@ -127,6 +127,15 @@ void RenderedChunk::prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t r
 ChunkRenderer::ChunkRenderer(FaceRenderer& renderer, int renderDist)
 	: faceRenderer(renderer), renderDist(renderDist) { }
 
+bool ChunkRenderer::isChunkRendered(int32_t chunkX, int32_t chunkZ) {
+	uint64_t key = packCoords(chunkX, chunkZ);
+	return renderedChunks.count(key) == 1;
+}
+
+size_t ChunkRenderer::renderedChunkCount() {
+	return renderedChunks.size();
+}
+
 void ChunkRenderer::prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ) {
 	uint64_t key = packCoords(chunkX, chunkZ);
 	RenderedChunk& renderedChunk = renderedChunks[key];
@@ -163,12 +172,18 @@ void ChunkRenderer::updateBlocks(World& world) {
 }
 
 void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
-	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
-		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
-			auto chunkIter = renderedChunks.find(packCoords(x, z));
-			if(chunkIter != renderedChunks.end()) {
-				chunkIter->second.render(faceRenderer);
+	for(auto iter = renderedChunks.begin(); iter != renderedChunks.end();) {
+		int32_t chunkX, chunkZ;
+		std::tie(chunkX, chunkZ) = unpackCoords(iter->first);
+		int32_t dist = (chunkX-camChunkX)*(chunkX-camChunkX) + (chunkZ-camChunkZ)*(chunkZ-camChunkZ);
+		if(dist >= (renderDist*2)*(renderDist*2)) {
+			iter = renderedChunks.erase(iter);
+		} else {
+			if(dist <= (renderDist+1)*(renderDist+1)) {
+				RenderedChunk& chunk = iter->second;
+				chunk.render(faceRenderer);
 			}
+			++iter;
 		}
 	}
 	

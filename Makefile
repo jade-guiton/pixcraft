@@ -7,7 +7,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 LDFLAGS   := -LC:/lib/glfw-3.3-mingw-w64/lib -lglfw3 -lopengl32 -lgdi32
 CPPFLAGS  := 
-CXXFLAGS  := -std=c++11 -Wall -Wno-unused -IC:/lib/glfw-3.3-mingw-w64/include -IC:/lib/glad-core3.3/include -IC:/lib/glm-0.9.9.2 -IC:/lib/stb -IC:/lib
+CXXFLAGS  := -O3 -std=c++11 -Wall -Wno-unused -IC:/lib/glfw-3.3-mingw-w64/include -IC:/lib/glad-core3.3/include -IC:/lib/glm-0.9.9.2 -IC:/lib/stb -IC:/lib
 
 CXXFLAGS += -MMD
 

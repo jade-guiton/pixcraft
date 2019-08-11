@@ -90,20 +90,23 @@ void GameClient::mainLoop() {
 	int frameCounter = 0;
 	
 	float dt = 1 / 60.0;
-	double lastFrame, lastSecond, now;
+	double lastFrame, now;
+	double lastSecond = glfwGetTime();
 	while(!glfwWindowShouldClose(window)) {
 		update(dt);
 		render();
 		
 		now = glfwGetTime();
-		dt = now - lastFrame;
-		if(dt > 1 / 30.0) {
-			std::cout << "Can't keep up!" << std::endl;
-			dt = 1/60.0;
+		if(!firstFrame) {
+			dt = now - lastFrame;
+			if(dt > 1 / 30.0) {
+				std::cout << "Can't keep up!" << std::endl;
+				dt = 1/60.0;
+			}
+		} else {
+			firstFrame = false;
 		}
 		lastFrame = now;
-		
-		if(firstFrame) firstFrame = false;
 		
 		frameCounter++;
 		if(now >= lastSecond + 1.0) {
@@ -196,10 +199,13 @@ void GameClient::update(float dt) {
 		int z = iter.getZ();
 		if(!world.isChunkLoaded(x, z)) {
 			world.genChunk(x, z);
+			loads++;
+		}
+		if(!chunkRenderer.isChunkRendered(x, z)) {
 			chunkRenderer.prerenderChunk(world, x, z);
 			loads++;
-			if(loads >= LOADS_PER_FRAME) break;
 		}
+		if(loads >= LOADS_PER_FRAME) break;
 		iter.next();
 	}
 }
@@ -253,6 +259,7 @@ void GameClient::render() {
 	debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
 	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode)] << std::endl;
 	debugStream << "Vertical speed: " << player->speed().y << std::endl;
+	debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 	debugText->setText(debugStream.str());
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textRenderer.render();

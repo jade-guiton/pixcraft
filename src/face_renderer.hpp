@@ -20,6 +20,7 @@ class FaceRenderer;
 class FaceBuffer {
 public:
 	FaceBuffer();
+	~FaceBuffer();
 	void init(FaceRenderer& faceRenderer, int capacity);
 	bool isInitialized();
 	

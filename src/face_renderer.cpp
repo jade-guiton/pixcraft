@@ -28,6 +28,13 @@ const glm::mat3 sideTransforms[6] = {
 FaceBuffer::FaceBuffer()
 	: VAO(0), VBO(0), capacity(0) { }
 
+FaceBuffer::~FaceBuffer() {
+	if(VAO != 0) {
+		glDeleteBuffers(1, &VBO);
+		glDeleteVertexArrays(1, &VAO);
+	}
+}
+
 void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);

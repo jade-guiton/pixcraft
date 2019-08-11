@@ -65,6 +65,7 @@ void World::markDirty(int32_t x, int32_t y, int32_t z) {
 void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	// TODO: if chunk doesn't exist yet, stash the update maybe?
 	if(chunk == nullptr) return;
 	chunk->requestUpdate(relX, y, relZ);
 	updateRequests.insert(getChunkIdxAt(x, z));
