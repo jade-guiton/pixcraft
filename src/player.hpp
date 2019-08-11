@@ -6,8 +6,7 @@
 
 #include "glm.hpp"
 
-class Player;
-#include "world.hpp"
+#include "world_module.hpp"
 
 enum class MovementMode { normal, flying, noClip };
 

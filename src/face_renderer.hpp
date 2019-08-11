@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <cstddef>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -33,7 +34,7 @@ public:
 	
 private:
 	GlId VAO, VBO;
-	int capacity;
+	size_t capacity;
 };
 
 struct RenderParams {

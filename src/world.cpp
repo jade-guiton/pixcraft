@@ -4,16 +4,25 @@
 
 #include "util.hpp"
 
+#include "blocks.hpp"
+#include "player.hpp"
+
 World::World() { }
 
 bool World::isValidHeight(int32_t y) {
 	return 0 <= y && y < CHUNK_HEIGHT;
 }
 
-std::pair<int32_t,int32_t> World::getChunkAt(int32_t x, int32_t z) {
+std::pair<int32_t,int32_t> World::getChunkPosAt(int32_t x, int32_t z) {
 	int32_t chunkX = floor(((float) x) / CHUNK_SIZE);
 	int32_t chunkZ = floor(((float) z) / CHUNK_SIZE);
 	return std::pair<int32_t,int32_t>(chunkX, chunkZ);
+}
+
+uint64_t World::getChunkIdxAt(int32_t x, int32_t z) {
+	int32_t chunkX, chunkZ;
+	std::tie(chunkX, chunkZ) = getChunkPosAt(x, z);
+	return packCoords(chunkX, chunkZ);
 }
 
 bool World::isChunkLoaded(int32_t x, int32_t z) {
@@ -27,57 +36,113 @@ Chunk& World::getChunk(int32_t x, int32_t z) {
 Chunk& World::genChunk(int32_t x, int32_t z) {
 	uint64_t key = packCoords(x, z);
 	loadedChunks.erase(key);
-	gen.generateChunk(loadedChunks[key], x, z);
-	return loadedChunks.at(key);
+	Chunk& chunk = loadedChunks[key];
+	chunk.init(this);
+	gen.generateChunk(chunk, x, z);
+	return chunk;
 }
 
-bool World::hasBlock(int32_t x, int32_t y, int32_t z) {
+std::tuple<Chunk*, uint8_t, uint8_t> World::getBlockFromChunk(int32_t x, int32_t z) {
 	int chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	if(!isChunkLoaded(chunkX, chunkZ)) return false;
-	Chunk& chunk = getChunk(chunkX, chunkZ);
+	std::tie(chunkX, chunkZ) = getChunkPosAt(x, z);
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	return chunk.hasBlock(relX, y, relZ);
+	if(isChunkLoaded(chunkX, chunkZ)) {
+		return std::tuple<Chunk*, uint8_t, uint8_t>(&getChunk(chunkX, chunkZ), relX, relZ);
+	} else {
+		return std::tuple<Chunk*, uint8_t, uint8_t>(nullptr, relX, relZ);
+	}
+}
+
+void World::markDirty(int32_t x, int32_t y, int32_t z) {
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return;
+	chunk->markDirty(relX, y, relZ);
+	dirtyChunks.insert(getChunkIdxAt(x, z));
+}
+
+void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return;
+	chunk->requestUpdate(relX, y, relZ);
+	updateRequests.insert(getChunkIdxAt(x, z));
+}
+
+void World::requestUpdatesAround(int32_t x, int32_t y, int32_t z) {
+	for(int side = 0; side < 6; ++side) {
+		requestUpdate(x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
+	}
+}
+
+void World::updateBlocks() {
+	std::unordered_set<uint64_t> updates;
+	updateRequests.swap(updates);
+	for(uint64_t chunkIdx : updates) {
+		int32_t chunkX, chunkZ;
+		std::tie(chunkX, chunkZ) = unpackCoords(chunkIdx);
+		bool res = loadedChunks[chunkIdx].updateBlocks(chunkX, chunkZ);
+		if(res) {
+			dirtyChunks.insert(chunkIdx);
+		}
+	}
+}
+
+std::vector<std::pair<int32_t, int32_t>> World::retrieveDirtyChunks() {
+	std::vector<std::pair<int32_t, int32_t>> res;
+	res.reserve(dirtyChunks.size());
+	for(uint64_t chunkIdx : dirtyChunks) {
+		res.push_back(unpackCoords(chunkIdx));
+	}
+	dirtyChunks.clear();
+	return res;
+}
+
+
+bool World::hasBlock(int32_t x, int32_t y, int32_t z) {
+	if(y < 0 || y >= CHUNK_HEIGHT) return false;
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return false;
+	return chunk->hasBlock(relX, y, relZ);
 }
 
 Block* World::getBlock(int32_t x, int32_t y, int32_t z) {
-	int chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	if(!isChunkLoaded(chunkX, chunkZ)) return nullptr;
-	Chunk& chunk = getChunk(chunkX, chunkZ);
-	int32_t relX = x - CHUNK_SIZE*chunkX;
-	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	return chunk.getBlock(relX, y, relZ);
+	if(y < 0 || y >= CHUNK_HEIGHT) return nullptr;
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return nullptr;
+	return chunk->getBlock(relX, y, relZ);
 }
 
 void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
-	int chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
-	int32_t relX = x - CHUNK_SIZE*chunkX;
-	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	return chunk.setBlock(relX, y, relZ, block);
+	if(y < 0 || y >= CHUNK_HEIGHT) return;
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return;
+	chunk->setBlock(relX, y, relZ, block);
+	markDirty(x, y, z);
+	requestUpdate(x, y, z);
+	requestUpdatesAround(x, y, z);
 }
 
 void World::removeBlock(int32_t x, int32_t y, int32_t z) {
-	int chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	if(!isChunkLoaded(chunkX, chunkZ)) return;
-	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
-	int32_t relX = x - CHUNK_SIZE*chunkX;
-	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	chunk.removeBlock(relX, y, relZ);
+	if(y < 0 || y >= CHUNK_HEIGHT) return;
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return;
+	chunk->removeBlock(relX, y, relZ);
+	markDirty(x, y, z);
+	requestUpdatesAround(x, y, z);
 }
 
 bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
-	int chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = getChunkAt(x, z);
-	if(!isChunkLoaded(chunkX, chunkZ)) return false;
-	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
-	int32_t relX = x - CHUNK_SIZE*chunkX;
-	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	return chunk.isOpaqueCube(relX, y, relZ);
+	if(y < 0 || y >= CHUNK_HEIGHT) return false;
+	Chunk* chunk; int relX, relZ;
+	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
+	if(chunk == nullptr) return false;
+	return chunk->isOpaqueCube(relX, y, relZ);
 }
 
 std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset, bool hitFluids) {

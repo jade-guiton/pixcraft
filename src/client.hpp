@@ -9,9 +9,10 @@
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
-#include "player.hpp"
-#include "world.hpp"
 
+#include "world_module.hpp"
+#include "world.hpp"
+#include "chunk.hpp"
 
 class GameClient {
 public:

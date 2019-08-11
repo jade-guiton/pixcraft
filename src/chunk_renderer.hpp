@@ -34,7 +34,7 @@ public:
 	ChunkRenderer(FaceRenderer& renderer, int renderDist);
 	
 	void prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ);
-	void updateBlock(World& world, int32_t x, int8_t y, int32_t z);
+	void updateBlocks(World& world);
 	
 	void render(int32_t camChunkX, int32_t chamChunkZ);
 	
@@ -45,4 +45,5 @@ private:
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 	
 	void updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z);
+	void updateBlock(World& world, int32_t x, int8_t y, int32_t z);
 };

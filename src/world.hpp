@@ -1,29 +1,36 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <tuple>
 #include <vector>
 
 #include "glm.hpp"
 
-#include "chunk.hpp"
+#include "world_module.hpp"
 #include "worldgen.hpp"
-#include "blocks.hpp"
-
-class World;
-#include "player.hpp"
+#include "chunk.hpp"
 
 class World {
 public:
 	World();
 	
 	static bool isValidHeight(int32_t y);
-	static std::pair<int32_t, int32_t> getChunkAt(int32_t x, int32_t z);
+	static std::pair<int32_t, int32_t> getChunkPosAt(int32_t x, int32_t z);
+	static uint64_t getChunkIdxAt(int32_t x, int32_t z);
 	
 	bool isChunkLoaded(int32_t x, int32_t z);
 	Chunk& getChunk(int32_t x, int32_t z);
 	Chunk& genChunk(int32_t x, int32_t z);
+	
+	std::tuple<Chunk*, uint8_t, uint8_t> getBlockFromChunk(int32_t x, int32_t z);
+	
+	void markDirty(int32_t x, int32_t y, int32_t z);
+	void requestUpdate(int32_t x, int32_t y, int32_t z);
+	void requestUpdatesAround(int32_t x, int32_t y, int32_t z);
+	void updateBlocks();
+	std::vector<std::pair<int32_t, int32_t>> retrieveDirtyChunks();
 	
 	bool hasBlock(int32_t x, int32_t y, int32_t z);
 	Block* getBlock(int32_t x, int32_t y, int32_t z);
@@ -57,4 +64,6 @@ public:
 private:
 	WorldGenerator gen;
 	std::unordered_map<uint64_t, Chunk> loadedChunks;
+	std::unordered_set<uint64_t> updateRequests;
+	std::unordered_set<uint64_t> dirtyChunks;
 };

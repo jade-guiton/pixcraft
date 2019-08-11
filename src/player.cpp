@@ -3,7 +3,9 @@
 #include <algorithm>
 
 #include "util.hpp"
+
 #include "blocks.hpp"
+#include "world.hpp"
 
 const char* movementModeNames[3] = {
 	"Normal", "Flying", "Noclip"
