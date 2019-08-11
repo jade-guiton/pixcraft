@@ -12,6 +12,8 @@
 #include "blocks.hpp"
 #include "shaders.hpp"
 
+#include "player.hpp"
+
 const char windowTitle[] = "OpenGL Test 2";
 
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
@@ -163,14 +165,11 @@ void GameClient::update(float dt) {
 			int x, y, z;
 			std::tie(hit, x, y, z) = player->castRay(5, !click1, false);
 			if(hit && World::isValidHeight(y)) {
-				int32_t chunkX, chunkZ;
-				std::tie(chunkX, chunkZ) = world.getChunkAt(x, z);
 				if(click2) {
 					world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
 					world.removeBlock(x, y, z);
 				}
-				chunkRenderer.updateBlock(world, x, y, z);
 			}
 		}
 	} else {
@@ -184,6 +183,9 @@ void GameClient::update(float dt) {
 		input.capturingMouse(!paused);
 	}
 	input.clearJustPressed();
+	
+	world.updateBlocks();
+	chunkRenderer.updateBlocks(world);
 	
 	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);

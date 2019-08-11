@@ -4,7 +4,7 @@
 
 #include "OpenSimplexNoise.hpp"
 
-#include "chunk.hpp"
+#include "world_module.hpp"
 
 class WorldGenerator {
 public:

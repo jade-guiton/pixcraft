@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <tuple>
 #include <utility>
-
-#include <iostream>
 
 #include "glm.hpp"
 
@@ -150,16 +149,16 @@ void ChunkRenderer::prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ)
 		chunkIter->second.updatePlaneZ(0);
 }
 
-void ChunkRenderer::updateBlock(World& world, int32_t x, int8_t y, int32_t z) {
-	updateSingleBlock(world, x, y, z);
-	
-	for(uint8_t side = 0; side < 6; ++side) {
-		int8_t x2 = x + sideVectors[side][0];
-		int8_t y2 = y + sideVectors[side][1];
-		int8_t z2 = z + sideVectors[side][2];
-		
-		if(y2 >= 0 && y2 < CHUNK_HEIGHT)
-			updateSingleBlock(world, x2, y2, z2);
+void ChunkRenderer::updateBlocks(World& world) {
+	int32_t chunkX, chunkZ;
+	for(std::pair<int32_t, int32_t> chunkPos : world.retrieveDirtyChunks()) {
+		std::tie(chunkX, chunkZ) = chunkPos;
+		Chunk& chunk = world.getChunk(chunkX, chunkZ);
+		uint8_t relX, relY, relZ;
+		for(std::tuple<uint8_t, uint8_t, uint8_t> relPos : chunk.retrieveDirtyBlocks()) {
+			std::tie(relX, relY, relZ) = relPos;
+			updateBlock(world, chunkX*CHUNK_SIZE + relX, relY, chunkZ*CHUNK_SIZE + relZ);
+		}
 	}
 }
 
@@ -187,12 +186,25 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 
 void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z) {
 	int32_t chunkX, chunkZ;
-	std::tie(chunkX, chunkZ) = World::getChunkAt(x, z);
+	std::tie(chunkX, chunkZ) = World::getChunkPosAt(x, z);
 	int8_t relX = x - chunkX*CHUNK_SIZE;
 	int8_t relZ = z - chunkZ*CHUNK_SIZE;
 	uint64_t key = packCoords(chunkX, chunkZ);
 	auto chunkIter = renderedChunks.find(key);
 	if(chunkIter != renderedChunks.end()) {
 		chunkIter->second.updateBlock(relX, y, relZ);
+	}
+}
+
+void ChunkRenderer::updateBlock(World& world, int32_t x, int8_t y, int32_t z) {
+	updateSingleBlock(world, x, y, z);
+	
+	for(uint8_t side = 0; side < 6; ++side) {
+		int8_t x2 = x + sideVectors[side][0];
+		int8_t y2 = y + sideVectors[side][1];
+		int8_t z2 = z + sideVectors[side][2];
+		
+		if(y2 >= 0 && y2 < CHUNK_HEIGHT)
+			updateSingleBlock(world, x2, y2, z2);
 	}
 }

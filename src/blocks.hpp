@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-typedef uint32_t BlockId;
+#include "world_module.hpp"
 
 class Block;
 namespace BlockRegistry {
@@ -37,6 +37,7 @@ public:
 	virtual ~Block() = default;
 	
 	virtual uint8_t getFaceTexture(uint8_t face);
+	virtual bool update(World& world, int32_t x, int32_t y, int32_t z);
 	
 	Block* rendering(BlockRendering rendering);
 	Block* mainTexture(uint8_t texture);
@@ -59,11 +60,19 @@ private:
 };
 
 class GrassBlock : public Block {
-	using Block::Block;
+public:
+	GrassBlock();
 	uint8_t getFaceTexture(uint8_t face) override;
 };
 
 class TrunkBlock : public Block {
-	using Block::Block;
+public:
+	TrunkBlock();
 	uint8_t getFaceTexture(uint8_t face) override;
+};
+
+class WaterBlock : public Block {
+public:
+	WaterBlock();
+	bool update(World& world, int32_t x, int32_t y, int32_t z) override;
 };

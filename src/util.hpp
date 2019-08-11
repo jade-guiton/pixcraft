@@ -2,6 +2,7 @@
 
 #include <string>
 #include <tuple>
+#include <utility>
 
 #include "glm.hpp"
 
@@ -63,3 +64,4 @@ private:
 std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos);
 
 uint64_t packCoords(int32_t x, int32_t z);
+std::pair<int32_t, int32_t> unpackCoords(uint64_t v);

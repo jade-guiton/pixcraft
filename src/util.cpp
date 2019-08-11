@@ -134,3 +134,9 @@ uint64_t packCoords(int32_t x, int32_t z) {
 	uint32_t z2 = (uint32_t) z;
 	return ((uint64_t) x2) << 32 | ((uint64_t) z2);
 }
+
+std::pair<int32_t, int32_t> unpackCoords(uint64_t v) {
+	int32_t x = (int32_t) ((uint32_t) (v >> 32));
+	int32_t z = (int32_t) ((uint32_t) v);
+	return std::pair<int32_t, int32_t>(x, z);
+}
