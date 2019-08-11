@@ -7,6 +7,8 @@
 #include <tuple>
 #include <utility>
 
+#include <iostream>
+
 #include "glm.hpp"
 
 #include "blocks.hpp"
@@ -199,11 +201,11 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	glDepthMask(GL_TRUE);
 }
 
-void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int8_t y, int32_t z) {
+void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int32_t y, int32_t z) {
 	int32_t chunkX, chunkZ;
 	std::tie(chunkX, chunkZ) = World::getChunkPosAt(x, z);
-	int8_t relX = x - chunkX*CHUNK_SIZE;
-	int8_t relZ = z - chunkZ*CHUNK_SIZE;
+	uint8_t relX = x - chunkX*CHUNK_SIZE;
+	uint8_t relZ = z - chunkZ*CHUNK_SIZE;
 	uint64_t key = packCoords(chunkX, chunkZ);
 	auto chunkIter = renderedChunks.find(key);
 	if(chunkIter != renderedChunks.end()) {
@@ -211,13 +213,13 @@ void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int8_t y, int32_t
 	}
 }
 
-void ChunkRenderer::updateBlock(World& world, int32_t x, int8_t y, int32_t z) {
+void ChunkRenderer::updateBlock(World& world, int32_t x, int32_t y, int32_t z) {
 	updateSingleBlock(world, x, y, z);
 	
 	for(uint8_t side = 0; side < 6; ++side) {
-		int8_t x2 = x + sideVectors[side][0];
-		int8_t y2 = y + sideVectors[side][1];
-		int8_t z2 = z + sideVectors[side][2];
+		int32_t x2 = x + sideVectors[side][0];
+		int32_t y2 = y + sideVectors[side][1];
+		int32_t z2 = z + sideVectors[side][2];
 		
 		if(y2 >= 0 && y2 < CHUNK_HEIGHT)
 			updateSingleBlock(world, x2, y2, z2);
