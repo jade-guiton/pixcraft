@@ -190,6 +190,7 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	}
 	
 	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
 		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
 			auto chunkIter = renderedChunks.find(packCoords(x, z));
@@ -199,6 +200,7 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 		}
 	}
 	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
 }
 
 void ChunkRenderer::updateSingleBlock(World& world, int32_t x, int32_t y, int32_t z) {
