@@ -32,8 +32,8 @@ glm::vec3 Player::dirVector() {
 	return glm::vec3(localToGlobalRot(orient()) * glm::vec4(0.0, 0.0, -1.0, 1.0));
 }
 
-std::tuple<bool, int,int,int> Player::castRay(float maxDist, bool offset) {
-	return world->raycast(pos(), dirVector(), maxDist, offset);
+std::tuple<bool, int,int,int> Player::castRay(float maxDist, bool offset, bool hitFluids) {
+	return world->raycast(pos(), dirVector(), maxDist, offset, hitFluids);
 }
 
 bool Player::canFly() { return movementMode == MovementMode::flying || movementMode == MovementMode::noClip; }

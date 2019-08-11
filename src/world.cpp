@@ -67,7 +67,7 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	Chunk& chunk = loadedChunks[packCoords(chunkX, chunkZ)];
 	int32_t relX = x - CHUNK_SIZE*chunkX;
 	int32_t relZ = z - CHUNK_SIZE*chunkZ;
-	return chunk.removeBlock(relX, y, relZ);
+	chunk.removeBlock(relX, y, relZ);
 }
 
 bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
@@ -80,12 +80,14 @@ bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
 	return chunk.isOpaqueCube(relX, y, relZ);
 }
 
-std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset) {
+std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset, bool hitFluids) {
 	Ray ray(pos, dir);
-	bool hit = hasBlock(ray.getX(), ray.getY(), ray.getZ());
+	bool hit = hitFluids ? hasBlock(ray.getX(), ray.getY(), ray.getZ())
+	                     : hasSolidBlock(ray.getX(), ray.getY(), ray.getZ());
 	while(!hit && ray.getDistance() <= maxDist) {
 		ray.nextFace();
-		hit = hasBlock(ray.getX(), ray.getY(), ray.getZ());
+		hit = hitFluids ? hasBlock(ray.getX(), ray.getY(), ray.getZ())
+	                    : hasSolidBlock(ray.getX(), ray.getY(), ray.getZ());;
 	}
 	if(hit) {
 		int32_t x = ray.getX();
