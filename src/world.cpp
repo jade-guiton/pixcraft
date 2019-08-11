@@ -102,7 +102,7 @@ std::vector<std::pair<int32_t, int32_t>> World::retrieveDirtyChunks() {
 
 
 bool World::hasBlock(int32_t x, int32_t y, int32_t z) {
-	if(y < 0 || y >= CHUNK_HEIGHT) return false;
+	if(!isValidHeight(y)) return false;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return false;
@@ -110,7 +110,7 @@ bool World::hasBlock(int32_t x, int32_t y, int32_t z) {
 }
 
 Block* World::getBlock(int32_t x, int32_t y, int32_t z) {
-	if(y < 0 || y >= CHUNK_HEIGHT) return nullptr;
+	if(!isValidHeight(y)) return nullptr;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return nullptr;
@@ -118,7 +118,7 @@ Block* World::getBlock(int32_t x, int32_t y, int32_t z) {
 }
 
 void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
-	if(y < 0 || y >= CHUNK_HEIGHT) return;
+	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return;
@@ -129,7 +129,7 @@ void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
 }
 
 void World::removeBlock(int32_t x, int32_t y, int32_t z) {
-	if(y < 0 || y >= CHUNK_HEIGHT) return;
+	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return;
@@ -139,11 +139,18 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 }
 
 bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
-	if(y < 0 || y >= CHUNK_HEIGHT) return false;
+	if(!isValidHeight(y)) return false;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return false;
 	return chunk->isOpaqueCube(relX, y, relZ);
+}
+
+bool World::containsPlayers(int32_t x, int32_t y, int32_t z) {
+	for(auto it = players.begin(); it != players.end(); ++it) {
+		if(it->isInsideBlock(x, y, z)) return true;
+	}
+	return false;
 }
 
 std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset, bool hitFluids) {
@@ -192,7 +199,7 @@ glm::vec2 World::collideCylHor(glm::vec3 center, float radius, float height, flo
 	float relX = center.x - blockX; // [-0.5, 0.5]
 	float relZ = center.z - blockZ;
 	
-	if(!hasSolidBlocksInLine(blockX, blockZ, center.y, height)) {
+	if(!hasSolidBlocksInLine(blockX, blockZ, center.y, height)) { // if we're not inside a block
 		int dirX = (relX >= 0.5 - radius) - (relX <= -0.5 + radius); // are we overlapping with a neighbor cell, and which
 		int dirZ = (relZ >= 0.5 - radius) - (relZ <= -0.5 + radius);
 		bool collideX = dirX != 0 && hasSolidBlocksInLine(blockX + dirX, blockZ, center.y, height); // are we colliding with a neighbor block

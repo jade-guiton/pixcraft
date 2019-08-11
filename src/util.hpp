@@ -65,3 +65,6 @@ std::tuple<int,int,int> getBlockCoordsAt(glm::vec3 pos);
 
 uint64_t packCoords(int32_t x, int32_t z);
 std::pair<int32_t, int32_t> unpackCoords(uint64_t v);
+
+// checks if a cylinder with base (center, radius) and given height collides with block at (x,y,z)
+bool cylinderBlockCollision(glm::vec3 center, float radius, float height, int32_t x, int32_t y, int32_t z);

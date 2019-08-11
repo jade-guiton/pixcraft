@@ -45,10 +45,12 @@ void Chunk::removeBlock(uint8_t x, uint8_t y, uint8_t z) {
 }
 
 void Chunk::markDirty(uint8_t x, uint8_t y, uint8_t z) {
+	if(INVALID_BLOCK_POS(x, y, z)) return;
 	dirtyBlocks.insert(blockIdx(x, y, z));
 }
 
 void Chunk::requestUpdate(uint8_t x, uint8_t y, uint8_t z) {
+	if(INVALID_BLOCK_POS(x, y, z)) return;
 	updateRequests.insert(blockIdx(x, y, z));
 }
 
