@@ -32,7 +32,7 @@ private:
 	static const int RENDER_DIST = 6;
 	static constexpr float FOG_END = RENDER_DIST * CHUNK_SIZE;
 	static constexpr float FOG_START = FOG_END * 0.9f;
-	static const int LOADS_PER_FRAME = 1;
+	static const int LOADS_PER_FRAME = 2;
 	
 	GLFWwindow* window;
 	
