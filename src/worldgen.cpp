@@ -31,7 +31,7 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 	}
 	
 	std::vector<float> trees = distributeObjects(getFeatureSeed(seed, FeatureType::trees),
-		chunkX*CHUNK_SIZE - 0.5, chunkZ*CHUNK_SIZE - 0.5, CHUNK_SIZE, 8, 2.5);
+		chunkX*CHUNK_SIZE - 0.5, chunkZ*CHUNK_SIZE - 0.5, CHUNK_SIZE, 6, 2.5);
 	for(size_t i = 0; i < trees.size(); i += 2) {
 		int32_t x = round(trees[i]);
 		int32_t z = round(trees[i + 1]);
