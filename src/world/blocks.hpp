@@ -4,11 +4,14 @@
 #include <vector>
 #include <memory>
 
+#include "../textures.hpp"
+
 #include "world_module.hpp"
 
 class Block;
 namespace BlockRegistry {
 	BlockId registerBlock(Block* block);
+	void defineBlocks();
 	
 	Block& fromId(BlockId id);
 	unsigned int registeredCount();
@@ -36,16 +39,16 @@ public:
 	Block();
 	virtual ~Block() = default;
 	
-	virtual uint8_t getFaceTexture(uint8_t face);
+	virtual TexId getFaceTexture(uint8_t face);
 	virtual bool update(World& world, int32_t x, int32_t y, int32_t z);
 	
 	Block* rendering(BlockRendering rendering);
-	Block* mainTexture(uint8_t texture);
+	Block* mainTexture(const TexId* texture);
 	Block* collision(BlockCollision collision);
 	
 	BlockId id();
 	BlockRendering rendering();
-	uint8_t mainTexture();
+	TexId mainTexture();
 	BlockCollision collision();
 	
 	static Block& fromId(BlockId id);
@@ -53,7 +56,7 @@ public:
 private:
 	BlockId _id;
 	BlockRendering _rendering;
-	int8_t _mainTexture;
+	const TexId* _mainTexture;
 	BlockCollision _collision;
 	
 	void setId(BlockId id);
@@ -62,13 +65,13 @@ private:
 class GrassBlock : public Block {
 public:
 	GrassBlock();
-	uint8_t getFaceTexture(uint8_t face) override;
+	TexId getFaceTexture(uint8_t face) override;
 };
 
 class TrunkBlock : public Block {
 public:
 	TrunkBlock();
-	uint8_t getFaceTexture(uint8_t face) override;
+	TexId getFaceTexture(uint8_t face) override;
 };
 
 class WaterBlock : public Block {

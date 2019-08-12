@@ -4,6 +4,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <iostream>
+
 #include <stb_image.h>
 #include "glfw.hpp"
 
@@ -15,17 +17,29 @@ namespace TextureManager {
 		
 		std::vector<std::string> otherTextureFiles;
 		std::vector<GlId> otherTextures;
+		
+		TexId requireBlockTexture(const char* filename) {
+			blockTextureFiles.push_back(std::string(filename));
+			return blockTextureFiles.size() - 1;
+		}
+		
+		TexId requireTexture(const char* filename) {
+			otherTextureFiles.push_back(std::string(filename));
+			return otherTextureFiles.size() - 1;
+		}
 	}
 	
-	unsigned int requireBlockTexture(const char* filename) {
-		blockTextureFiles.push_back(std::string(filename));
-		return blockTextureFiles.size() - 1;
-	}
+	const TexId PLACEHOLDER = requireBlockTexture("placeholder");
+	const TexId STONE = requireBlockTexture("stone");
+	const TexId DIRT = requireBlockTexture("dirt");
+	const TexId GRASS_SIDE = requireBlockTexture("grass_side");
+	const TexId GRASS_TOP = requireBlockTexture("grass_top");
+	const TexId TRUNK_SIDE = requireBlockTexture("trunk_side");
+	const TexId TRUNK_INSIDE = requireBlockTexture("trunk_inside");
+	const TexId LEAVES = requireBlockTexture("leaves");
+	const TexId WATER = requireBlockTexture("water");
 	
-	unsigned int requireTexture(const char* filename) {
-		otherTextureFiles.push_back(std::string(filename));
-		return otherTextureFiles.size() - 1;
-	}
+	const TexId SLIME = requireTexture("slime");
 	
 	void loadTextures() {
 		glGenTextures(1, &blockTextureArray);
@@ -77,7 +91,7 @@ namespace TextureManager {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
 	}
 	
-	void bindOtherTexture(unsigned int texId) {
+	void bindOtherTextures(TexId texId) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, otherTextures[texId]);
 	}

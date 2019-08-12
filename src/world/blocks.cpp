@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-#include "../textures.hpp"
 #include "../util.hpp"
 
 #include "world.hpp"
@@ -23,11 +22,11 @@ namespace BlockRegistry {
 		return id;
 	}
 	
-	const BlockId STONE_ID = registerBlock((new Block())->mainTexture(TEX(STONE)));
-	const BlockId DIRT_ID = registerBlock((new Block())->mainTexture(TEX(DIRT)));
+	const BlockId STONE_ID = registerBlock((new Block())->mainTexture(&TEX(STONE)));
+	const BlockId DIRT_ID = registerBlock((new Block())->mainTexture(&TEX(DIRT)));
 	const BlockId GRASS_ID = registerBlock(new GrassBlock());
 	const BlockId TRUNK_ID = registerBlock(new TrunkBlock());
-	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(TEX(LEAVES))->rendering(BlockRendering::transparentCube));
+	const BlockId LEAVES_ID = registerBlock((new Block())->mainTexture(&TEX(LEAVES))->rendering(BlockRendering::transparentCube));
 	const BlockId WATER_ID = registerBlock(new WaterBlock());
 
 	Block& fromId(BlockId id) {
@@ -41,21 +40,21 @@ namespace BlockRegistry {
 
 
 Block::Block() :
-	_id((BlockId) -1), _rendering(BlockRendering::opaqueCube), _mainTexture(TEX(PLACEHOLDER)), _collision(BlockCollision::solidCube) { }
+	_id((BlockId) -1), _rendering(BlockRendering::opaqueCube), _mainTexture(&TEX(PLACEHOLDER)), _collision(BlockCollision::solidCube) { }
 
-uint8_t Block::getFaceTexture(uint8_t face) {
-	return _mainTexture;
+TexId Block::getFaceTexture(uint8_t face) {
+	return *_mainTexture;
 }
 
 bool Block::update(World& world, int32_t x, int32_t y, int32_t z) { return false; }
 
 Block* Block::rendering(BlockRendering rendering) { _rendering = rendering; return this; }
-Block* Block::mainTexture(uint8_t texture) { _mainTexture = texture; return this; }
+Block* Block::mainTexture(const TexId* texture) { _mainTexture = texture; return this; }
 Block* Block::collision(BlockCollision collision) { _collision = collision; return this; }
 
 BlockId Block::id() { return _id; }
 BlockRendering Block::rendering() { return _rendering; }
-uint8_t Block::mainTexture() { return _mainTexture; }
+TexId Block::mainTexture() { return *_mainTexture; }
 BlockCollision Block::collision() { return _collision; }
 
 Block& Block::fromId(BlockId id) {
@@ -66,10 +65,10 @@ void Block::setId(BlockId id) { _id = id; }
 
 
 GrassBlock::GrassBlock() {
-	mainTexture(TEX(GRASS_SIDE));
+	mainTexture(&TEX(GRASS_SIDE));
 }
 
-uint8_t GrassBlock::getFaceTexture(uint8_t face) {
+TexId GrassBlock::getFaceTexture(uint8_t face) {
 	if(face == 4) {
 		return TEX(DIRT);
 	} else if(face == 5) {
@@ -80,15 +79,15 @@ uint8_t GrassBlock::getFaceTexture(uint8_t face) {
 }
 
 TrunkBlock::TrunkBlock() {
-	mainTexture(TEX(TRUNK_SIDE));
+	mainTexture(&TEX(TRUNK_SIDE));
 }
 
-uint8_t TrunkBlock::getFaceTexture(uint8_t face) {
+TexId TrunkBlock::getFaceTexture(uint8_t face) {
 	return face >= 4 ? TEX(TRUNK_INSIDE) : TEX(TRUNK_SIDE);
 }
 
 WaterBlock::WaterBlock() {
-	mainTexture(TEX(WATER));
+	mainTexture(&TEX(WATER));
 	rendering(BlockRendering::translucentCube);
 	collision(BlockCollision::fluidCube);
 }

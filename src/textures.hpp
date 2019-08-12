@@ -1,23 +1,27 @@
 #pragma once
 
+#include <cstdint>
+
+typedef uint32_t TexId;
+
 #define TEX(name) (TextureManager::name)
-#define REQ_BLOCK_TEX(name, filename) const unsigned int name = requireBlockTexture(filename)
-#define REQ_TEX(name, filename) const unsigned int name = requireTexture(filename)
 
 namespace TextureManager {
-	unsigned int requireBlockTexture(const char* filename);
-	unsigned int requireTexture(const char* filename);
-
-	REQ_BLOCK_TEX(PLACEHOLDER, "placeholder");
-	REQ_BLOCK_TEX(STONE, "stone");
-	REQ_BLOCK_TEX(DIRT, "dirt");
-	REQ_BLOCK_TEX(GRASS_TOP, "grass_top");
-	REQ_BLOCK_TEX(GRASS_SIDE, "grass_side");
-	REQ_BLOCK_TEX(TRUNK_SIDE, "trunk_side");
-	REQ_BLOCK_TEX(TRUNK_INSIDE, "trunk_inside");
-	REQ_BLOCK_TEX(LEAVES, "leaves");
-	REQ_BLOCK_TEX(WATER, "water");
-	
 	void loadTextures();
 	void bindBlockTextureArray();
+	void bindOtherTextures(TexId texId);
+	
+	// Block textures
+	extern const TexId PLACEHOLDER;
+	extern const TexId STONE;
+	extern const TexId DIRT;
+	extern const TexId GRASS_SIDE;
+	extern const TexId GRASS_TOP;
+	extern const TexId TRUNK_SIDE;
+	extern const TexId TRUNK_INSIDE;
+	extern const TexId LEAVES;
+	extern const TexId WATER;
+	
+	// Other textures
+	extern const TexId SLIME;
 };
