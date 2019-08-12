@@ -122,8 +122,6 @@ void FaceRenderer::init() {
 	glGenBuffers(1, &faceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(faceVertices), faceVertices, GL_STATIC_DRAW);
-	
-	TextureManager::loadTextures();
 }
 
 void FaceRenderer::bindFaceAttributes() {
@@ -159,7 +157,7 @@ void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams p
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
 	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
 	
-	TextureManager::bindTextureArray();
+	TextureManager::bindBlockTextureArray();
 }
 
 void FaceRenderer::render(FaceBuffer& buffer, glm::mat4 model) {
