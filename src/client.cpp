@@ -11,6 +11,7 @@
 #include "util.hpp"
 #include "blocks.hpp"
 #include "shaders.hpp"
+#include "textures.hpp"
 
 #include "player.hpp"
 
@@ -81,6 +82,7 @@ GameClient::GameClient()
 	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
 	player = &world.players.back();
 	
+	TextureManager::loadTextures();
 	faceRenderer.init();
 	textRenderer.init();
 	hotbar.init();
