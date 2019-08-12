@@ -54,7 +54,7 @@ void Chunk::requestUpdate(uint8_t x, uint8_t y, uint8_t z) {
 	updateRequests.insert(blockIdx(x, y, z));
 }
 
-bool Chunk::updateBlocks(int32_t chunkX, int32_t chunkZ) {
+void Chunk::updateBlocks(int32_t chunkX, int32_t chunkZ) {
 	std::unordered_set<uint32_t> updates;
 	updateRequests.swap(updates);
 	for(uint32_t blockIdx : updates) {
@@ -65,12 +65,12 @@ bool Chunk::updateBlocks(int32_t chunkX, int32_t chunkZ) {
 			int32_t z = CHUNK_SIZE*chunkZ + zFromIdx(blockIdx);
 			bool res = Block::fromId(id).update(*world, x, y, z);
 			if(res) {
+				world->markDirty(x, y, z);
+				world->markDirtyAround(x, y, z);
 				world->requestUpdatesAround(x, y, z);
-				dirtyBlocks.insert(blockIdx);
 			}
 		}
 	}
-	return dirtyBlocks.size() > 0;
 }
 
 std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> Chunk::retrieveDirtyBlocks() {
