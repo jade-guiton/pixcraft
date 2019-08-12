@@ -55,6 +55,7 @@ std::tuple<Chunk*, uint8_t, uint8_t> World::getBlockFromChunk(int32_t x, int32_t
 }
 
 void World::markDirty(int32_t x, int32_t y, int32_t z) {
+	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return;
@@ -63,6 +64,7 @@ void World::markDirty(int32_t x, int32_t y, int32_t z) {
 }
 
 void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
+	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	// TODO: if chunk doesn't exist yet, stash the update maybe?

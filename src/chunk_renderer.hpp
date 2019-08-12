@@ -13,6 +13,8 @@ public:
 	bool isInitialized();
 	
 	void prerender();
+	void updateBuffers();
+	
 	void updateBlock(int8_t relX, int8_t y, int8_t relZ);
 	void updatePlaneX(int8_t relX);
 	void updatePlaneZ(int8_t relZ);
@@ -46,7 +48,4 @@ private:
 	const int renderDist;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
-	
-	void updateSingleBlock(World& world, int32_t x, int32_t y, int32_t z);
-	void updateBlock(World& world, int32_t x, int32_t y, int32_t z);
 };
