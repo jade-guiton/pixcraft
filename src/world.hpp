@@ -27,6 +27,7 @@ public:
 	std::tuple<Chunk*, uint8_t, uint8_t> getBlockFromChunk(int32_t x, int32_t z);
 	
 	void markDirty(int32_t x, int32_t y, int32_t z);
+	void markDirtyAround(int32_t x, int32_t y, int32_t z);
 	void requestUpdate(int32_t x, int32_t y, int32_t z);
 	void requestUpdatesAround(int32_t x, int32_t y, int32_t z);
 	void updateBlocks();

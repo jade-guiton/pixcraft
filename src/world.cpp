@@ -63,6 +63,12 @@ void World::markDirty(int32_t x, int32_t y, int32_t z) {
 	dirtyChunks.insert(getChunkIdxAt(x, z));
 }
 
+void World::markDirtyAround(int32_t x, int32_t y, int32_t z) {
+	for(int side = 0; side < 6; ++side) {
+		markDirty(x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
+	}
+}
+
 void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
 	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
@@ -85,10 +91,7 @@ void World::updateBlocks() {
 	for(uint64_t chunkIdx : updates) {
 		int32_t chunkX, chunkZ;
 		std::tie(chunkX, chunkZ) = unpackCoords(chunkIdx);
-		bool res = loadedChunks[chunkIdx].updateBlocks(chunkX, chunkZ);
-		if(res) {
-			dirtyChunks.insert(chunkIdx);
-		}
+		loadedChunks[chunkIdx].updateBlocks(chunkX, chunkZ);
 	}
 }
 
@@ -126,6 +129,7 @@ void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
 	if(chunk == nullptr) return;
 	chunk->setBlock(relX, y, relZ, block);
 	markDirty(x, y, z);
+	markDirtyAround(x, y, z);
 	requestUpdate(x, y, z);
 	requestUpdatesAround(x, y, z);
 }
@@ -137,6 +141,7 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	if(chunk == nullptr) return;
 	chunk->removeBlock(relX, y, relZ);
 	markDirty(x, y, z);
+	markDirtyAround(x, y, z);
 	requestUpdatesAround(x, y, z);
 }
 

@@ -25,7 +25,7 @@ public:
 	
 	void markDirty(uint8_t x, uint8_t y, uint8_t z);
 	void requestUpdate(uint8_t x, uint8_t y, uint8_t z);
-	bool updateBlocks(int32_t chunkX, int32_t chunkZ);
+	void updateBlocks(int32_t chunkX, int32_t chunkZ);
 	std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> retrieveDirtyBlocks();
 	
 	// Fast functions; they do not check for invalid positions, and do not update blocks.
