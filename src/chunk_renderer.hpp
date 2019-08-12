@@ -5,7 +5,7 @@
 
 #include <stb_image.h>
 
-#include "world.hpp"
+#include "world/world.hpp"
 #include "face_renderer.hpp"
 
 class RenderedChunk {

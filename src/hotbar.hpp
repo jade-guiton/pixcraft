@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blocks.hpp"
+#include "world/blocks.hpp"
 #include "face_renderer.hpp"
 
 class Hotbar {

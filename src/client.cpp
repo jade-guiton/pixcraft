@@ -9,11 +9,11 @@
 #include "glm.hpp"
 
 #include "util.hpp"
-#include "blocks.hpp"
+#include "world/blocks.hpp"
 #include "shaders.hpp"
 #include "textures.hpp"
 
-#include "player.hpp"
+#include "world/player.hpp"
 
 const char windowTitle[] = "OpenGL Test 2";
 

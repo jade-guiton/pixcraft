@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "blocks.hpp"
-#include "random.hpp"
+#include "../random.hpp"
 
 #include "chunk.hpp"
 

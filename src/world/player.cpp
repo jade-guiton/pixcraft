@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "util.hpp"
+#include "../util.hpp"
 
 #include "blocks.hpp"
 #include "world.hpp"

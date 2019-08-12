@@ -5,8 +5,8 @@
 
 #include <iostream>
 
-#include "textures.hpp"
-#include "util.hpp"
+#include "../textures.hpp"
+#include "../util.hpp"
 
 #include "world.hpp"
 

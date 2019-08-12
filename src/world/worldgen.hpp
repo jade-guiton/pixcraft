@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "OpenSimplexNoise.hpp"
+#include "../OpenSimplexNoise.hpp"
 
 #include "world_module.hpp"
 
