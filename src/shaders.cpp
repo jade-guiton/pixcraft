@@ -41,10 +41,14 @@ GlId loadShaders(const char* vertexSrc, const char* fragmentSrc) {
 	return shaderProgram;
 }
 
-GlId loadBlockShaders() {
+GlId loadBlockProgram() {
 	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource);
 }
 
-GlId loadCursorShaders() {
-	return loadShaders(cursorVertexShaderSource, cursorFragmentShaderSource);
+GlId loadCursorProgram() {
+	return loadShaders(pixelVertexShaderSource, colorFragmentShaderSource);
+}
+
+GlId loadWaterOverlayProgram() {
+	return loadShaders(identityVertexShaderSource, colorFragmentShaderSource);
 }

@@ -117,7 +117,7 @@ void FaceBuffer::render() {
 FaceRenderer::FaceRenderer() { }
 
 void FaceRenderer::init() {
-	program = loadBlockShaders();
+	program = loadBlockProgram();
 	
 	glGenBuffers(1, &faceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);

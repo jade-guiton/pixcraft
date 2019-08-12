@@ -89,6 +89,13 @@ int Player::getUnderwaterLevel() {
 	return level;
 }
 
+bool Player::isCameraUnderwater() {
+	int32_t x, y, z;
+	std::tie(x, y, z) = getBlockCoordsAt(_pos);
+	Block* block = world->getBlock(x, y, z);
+	return block != nullptr && block->collision() == BlockCollision::fluidCube;
+}
+
 void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 	glm::mat4 yRot = glm::mat4(1.0f);
 	yRot = glm::rotate(yRot, _orient.y, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -119,7 +126,7 @@ void Player::move(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 			if(onGround && underwaterLevel < 2) {
 				_speed.y = JUMP_SPEED;
 			}
-			if(underwaterLevel == 2 && _speed.y <= SWIM_SPEED) { // above waist
+			if(underwaterLevel >= 2 && _speed.y <= SWIM_SPEED) { // above waist
 				_speed.y += dt*SWIM_ACCEL;
 				if(_speed.y >= SWIM_SPEED) _speed.y = SWIM_SPEED;
 			}

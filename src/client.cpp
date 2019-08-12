@@ -28,6 +28,10 @@ const float cursorVertices[] = {
 	-10, 0, 10, 0, 0, -10, 0.0, 10
 };
 
+const float overlayVertices[] = {
+	1, -1, 1, 1, -1, -1, -1, 1
+};
+
 GameClient::GameClient()
 	: chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -50,7 +54,7 @@ GameClient::GameClient()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	
-	cursorProgram = loadCursorShaders();
+	cursorProgram = loadCursorProgram();
 	glGenVertexArrays(1, &cursorVAO);
 	GlId cursorVBO;
 	glGenBuffers(1, &cursorVBO);
@@ -58,6 +62,18 @@ GameClient::GameClient()
 	glBindVertexArray(cursorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cursorVertices), cursorVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+	
+	waterOverlayProgram = loadWaterOverlayProgram();
+	glGenVertexArrays(1, &waterOverlayVAO);
+	GlId waterOverlayVBO;
+	glGenBuffers(1, &waterOverlayVBO);
+	
+	glBindVertexArray(waterOverlayVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, waterOverlayVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(overlayVertices), overlayVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
@@ -244,11 +260,22 @@ void GameClient::render() {
 	
 	faceRenderer.stopRendering();
 	
+	// Draw underwater overlay
+	if(player->isCameraUnderwater()) {
+		glUseProgram(waterOverlayProgram);
+		glUniform4f(glGetUniformLocation(waterOverlayProgram, "color"), 0.11f, 0.43f, 0.97f, 0.3f);
+		glBindVertexArray(waterOverlayVAO);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
+	
 	// Draw cursor
 	glLineWidth(2.0f);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 	glUseProgram(cursorProgram);
 	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
+	glUniform4f(glGetUniformLocation(cursorProgram, "color"), 1, 1, 1, 1);
 	glBindVertexArray(cursorVAO);
 	glDrawArrays(GL_LINES, 0, 4);
 	glBindVertexArray(0);
