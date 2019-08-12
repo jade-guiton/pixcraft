@@ -6,9 +6,9 @@
 #include <tuple>
 #include <vector>
 
-#include "glm.hpp"
+#include "../glm.hpp"
 
-#include "util.hpp"
+#include "../util.hpp"
 
 #include "world_module.hpp"
 #include "worldgen.hpp"

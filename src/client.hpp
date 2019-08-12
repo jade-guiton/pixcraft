@@ -10,9 +10,9 @@
 #include "input.hpp"
 #include "text.hpp"
 
-#include "world_module.hpp"
-#include "world.hpp"
-#include "chunk.hpp"
+#include "world/world_module.hpp"
+#include "world/world.hpp"
+#include "world/chunk.hpp"
 
 class GameClient {
 public:

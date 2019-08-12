@@ -11,8 +11,8 @@
 
 #include "glm.hpp"
 
-#include "blocks.hpp"
-#include "chunk.hpp"
+#include "world/blocks.hpp"
+#include "world/chunk.hpp"
 #include "util.hpp"
 
 void RenderedChunk::init(World& world2, FaceRenderer& faceRenderer, int32_t chunkX2, int32_t chunkZ2) {

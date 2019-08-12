@@ -2,7 +2,7 @@ SRC_DIR   := src
 OBJ_DIR   := obj
 GLSL_DIR  := glsl
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp) $(SRC_DIR)/shaders_src.cpp
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*/*.cpp)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 LDFLAGS   := -LC:/lib/glfw-3.3-mingw-w64/lib -lglfw3 -lopengl32 -lgdi32
@@ -18,7 +18,7 @@ runDebug: test_debug.exe
 clean:
 	rm -f test.exe
 	rm -f test_debug.exe
-	rm -f $(OBJ_DIR)/*
+	find obj -type f -delete
 
 test.exe: CXXFLAGS := -O3 $(CXXFLAGS)
 test_debug.exe: CXXFLAGS := -g $(CXXFLAGS)
