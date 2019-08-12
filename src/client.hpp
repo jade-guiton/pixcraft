@@ -47,8 +47,8 @@ private:
 	TextRenderer textRenderer;
 	Text* debugText;
 	
-	GlId cursorProgram;
-	GlId cursorVAO;
+	GlId cursorProgram, cursorVAO;
+	GlId waterOverlayProgram, waterOverlayVAO;
 	
 	bool paused;
 	bool firstFrame;

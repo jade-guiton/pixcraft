@@ -35,6 +35,7 @@ public:
 	std::pair<glm::vec3, glm::vec3> getBoundingBox();
 	bool isInsideBlock(int32_t x, int32_t y, int32_t z);
 	int getUnderwaterLevel();
+	bool isCameraUnderwater();
 	
 	void move(std::tuple<int,int,bool,bool> mvtKeys, float dt);
 	

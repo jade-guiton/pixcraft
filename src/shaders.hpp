@@ -5,8 +5,10 @@
 extern const char* blockVertexShaderSource;
 extern const char* blockFragmentShaderSource;
 
-extern const char* cursorVertexShaderSource;
-extern const char* cursorFragmentShaderSource;
+extern const char* pixelVertexShaderSource;
+extern const char* identityVertexShaderSource;
+extern const char* colorFragmentShaderSource;
 
-GlId loadBlockShaders();
-GlId loadCursorShaders();
+GlId loadBlockProgram();
+GlId loadCursorProgram();
+GlId loadWaterOverlayProgram();

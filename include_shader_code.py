@@ -11,5 +11,6 @@ with open("src/shaders_src.cpp", "w") as out:
 	include("glsl/block_vertex.glsl", "blockVertex")
 	include("glsl/block_fragment.glsl", "blockFragment")
 	
-	include("glsl/cursor_vertex.glsl", "cursorVertex")
-	include("glsl/cursor_fragment.glsl", "cursorFragment")
+	include("glsl/pixel_vertex.glsl", "pixelVertex")
+	include("glsl/identity_vertex.glsl", "identityVertex")
+	include("glsl/color_fragment.glsl", "colorFragment")
