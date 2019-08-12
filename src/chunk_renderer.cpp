@@ -166,12 +166,18 @@ void ChunkRenderer::prerenderChunk(int32_t chunkX, int32_t chunkZ) {
 void ChunkRenderer::updateBlocks() {
 	int32_t x, y, z;
 	std::unordered_set<uint64_t> updatedChunks;
-	for(std::tuple<int32_t, int32_t, int32_t> blockPos : world.retrieveDirtyBlocks()) {
+	BlockPosSet toUpdate = world.retrieveDirtyBlocks();
+	BlockPosSet neighbors;
+	for(BlockPos blockPos : toUpdate) {
+		for(int side = 0; side < 6; ++side) {
+			std::tie(x, y, z) = blockPos;
+			neighbors.emplace(x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
+		}
+	}
+	toUpdate.insert(neighbors.begin(), neighbors.end());
+	for(BlockPos blockPos : toUpdate) {
 		std::tie(x, y, z) = blockPos;
 		updateBlock(updatedChunks, x, y, z);
-		for(int side = 0; side < 6; ++side) {
-			updateBlock(updatedChunks, x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
-		}
 	}
 	for(uint64_t chunkIdx : updatedChunks) {
 		renderedChunks[chunkIdx].updateBuffers();
