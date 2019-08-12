@@ -44,11 +44,6 @@ void Chunk::removeBlock(uint8_t x, uint8_t y, uint8_t z) {
 	opaqueCubeCache[blockIdx(x, y, z)] = false;
 }
 
-void Chunk::markDirty(uint8_t x, uint8_t y, uint8_t z) {
-	if(INVALID_BLOCK_POS(x, y, z)) return;
-	dirtyBlocks.insert(blockIdx(x, y, z));
-}
-
 void Chunk::requestUpdate(uint8_t x, uint8_t y, uint8_t z) {
 	if(INVALID_BLOCK_POS(x, y, z)) return;
 	updateRequests.insert(blockIdx(x, y, z));
@@ -66,24 +61,10 @@ void Chunk::updateBlocks(int32_t chunkX, int32_t chunkZ) {
 			bool res = Block::fromId(id).update(*world, x, y, z);
 			if(res) {
 				world->markDirty(x, y, z);
-				world->markDirtyAround(x, y, z);
 				world->requestUpdatesAround(x, y, z);
 			}
 		}
 	}
-}
-
-std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> Chunk::retrieveDirtyBlocks() {
-	std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> res;
-	res.reserve(dirtyBlocks.size());
-	for(uint32_t blockIdx : dirtyBlocks) {
-		uint8_t relX = xFromIdx(blockIdx);
-		uint8_t relY = yFromIdx(blockIdx);
-		uint8_t relZ = zFromIdx(blockIdx);
-		res.push_back(std::tuple<uint8_t, uint8_t, uint8_t>(relX, relY, relZ));
-	}
-	dirtyBlocks.clear();
-	return res;
 }
 
 bool Chunk::isOpaqueCube(uint8_t x, uint8_t y, uint8_t z) {

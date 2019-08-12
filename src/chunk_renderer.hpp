@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include <stb_image.h>
 
@@ -9,7 +10,7 @@
 
 class RenderedChunk {
 public:
-	void init(FaceRenderer& faceRenderer, World& world, int32_t chunkX, int32_t chunkZ);
+	void init(World& world, FaceRenderer& faceRenderer, int32_t chunkX, int32_t chunkZ);
 	bool isInitialized();
 	
 	void prerender();
@@ -23,9 +24,9 @@ public:
 	void renderTranslucent(FaceRenderer& faceRenderer);
 	
 private:
+	World* world;
 	FaceBuffer buffer;
 	FaceBuffer translucentBuffer;
-	World* world;
 	int32_t chunkX, chunkZ;
 	
 	void prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t relZ);
@@ -33,19 +34,22 @@ private:
 
 class ChunkRenderer {
 public:
-	ChunkRenderer(FaceRenderer& renderer, int renderDist);
+	ChunkRenderer(World& world, FaceRenderer& renderer, int renderDist);
 	
 	bool isChunkRendered(int32_t chunkX, int32_t chunkZ);
 	size_t renderedChunkCount();
 	
-	void prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ);
-	void updateBlocks(World& world);
+	void prerenderChunk(int32_t chunkX, int32_t chunkZ);
+	void updateBlocks();
 	
 	void render(int32_t camChunkX, int32_t chamChunkZ);
 	
 private:
+	World& world;
 	FaceRenderer& faceRenderer;
 	const int renderDist;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
+	
+	void updateBlock(std::unordered_set<uint64_t>& updated, int32_t x, int32_t y, int32_t z);
 };

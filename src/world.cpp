@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include "util.hpp"
-
 #include "blocks.hpp"
 #include "player.hpp"
 
@@ -56,17 +54,13 @@ std::tuple<Chunk*, uint8_t, uint8_t> World::getBlockFromChunk(int32_t x, int32_t
 
 void World::markDirty(int32_t x, int32_t y, int32_t z) {
 	if(!isValidHeight(y)) return;
-	Chunk* chunk; int relX, relZ;
-	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
-	if(chunk == nullptr) return;
-	chunk->markDirty(relX, y, relZ);
-	dirtyChunks.insert(getChunkIdxAt(x, z));
+	dirtyBlocks.insert(std::tuple<int32_t, int32_t, int32_t>(x, y, z));
 }
 
-void World::markDirtyAround(int32_t x, int32_t y, int32_t z) {
-	for(int side = 0; side < 6; ++side) {
-		markDirty(x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
-	}
+BlockPosSet World::retrieveDirtyBlocks() {
+	BlockPosSet res;
+	res.swap(dirtyBlocks);
+	return res;
 }
 
 void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
@@ -95,16 +89,6 @@ void World::updateBlocks() {
 	}
 }
 
-std::vector<std::pair<int32_t, int32_t>> World::retrieveDirtyChunks() {
-	std::vector<std::pair<int32_t, int32_t>> res;
-	res.reserve(dirtyChunks.size());
-	for(uint64_t chunkIdx : dirtyChunks) {
-		res.push_back(unpackCoords(chunkIdx));
-	}
-	dirtyChunks.clear();
-	return res;
-}
-
 
 bool World::hasBlock(int32_t x, int32_t y, int32_t z) {
 	if(!isValidHeight(y)) return false;
@@ -129,7 +113,6 @@ void World::setBlock(int32_t x, int32_t y, int32_t z, Block& block) {
 	if(chunk == nullptr) return;
 	chunk->setBlock(relX, y, relZ, block);
 	markDirty(x, y, z);
-	markDirtyAround(x, y, z);
 	requestUpdate(x, y, z);
 	requestUpdatesAround(x, y, z);
 }
@@ -141,7 +124,6 @@ void World::removeBlock(int32_t x, int32_t y, int32_t z) {
 	if(chunk == nullptr) return;
 	chunk->removeBlock(relX, y, relZ);
 	markDirty(x, y, z);
-	markDirtyAround(x, y, z);
 	requestUpdatesAround(x, y, z);
 }
 

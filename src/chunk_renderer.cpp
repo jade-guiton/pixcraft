@@ -15,10 +15,10 @@
 #include "chunk.hpp"
 #include "util.hpp"
 
-void RenderedChunk::init(FaceRenderer& faceRenderer, World& world2, int32_t chunkX2, int32_t chunkZ2) {
+void RenderedChunk::init(World& world2, FaceRenderer& faceRenderer, int32_t chunkX2, int32_t chunkZ2) {
+	world = &world2;
 	buffer.init(faceRenderer, MAX_CHUNK_FACES);
 	translucentBuffer.init(faceRenderer, MAX_CHUNK_FACES);
-	world = &world2;
 	chunkX = chunkX2; chunkZ = chunkZ2;
 }
 
@@ -121,8 +121,8 @@ void RenderedChunk::prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t r
 }
 
 
-ChunkRenderer::ChunkRenderer(FaceRenderer& renderer, int renderDist)
-	: faceRenderer(renderer), renderDist(renderDist) { }
+ChunkRenderer::ChunkRenderer(World& world, FaceRenderer& renderer, int renderDist)
+	: world(world), faceRenderer(renderer), renderDist(renderDist) { }
 
 bool ChunkRenderer::isChunkRendered(int32_t chunkX, int32_t chunkZ) {
 	uint64_t key = packCoords(chunkX, chunkZ);
@@ -133,11 +133,11 @@ size_t ChunkRenderer::renderedChunkCount() {
 	return renderedChunks.size();
 }
 
-void ChunkRenderer::prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ) {
+void ChunkRenderer::prerenderChunk(int32_t chunkX, int32_t chunkZ) {
 	uint64_t key = packCoords(chunkX, chunkZ);
 	RenderedChunk& renderedChunk = renderedChunks[key];
 	if(!renderedChunk.isInitialized())
-		renderedChunk.init(faceRenderer, world, chunkX, chunkZ);
+		renderedChunk.init(world, faceRenderer, chunkX, chunkZ);
 	renderedChunk.prerender();
 	
 	// Update nearby chunks
@@ -163,20 +163,18 @@ void ChunkRenderer::prerenderChunk(World& world, int32_t chunkX, int32_t chunkZ)
 	}
 }
 
-void ChunkRenderer::updateBlocks(World& world) {
-	int32_t chunkX, chunkZ;
-	for(std::pair<int32_t, int32_t> chunkPos : world.retrieveDirtyChunks()) {
-		std::tie(chunkX, chunkZ) = chunkPos;
-		auto iter = renderedChunks.find(packCoords(chunkX, chunkZ));
-		if(iter == renderedChunks.end()) continue;
-		RenderedChunk& renderedChunk = iter->second;
-		Chunk& chunk = world.getChunk(chunkX, chunkZ);
-		uint8_t relX, relY, relZ;
-		for(std::tuple<uint8_t, uint8_t, uint8_t> relPos : chunk.retrieveDirtyBlocks()) {
-			std::tie(relX, relY, relZ) = relPos;
-			renderedChunk.updateBlock(relX, relY, relZ);
+void ChunkRenderer::updateBlocks() {
+	int32_t x, y, z;
+	std::unordered_set<uint64_t> updatedChunks;
+	for(std::tuple<int32_t, int32_t, int32_t> blockPos : world.retrieveDirtyBlocks()) {
+		std::tie(x, y, z) = blockPos;
+		updateBlock(updatedChunks, x, y, z);
+		for(int side = 0; side < 6; ++side) {
+			updateBlock(updatedChunks, x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
 		}
-		renderedChunk.updateBuffers();
+	}
+	for(uint64_t chunkIdx : updatedChunks) {
+		renderedChunks[chunkIdx].updateBuffers();
 	}
 }
 
@@ -208,4 +206,14 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	}
 	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
+}
+
+void ChunkRenderer::updateBlock(std::unordered_set<uint64_t>& updated, int32_t x, int32_t y, int32_t z) {
+	int32_t chunkX, chunkZ;
+	std::tie(chunkX, chunkZ) = World::getChunkPosAt(x, z);
+	uint64_t chunkIdx = packCoords(chunkX, chunkZ);
+	auto iter = renderedChunks.find(chunkIdx);
+	if(iter == renderedChunks.end()) return;
+	updated.insert(chunkIdx);
+	iter->second.updateBlock(x - chunkX*CHUNK_SIZE, y, z - chunkZ*CHUNK_SIZE);
 }

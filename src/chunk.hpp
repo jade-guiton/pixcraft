@@ -23,10 +23,8 @@ public:
 	void setBlock(uint8_t x, uint8_t y, uint8_t z, Block& block);
 	void removeBlock(uint8_t x, uint8_t y, uint8_t z);
 	
-	void markDirty(uint8_t x, uint8_t y, uint8_t z);
 	void requestUpdate(uint8_t x, uint8_t y, uint8_t z);
 	void updateBlocks(int32_t chunkX, int32_t chunkZ);
-	std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> retrieveDirtyBlocks();
 	
 	// Fast functions; they do not check for invalid positions, and do not update blocks.
 	bool isOpaqueCube(uint8_t x, uint8_t y, uint8_t z);
@@ -37,5 +35,4 @@ private:
 	BlockId blocks[CHUNK_BLOCKS];
 	bool opaqueCubeCache[CHUNK_BLOCKS];
 	std::unordered_set<uint32_t> updateRequests;
-	std::unordered_set<uint32_t> dirtyBlocks;
 };
