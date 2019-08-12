@@ -6,12 +6,14 @@
 #include "glfw.hpp"
 #include "glm.hpp"
 
+#include "textures.hpp"
+
 struct FaceData {
 	float offsetX;
 	float offsetY;
 	float offsetZ;
 	uint8_t side;
-	uint32_t texId;
+	TexId texId;
 } __attribute__((packed));
 // ^^^ It works without the __attribute__, but adding it allows sending less data to the GPU
 

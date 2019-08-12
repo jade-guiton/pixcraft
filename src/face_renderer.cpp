@@ -5,7 +5,6 @@
 #include <cstddef>
 
 #include "shaders.hpp"
-#include "textures.hpp"
 #include "util.hpp"
 
 const float faceVertices[] = {
