@@ -29,7 +29,7 @@ const float cursorVertices[] = {
 };
 
 GameClient::GameClient()
-	: chunkRenderer(faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false), firstFrame(true), FPS(0.0) {
+	: chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false), firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -189,7 +189,7 @@ void GameClient::update(float dt) {
 	input.clearJustPressed();
 	
 	world.updateBlocks();
-	chunkRenderer.updateBlocks(world);
+	chunkRenderer.updateBlocks();
 	
 	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
@@ -203,7 +203,7 @@ void GameClient::update(float dt) {
 			loads++;
 		}
 		if(!chunkRenderer.isChunkRendered(x, z)) {
-			chunkRenderer.prerenderChunk(world, x, z);
+			chunkRenderer.prerenderChunk(x, z);
 			loads++;
 		}
 		if(loads >= LOADS_PER_FRAME) break;

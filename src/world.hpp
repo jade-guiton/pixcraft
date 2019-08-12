@@ -8,6 +8,8 @@
 
 #include "glm.hpp"
 
+#include "util.hpp"
+
 #include "world_module.hpp"
 #include "worldgen.hpp"
 #include "chunk.hpp"
@@ -27,11 +29,10 @@ public:
 	std::tuple<Chunk*, uint8_t, uint8_t> getBlockFromChunk(int32_t x, int32_t z);
 	
 	void markDirty(int32_t x, int32_t y, int32_t z);
-	void markDirtyAround(int32_t x, int32_t y, int32_t z);
+	BlockPosSet retrieveDirtyBlocks();
 	void requestUpdate(int32_t x, int32_t y, int32_t z);
 	void requestUpdatesAround(int32_t x, int32_t y, int32_t z);
 	void updateBlocks();
-	std::vector<std::pair<int32_t, int32_t>> retrieveDirtyChunks();
 	
 	bool hasBlock(int32_t x, int32_t y, int32_t z);
 	Block* getBlock(int32_t x, int32_t y, int32_t z);
@@ -68,5 +69,5 @@ private:
 	WorldGenerator gen;
 	std::unordered_map<uint64_t, Chunk> loadedChunks;
 	std::unordered_set<uint64_t> updateRequests;
-	std::unordered_set<uint64_t> dirtyChunks;
+	BlockPosSet dirtyBlocks;
 };

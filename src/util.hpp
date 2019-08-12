@@ -3,12 +3,23 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <unordered_set>
 
 #include "glm.hpp"
 
 #define TAU 6.28318531f
 
 extern const int sideVectors[6][3];
+
+typedef std::tuple<int32_t, int32_t, int32_t> BlockPos;
+
+struct BlockPosHash : public std::unary_function<BlockPos, std::size_t> {
+	std::size_t operator()(const BlockPos& k) const {
+		return std::get<0>(k) ^ std::get<1>(k) ^ std::get<2>(k);
+	}
+};
+
+typedef std::unordered_set<BlockPos, BlockPosHash> BlockPosSet;
 
 glm::mat4 globalToLocalRot(glm::vec3 orient);
 glm::mat4 localToGlobalRot(glm::vec3 orient);
