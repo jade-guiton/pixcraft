@@ -9,3 +9,13 @@
 #include <GLFW/glfw3.h>
 
 typedef uint32_t GlId;
+
+struct RenderParams {
+	float skyColor[3];
+	
+	bool applyView;
+	bool applyFog;
+	
+	float fogStart;
+	float fogEnd;
+};
