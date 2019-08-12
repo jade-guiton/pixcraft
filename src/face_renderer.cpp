@@ -149,7 +149,7 @@ void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams p
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
 	glUniformMatrix3fv(glGetUniformLocation(program, "sideTransforms"), 6, GL_FALSE, glm::value_ptr(sideTransforms[0]));
 	
-	glUniform1i(glGetUniformLocation(program, "tex"), 0);
+	glUniform1i(glGetUniformLocation(program, "texArray"), 0);
 	
 	glUniform1f(glGetUniformLocation(program, "ambientLight"), 0.7);
 	glUniform1f(glGetUniformLocation(program, "diffuseLight"), 0.3);

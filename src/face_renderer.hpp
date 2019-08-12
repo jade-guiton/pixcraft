@@ -40,16 +40,6 @@ private:
 	size_t capacity;
 };
 
-struct RenderParams {
-	float skyColor[3];
-	
-	bool applyView;
-	bool applyFog;
-	
-	float fogStart;
-	float fogEnd;
-};
-
 class FaceRenderer {
 public:
 	FaceRenderer();
