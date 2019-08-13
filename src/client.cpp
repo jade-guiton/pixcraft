@@ -261,17 +261,18 @@ void GameClient::render() {
 	};
 	faceRenderer.startRendering(proj, view, params);
 	chunkRenderer.render(camChunkX, camChunkZ);
+	faceRenderer.stopRendering();
+	
+	entityRenderer.renderEntities(world, proj, view, params);
+	
+	faceRenderer.startRendering(proj, view, params);
+	chunkRenderer.renderTranslucent(camChunkX, camChunkZ);
 	
 	params.applyView = false;
 	params.applyFog = false;
 	faceRenderer.setParams(params);
 	hotbar.render();
-	
 	faceRenderer.stopRendering();
-	
-	params.applyView = true;
-	params.applyFog = true;
-	entityRenderer.renderEntities(world, proj, view, params);
 	
 	// Draw underwater overlay
 	if(player->isEyeUnderwater()) {

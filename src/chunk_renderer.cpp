@@ -199,7 +199,9 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 			++iter;
 		}
 	}
-	
+}
+
+void ChunkRenderer::renderTranslucent(int32_t camChunkX, int32_t camChunkZ) {
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
