@@ -32,6 +32,7 @@ public:
 	
 private:
 	World* world;
+	
 	BlockId blocks[CHUNK_BLOCKS];
 	bool opaqueCubeCache[CHUNK_BLOCKS];
 	std::unordered_set<uint32_t> updateRequests;

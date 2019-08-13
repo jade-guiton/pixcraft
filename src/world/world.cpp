@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "blocks.hpp"
-#include "player.hpp"
+#include "mob.hpp"
 
 World::World() { }
 
@@ -133,13 +133,6 @@ bool World::isOpaqueCube(int32_t x, int32_t y, int32_t z) {
 	std::tie(chunk, relX, relZ) = getBlockFromChunk(x, z);
 	if(chunk == nullptr) return false;
 	return chunk->isOpaqueCube(relX, y, relZ);
-}
-
-bool World::containsPlayers(int32_t x, int32_t y, int32_t z) {
-	for(auto it = players.begin(); it != players.end(); ++it) {
-		if(it->isInsideBlock(x, y, z)) return true;
-	}
-	return false;
 }
 
 std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float maxDist, bool offset, bool hitFluids) {
@@ -286,3 +279,15 @@ float World::collideDiskVer(glm::vec3 center, float radius, float verBarrier, fl
 	return 0.0;
 }
 
+bool World::containsMobs(int32_t x, int32_t y, int32_t z) {
+	for(auto it = mobs.begin(); it != mobs.end(); ++it) {
+		if((*it)->isInsideBlock(x, y, z)) return true;
+	}
+	return false;
+}
+
+void World::updateEntities(float dt) {
+	for(auto it = mobs.begin(); it != mobs.end(); ++it) {
+		(*it)->update(dt);
+	}
+}

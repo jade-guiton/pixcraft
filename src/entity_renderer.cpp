@@ -1,8 +1,13 @@
 #include "entity_renderer.hpp"
 
 #include <cstddef>
+#include <typeinfo>
 
 #include "shaders.hpp"
+
+#include "world/world.hpp"
+#include "world/mob.hpp"
+#include "world/slime.hpp"
 
 const float slimeVertices[70] = {
 	-1, -1, -1,  1.0/4, 0.0/3,
@@ -32,9 +37,11 @@ const unsigned int slimeIndices[36] = {
 
 EntityModel::EntityModel() : VAO(0) {}
 
-void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount, const unsigned int* indices, size_t indexCount2) {
+void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount, const unsigned int* indices,
+		size_t indexCount2, glm::mat4 preModel) {
 	texture = texture2;
 	indexCount = indexCount2;
+	_preModel = preModel;
 	
 	glGenVertexArrays(1, &VAO);
 	GlId VBO, EBO;
@@ -60,6 +67,8 @@ void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount
 	glBindVertexArray(0);
 }
 
+glm::mat4 EntityModel::preModel() { return _preModel; }
+
 void EntityModel::bindTexture() {
 	TextureManager::bindOtherTextures(texture);
 }
@@ -76,7 +85,27 @@ EntityRenderer::EntityRenderer() {}
 void EntityRenderer::init() {
 	program = loadEntityProgram();
 	
-	slimeModel.init(TEX(SLIME), slimeVertices, 14, slimeIndices, 36);
+	glm::mat4 preModel = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f)), glm::vec3(0.0f, 1.0f, 0.0f));
+	slimeModel.init(TEX(SLIME), slimeVertices, 14, slimeIndices, 36, preModel);
+}
+
+void EntityRenderer::renderEntities(World& world, glm::mat4 proj, glm::mat4 view, RenderParams params) {
+	startRendering(proj, view, params);
+	
+	EntityModel* model;
+	for(auto it = world.mobs.begin(); it != world.mobs.end(); ++it) {
+		model = nullptr;
+		if(typeid(**it) == typeid(Slime)) {
+			model = &slimeModel;
+		}
+		if(model != nullptr) {
+			glm::mat4 modelMat = glm::translate(glm::mat4(1.0f), (*it)->pos());
+			model->bindTexture();
+			render(*model, modelMat);
+		}
+	}
+	
+	stopRendering();
 }
 
 void EntityRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
@@ -97,6 +126,8 @@ void EntityRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams
 }
 
 void EntityRenderer::render(EntityModel& model, glm::mat4 modelMat) {
+	glm::mat4 preModel = model.preModel();
+	modelMat = modelMat * preModel;
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
 	
 	model.render();

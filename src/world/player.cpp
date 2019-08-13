@@ -23,8 +23,6 @@ const float NOCLIP_SPEED = 30.0f;
 const float SWIM_SPEED = 5.0f;
 const float SWIM_ACCEL = 40.0f;
 
-const float GRAVITY = 32.0f;
-const float BUOYANCY = 20.0f;
 const float JUMP_HEIGHT = 1.3f;
 const float JUMP_SPEED = sqrt(2*JUMP_HEIGHT*GRAVITY);
 
@@ -102,15 +100,4 @@ void Player::handleKeys(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 			}
 		}
 	}
-}
-
-void Player::update(float dt) {
-	if(!canFly) {
-		if(getWaterHeight() > 0) {
-			_speed.y -= dt*(GRAVITY - BUOYANCY);
-		} else {
-			_speed.y -= dt*GRAVITY;
-		}
-	}
-	Mob::update(dt);
 }

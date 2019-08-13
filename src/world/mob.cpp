@@ -7,13 +7,21 @@
 #include "blocks.hpp"
 #include "world.hpp"
 
+
+const float BUOYANCY = 20.0f;
+
+
 glm::vec3 Mob::pos() { return _pos; }
 void Mob::pos(glm::vec3 pos) { _pos = pos; }
 glm::vec3 Mob::speed() { return _speed; }
 
 glm::vec3 Mob::orient() { return _orient; }
 void Mob::orient(glm::vec3 orient) { _orient = orient; }
-void Mob::rotate(glm::vec3 dorient) { _orient += dorient; }
+void Mob::rotate(glm::vec3 dorient) {
+	_orient += dorient;
+	if(_orient.x > TAU/4) _orient.x = TAU/4;
+	if(_orient.x < -TAU/4) _orient.x = -TAU/4;
+}
 
 glm::vec3 Mob::dirVector() {
 	return glm::vec3(localToGlobalRot(orient()) * glm::vec4(0.0, 0.0, -1.0, 1.0));
@@ -56,6 +64,14 @@ float Mob::getWaterHeight() {
 }
 
 void Mob::update(float dt) {
+	if(!canFly) {
+		if(getWaterHeight() > 0) {
+			_speed.y -= dt*(GRAVITY - BUOYANCY);
+		} else {
+			_speed.y -= dt*GRAVITY;
+		}
+	}
+	
 	onGround = false;
 	glm::vec3 dpos = dt * _speed;
 	if(collidesWithBlocks) {

@@ -25,8 +25,7 @@ public:
 	float getMaxHorSpeed();
 	
 	void handleKeys(std::tuple<int,int,bool,bool> mvtKeys, float dt);
-	void update(float dt) override;
-
+	
 private:
 	MovementMode _movementMode;
 };
