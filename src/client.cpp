@@ -111,8 +111,9 @@ void GameClient::mainLoop() {
 	int frameCounter = 0;
 	
 	float dt = 1 / 60.0;
-	double lastFrame, now;
-	double lastSecond = glfwGetTime();
+	double now = glfwGetTime();
+	double lastFrame = now;
+	double lastSecond = now;
 	while(!glfwWindowShouldClose(window)) {
 		update(dt);
 		render();
@@ -152,21 +153,21 @@ void GameClient::update(float dt) {
 	
 	if(!paused) {
 		if(input.justPressed(GLFW_KEY_F)) {
-			if(player->movementMode == MovementMode::flying) {
-				player->movementMode = MovementMode::normal;
+			if(player->movementMode() == MovementMode::flying) {
+				player->movementMode(MovementMode::normal);
 			} else {
-				player->movementMode = MovementMode::flying;
+				player->movementMode(MovementMode::flying);
 			}
 		}
 		if(input.justPressed(GLFW_KEY_N)) {
-			if(player->movementMode == MovementMode::noClip) {
-				player->movementMode = MovementMode::normal;
+			if(player->movementMode() == MovementMode::noClip) {
+				player->movementMode(MovementMode::normal);
 			} else {
-				player->movementMode = MovementMode::noClip;
+				player->movementMode(MovementMode::noClip);
 			}
 		}
 		
-		player->move(input.getMovementKeys(), dt);
+		player->handleKeys(input.getMovementKeys(), dt);
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
 		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
@@ -198,7 +199,7 @@ void GameClient::update(float dt) {
 			}
 		}
 	} else {
-		player->move(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
+		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
 	input.clearJustClicked();
 	input.clearJustScrolled();
@@ -211,6 +212,8 @@ void GameClient::update(float dt) {
 	
 	world.updateBlocks();
 	chunkRenderer.updateBlocks();
+	
+	player->update(dt);
 	
 	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
@@ -237,7 +240,7 @@ void GameClient::render() {
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	float aspect = ((float) width) / height;
-	glm::vec3 playerPos = player->pos();
+	glm::vec3 playerPos = player->eyePos();
 	glm::mat4 proj = glm::perspective(glm::radians(90.0f), aspect, 0.001f, 1000.0f);
 	glm::mat4 view = globalToLocal(playerPos, player->orient());
 	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
@@ -273,7 +276,7 @@ void GameClient::render() {
 	entityRenderer.stopRendering();
 	
 	// Draw underwater overlay
-	if(player->isCameraUnderwater()) {
+	if(player->isEyeUnderwater()) {
 		glUseProgram(waterOverlayProgram);
 		glUniform4f(glGetUniformLocation(waterOverlayProgram, "color"), 0.11f, 0.43f, 0.97f, 0.3f);
 		glBindVertexArray(waterOverlayVAO);
@@ -297,7 +300,7 @@ void GameClient::render() {
 	std::stringstream debugStream;
 	debugStream << FPS << " FPS" << std::endl;
 	debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
-	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode)] << std::endl;
+	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode())] << std::endl;
 	debugStream << "Vertical speed: " << player->speed().y << std::endl;
 	debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 	debugText->setText(debugStream.str());
