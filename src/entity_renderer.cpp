@@ -4,9 +4,35 @@
 
 #include "shaders.hpp"
 
+const float slimeVertices[70] = {
+	-1, -1, -1,  1.0/4, 0.0/3,
+	 1, -1, -1,  2.0/4, 0.0/3,
+	-1, -1, -1,  0.0/4, 1.0/3,
+	-1, -1,  1,  1.0/4, 1.0/3,
+	 1, -1,  1,  2.0/4, 1.0/3,
+	 1, -1, -1,  3.0/4, 1.0/3,
+	-1, -1, -1,  4.0/4, 1.0/3,
+	-1,  1, -1,  0.0/4, 2.0/3,
+	-1,  1,  1,  1.0/4, 2.0/3,
+	 1,  1,  1,  2.0/4, 2.0/3,
+	 1,  1, -1,  3.0/4, 2.0/3,
+	-1,  1, -1,  4.0/4, 2.0/3,
+	-1,  1, -1,  1.0/4, 3.0/3,
+	 1,  1, -1,  2.0/4, 3.0/3
+};
+
+const unsigned int slimeIndices[36] = {
+	0,  1,  3,    3,  1,  4, // bottom
+	2,  3,  7,    7,  3,  8, // left
+	3,  4,  8,    8,  4,  9, // front
+	4,  5,  9,    9,  5,  10, // right
+	5,  6,  10,   10, 6,  11, // back
+	8,  9,  12,   12, 9,  13
+};
+
 EntityModel::EntityModel() : VAO(0) {}
 
-void EntityModel::init(TexId texture2, float* vertices, size_t vertexCount, unsigned int* indices, size_t indexCount2) {
+void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount, const unsigned int* indices, size_t indexCount2) {
 	texture = texture2;
 	indexCount = indexCount2;
 	
@@ -29,7 +55,7 @@ void EntityModel::init(TexId texture2, float* vertices, size_t vertexCount, unsi
 	glEnableVertexAttribArray(1);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(unsigned int), indices, GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
 }
@@ -49,6 +75,8 @@ EntityRenderer::EntityRenderer() {}
 
 void EntityRenderer::init() {
 	program = loadEntityProgram();
+	
+	slimeModel.init(TEX(SLIME), slimeVertices, 14, slimeIndices, 36);
 }
 
 void EntityRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
@@ -72,4 +100,8 @@ void EntityRenderer::render(EntityModel& model, glm::mat4 modelMat) {
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
 	
 	model.render();
+}
+
+void EntityRenderer::stopRendering() {
+	glUseProgram(0);
 }

@@ -54,6 +54,7 @@ GameClient::GameClient()
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
 	
 	cursorProgram = loadCursorProgram();
 	glGenVertexArrays(1, &cursorVAO);
@@ -245,7 +246,6 @@ void GameClient::render() {
 	// Clear screen
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// Start the face rendering
@@ -263,6 +263,14 @@ void GameClient::render() {
 	hotbar.render();
 	
 	faceRenderer.stopRendering();
+	
+	params.applyView = true;
+	params.applyFog = true;
+	entityRenderer.startRendering(proj, view, params);
+	glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 40.0f, 0.0f)), glm::vec3(0.3f));
+	entityRenderer.slimeModel.bindTexture();
+	entityRenderer.render(entityRenderer.slimeModel, model);
+	entityRenderer.stopRendering();
 	
 	// Draw underwater overlay
 	if(player->isCameraUnderwater()) {

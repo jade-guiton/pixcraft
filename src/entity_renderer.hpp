@@ -10,7 +10,7 @@
 class EntityModel {
 public:
 	EntityModel();
-	void init(TexId texture, float* vertices, size_t vertexCount, unsigned int* indices, size_t indexCount);
+	void init(TexId texture, const float* vertices, size_t vertexCount, const unsigned int* indices, size_t indexCount);
 	
 	void bindTexture();
 	void render();
@@ -28,6 +28,9 @@ public:
 	
 	void startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params);
 	void render(EntityModel& model, glm::mat4 modelMat);
+	void stopRendering();
+	
+	EntityModel slimeModel;
 	
 private:
 	GlId program;
