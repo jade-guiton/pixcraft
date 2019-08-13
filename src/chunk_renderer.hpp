@@ -43,6 +43,7 @@ public:
 	void updateBlocks();
 	
 	void render(int32_t camChunkX, int32_t chamChunkZ);
+	void renderTranslucent(int32_t camChunkX, int32_t chamChunkZ);
 	
 private:
 	World& world;
