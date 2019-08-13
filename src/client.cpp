@@ -9,11 +9,12 @@
 #include "glm.hpp"
 
 #include "util.hpp"
-#include "world/blocks.hpp"
 #include "shaders.hpp"
 #include "textures.hpp"
 
+#include "world/blocks.hpp"
 #include "world/player.hpp"
+#include "world/slime.hpp"
 
 const char windowTitle[] = "OpenGL Test 2";
 
@@ -87,8 +88,9 @@ GameClient::GameClient()
 	entityRenderer.init();
 	hotbar.init();
 	
-	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
-	player = &world.players.back();
+	world.mobs.emplace_back(new Player(world, glm::vec3(8.0f, 50.0f, 8.0f)));
+	player = (Player*) world.mobs.back().get();
+	world.mobs.emplace_back(new Slime(world, glm::vec3(0.0f, 50.0f, 0.0f)));
 	
 	input.init(window);
 	input.capturingMouse(!paused);
@@ -191,7 +193,7 @@ void GameClient::update(float dt) {
 			std::tie(hit, x, y, z) = player->castRay(5, !click1, false);
 			if(hit && World::isValidHeight(y)) {
 				if(click2) {
-					if(!world.hasSolidBlock(x, y, z) && !world.containsPlayers(x, y, z))
+					if(!world.hasSolidBlock(x, y, z) && !world.containsMobs(x, y, z))
 						world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
 					world.removeBlock(x, y, z);
@@ -213,7 +215,7 @@ void GameClient::update(float dt) {
 	world.updateBlocks();
 	chunkRenderer.updateBlocks();
 	
-	player->update(dt);
+	world.updateEntities(dt);
 	
 	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
@@ -269,11 +271,7 @@ void GameClient::render() {
 	
 	params.applyView = true;
 	params.applyFog = true;
-	entityRenderer.startRendering(proj, view, params);
-	glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 40.0f, 0.0f)), glm::vec3(0.3f));
-	entityRenderer.slimeModel.bindTexture();
-	entityRenderer.render(entityRenderer.slimeModel, model);
-	entityRenderer.stopRendering();
+	entityRenderer.renderEntities(world, proj, view, params);
 	
 	// Draw underwater overlay
 	if(player->isEyeUnderwater()) {

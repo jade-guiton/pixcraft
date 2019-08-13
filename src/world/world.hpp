@@ -16,8 +16,11 @@
 
 class World {
 public:
+	std::vector<std::unique_ptr<Mob>> mobs;
+	
 	World();
 	
+	// Chunks
 	static bool isValidHeight(int32_t y);
 	static std::pair<int32_t, int32_t> getChunkPosAt(int32_t x, int32_t z);
 	static uint64_t getChunkIdxAt(int32_t x, int32_t z);
@@ -28,20 +31,21 @@ public:
 	
 	std::tuple<Chunk*, uint8_t, uint8_t> getBlockFromChunk(int32_t x, int32_t z);
 	
+	// Block updates
 	void markDirty(int32_t x, int32_t y, int32_t z);
 	BlockPosSet retrieveDirtyBlocks();
 	void requestUpdate(int32_t x, int32_t y, int32_t z);
 	void requestUpdatesAround(int32_t x, int32_t y, int32_t z);
 	void updateBlocks();
 	
+	// Block access
 	bool hasBlock(int32_t x, int32_t y, int32_t z);
 	Block* getBlock(int32_t x, int32_t y, int32_t z);
 	void setBlock(int32_t x, int32_t y, int32_t z, Block& block);
 	void removeBlock(int32_t x, int32_t y, int32_t z);
 	
+	// Block collisions
 	bool isOpaqueCube(int32_t x, int32_t y, int32_t z);
-	
-	bool containsPlayers(int32_t x, int32_t y, int32_t z);
 	
 	// sends a ray from pos in dir, on maxDist, and tests for block collisions; returns a tuple with:
 	// { hit?, hitBlockX, hitBlockY, hitBlockZ }
@@ -63,10 +67,13 @@ public:
 	// verBarrier determines how far the center can venture inside a block for the collision to continue to be acknowledged
 	float collideDiskVer(glm::vec3 center, float radius, float verBarrier, float margin);
 	
-	std::vector<Player> players;
+	// Entities
+	bool containsMobs(int32_t x, int32_t y, int32_t z);
+	void updateEntities(float dt);
 	
 private:
 	WorldGenerator gen;
+	
 	std::unordered_map<uint64_t, Chunk> loadedChunks;
 	std::unordered_set<uint64_t> updateRequests;
 	BlockPosSet dirtyBlocks;

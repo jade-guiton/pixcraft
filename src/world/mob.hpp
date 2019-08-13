@@ -6,6 +6,8 @@
 
 #include "world_module.hpp"
 
+constexpr float GRAVITY = 32.0f;
+
 class Mob {
 public:
 	glm::vec3 pos();
