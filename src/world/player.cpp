@@ -65,8 +65,7 @@ float Player::getMaxHorSpeed() {
 
 
 void Player::handleKeys(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
-	glm::mat4 yRot = glm::mat4(1.0f);
-	yRot = glm::rotate(yRot, _orient.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 yRot = glm::rotate(glm::mat4(1.0f), _orient.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	
 	int dx, dz; bool up, down;
 	std::tie(dx, dz, up, down) = mvtKeys;

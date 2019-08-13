@@ -8,4 +8,6 @@
 class Slime : public Mob {
 public:
 	Slime(World& world, glm::vec3 pos);
+	
+	void update(float dt) override;
 };
