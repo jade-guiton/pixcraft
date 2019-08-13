@@ -39,12 +39,13 @@ public:
 	Block();
 	virtual ~Block() = default;
 	
+	virtual void define();
 	virtual TexId getFaceTexture(uint8_t face);
 	virtual bool update(World& world, int32_t x, int32_t y, int32_t z);
 	
-	Block* rendering(BlockRendering rendering);
-	Block* mainTexture(const TexId* texture);
-	Block* collision(BlockCollision collision);
+	Block& rendering(BlockRendering rendering);
+	Block& mainTexture(TexId texture);
+	Block& collision(BlockCollision collision);
 	
 	BlockId id();
 	BlockRendering rendering();
@@ -56,7 +57,7 @@ public:
 private:
 	BlockId _id;
 	BlockRendering _rendering;
-	const TexId* _mainTexture;
+	TexId _mainTexture;
 	BlockCollision _collision;
 	
 	void setId(BlockId id);
@@ -64,18 +65,18 @@ private:
 
 class GrassBlock : public Block {
 public:
-	GrassBlock();
+	void define() override;
 	TexId getFaceTexture(uint8_t face) override;
 };
 
 class TrunkBlock : public Block {
 public:
-	TrunkBlock();
+	void define() override;
 	TexId getFaceTexture(uint8_t face) override;
 };
 
 class WaterBlock : public Block {
 public:
-	WaterBlock();
+	void define() override;
 	bool update(World& world, int32_t x, int32_t y, int32_t z) override;
 };

@@ -6,6 +6,7 @@
 
 #include "face_renderer.hpp"
 #include "chunk_renderer.hpp"
+#include "entity_renderer.hpp"
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
@@ -42,6 +43,7 @@ private:
 	
 	FaceRenderer faceRenderer;
 	ChunkRenderer chunkRenderer;
+	EntityRenderer entityRenderer;
 	Hotbar hotbar;
 	
 	TextRenderer textRenderer;

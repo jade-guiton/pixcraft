@@ -18,7 +18,8 @@ runDebug: test_debug.exe
 clean:
 	rm -f test.exe
 	rm -f test_debug.exe
-	find obj -type f -delete
+	rm -fr  obj/*
+	mkdir obj/world
 
 test.exe: CXXFLAGS := -O3 $(CXXFLAGS)
 test_debug.exe: CXXFLAGS := -g $(CXXFLAGS)

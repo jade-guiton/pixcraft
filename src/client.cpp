@@ -79,13 +79,15 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
-	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
-	player = &world.players.back();
-	
 	TextureManager::loadTextures();
+	BlockRegistry::defineBlocks();
 	faceRenderer.init();
 	textRenderer.init();
+	entityRenderer.init();
 	hotbar.init();
+	
+	world.players.emplace_back(world, glm::vec3(8.0f, 50.0f, 8.0f));
+	player = &world.players.back();
 	
 	input.init(window);
 	input.capturingMouse(!paused);
