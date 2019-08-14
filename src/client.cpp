@@ -314,16 +314,16 @@ void GameClient::render() {
 		glBindVertexArray(0);
 		glUseProgram(0);
 		checkGlErrors("pause menu overlay rendering");
+		
+		// Draw debug data
+		std::stringstream debugStream;
+		debugStream << FPS << " FPS" << std::endl;
+		debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
+		debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode())] << std::endl;
+		debugStream << "Vertical speed: " << player->speed().y << std::endl;
+		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
+		debugText->setText(debugStream.str());
+		textRenderer.render();
+		checkGlErrors("debug text rendering");
 	}
-	
-	// Draw debug data
-	std::stringstream debugStream;
-	debugStream << FPS << " FPS" << std::endl;
-	debugStream << "Pos: " << vec3ToString(playerPos) << std::endl;
-	debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode())] << std::endl;
-	debugStream << "Vertical speed: " << player->speed().y << std::endl;
-	debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
-	debugText->setText(debugStream.str());
-	textRenderer.render();
-	checkGlErrors("text rendering");
 }
