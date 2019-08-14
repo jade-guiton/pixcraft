@@ -10,7 +10,6 @@
 #include "shaders.hpp"
 
 
-std::string testText("Hello, World!");
 
 void TextRenderer2::init() {
 	FT_Library ft;
@@ -21,7 +20,8 @@ void TextRenderer2::init() {
 	if(FT_New_Face(ft, "res/NotoSans-Regular.ttf", 0, &face))
 		throw std::runtime_error("Failed to load font");
 	
-	FT_Set_Pixel_Sizes(face, 0, 24);
+	fontHeight = 16;
+	FT_Set_Pixel_Sizes(face, 0, fontHeight);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
 	
@@ -76,24 +76,35 @@ void TextRenderer2::setViewport(int width2, int height2) {
 	width = width2; height = height2;
 }
 
-void TextRenderer2::render() {
+void TextRenderer2::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
 	glUseProgram(program);
 	glBindVertexArray(VAO);
 	
 	glUniform2f(glGetUniformLocation(program, "winSize"), width, height);
 	
-	glUniform3f(glGetUniformLocation(program, "textColor"), 1, 1, 1);
+	glUniform3f(glGetUniformLocation(program, "textColor"), color.r, color.g, color.b);
 	
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0);
 	
-	float x = 5;
-	float y = 120;
-	float scale = 1;
+	float x = startX;
+	float y = startY;
+	float lineHeight = fontHeight * 1.25;
 	
 	std::string::const_iterator c;
-	for(c = testText.begin(); c != testText.end(); ++c) {
-		Character ch = characters[*c];
+	for(c = str.begin(); c != str.end(); ++c) {
+		char c2 = *c;
+		
+		if(c2 == '\n') {
+			x = startX;
+			y += lineHeight;
+			continue;
+		}
+		
+		if(characters.count(c2) == 0)
+			c2 = '?';
+		
+		Character ch = characters[c2];
 		
 		float xpos = x + ch.bearing.x * scale;
 		float ypos = y - ch.bearing.y * scale;
