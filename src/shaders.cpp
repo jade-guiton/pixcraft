@@ -49,7 +49,7 @@ GlId loadCursorProgram() {
 	return loadShaders(pixelVertexShaderSource, colorFragmentShaderSource);
 }
 
-GlId loadWaterOverlayProgram() {
+GlId loadColorOverlayProgram() {
 	return loadShaders(identityVertexShaderSource, colorFragmentShaderSource);
 }
 

@@ -69,13 +69,13 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	
-	waterOverlayProgram = loadWaterOverlayProgram();
-	glGenVertexArrays(1, &waterOverlayVAO);
-	GlId waterOverlayVBO;
-	glGenBuffers(1, &waterOverlayVBO);
+	colorOverlayProgram = loadColorOverlayProgram();
+	glGenVertexArrays(1, &colorOverlayVAO);
+	GlId colorOverlayVBO;
+	glGenBuffers(1, &colorOverlayVBO);
 	
-	glBindVertexArray(waterOverlayVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, waterOverlayVBO);
+	glBindVertexArray(colorOverlayVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, colorOverlayVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(overlayVertices), overlayVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
@@ -276,24 +276,34 @@ void GameClient::render() {
 	
 	// Draw underwater overlay
 	if(player->isEyeUnderwater()) {
-		glUseProgram(waterOverlayProgram);
-		glUniform4f(glGetUniformLocation(waterOverlayProgram, "color"), 0.11f, 0.43f, 0.97f, 0.3f);
-		glBindVertexArray(waterOverlayVAO);
+		glUseProgram(colorOverlayProgram);
+		glUniform4f(glGetUniformLocation(colorOverlayProgram, "color"), 0.11f, 0.43f, 0.97f, 0.3f);
+		glBindVertexArray(colorOverlayVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 		glUseProgram(0);
 	}
 	
 	// Draw cursor
+	glUseProgram(cursorProgram);
 	glLineWidth(2.0f);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
-	glUseProgram(cursorProgram);
 	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
 	glUniform4f(glGetUniformLocation(cursorProgram, "color"), 1, 1, 1, 1);
 	glBindVertexArray(cursorVAO);
 	glDrawArrays(GL_LINES, 0, 4);
 	glBindVertexArray(0);
 	glUseProgram(0);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	if(paused) {
+		glUseProgram(colorOverlayProgram);
+		glUniform4f(glGetUniformLocation(colorOverlayProgram, "color"), 0.0f, 0.0f, 0.0f, 0.5f);
+		glBindVertexArray(colorOverlayVAO);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
 	
 	// Draw debug data
 	std::stringstream debugStream;
@@ -303,6 +313,5 @@ void GameClient::render() {
 	debugStream << "Vertical speed: " << player->speed().y << std::endl;
 	debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 	debugText->setText(debugStream.str());
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	textRenderer.render();
 }

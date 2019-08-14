@@ -50,7 +50,7 @@ private:
 	Text* debugText;
 	
 	GlId cursorProgram, cursorVAO;
-	GlId waterOverlayProgram, waterOverlayVAO;
+	GlId colorOverlayProgram, colorOverlayVAO;
 	
 	bool paused;
 	bool firstFrame;

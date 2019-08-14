@@ -14,5 +14,5 @@ extern const char* entityFragmentShaderSource;
 
 GlId loadBlockProgram();
 GlId loadCursorProgram();
-GlId loadWaterOverlayProgram();
+GlId loadColorOverlayProgram();
 GlId loadEntityProgram();
