@@ -10,6 +10,7 @@
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
+#include "text2.hpp"
 
 #include "world/world_module.hpp"
 #include "world/world.hpp"
@@ -24,6 +25,7 @@ public:
 	
 	InputManager& getInputManager();
 	TextRenderer& getTextRenderer();
+	TextRenderer2& getTextRenderer2();
 	
 private:
 	static const int START_WIDTH = 800;
@@ -47,6 +49,7 @@ private:
 	Hotbar hotbar;
 	
 	TextRenderer textRenderer;
+	TextRenderer2 textRenderer2;
 	Text* debugText;
 	
 	GlId cursorProgram, cursorVAO;

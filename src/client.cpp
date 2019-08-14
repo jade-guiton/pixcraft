@@ -24,6 +24,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	
 	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
 	client.getTextRenderer().setViewport(width, height);
+	client.getTextRenderer2().setViewport(width, height);
 }
 
 const float cursorVertices[] = {
@@ -83,6 +84,7 @@ GameClient::GameClient()
 	BlockRegistry::defineBlocks();
 	faceRenderer.init();
 	textRenderer.init();
+	textRenderer2.init();
 	entityRenderer.init();
 	hotbar.init();
 	
@@ -146,6 +148,7 @@ void GameClient::mainLoop() {
 
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
+TextRenderer2& GameClient::getTextRenderer2() { return textRenderer2; }
 
 void GameClient::update(float dt) {
 	glfwPollEvents();
@@ -324,6 +327,9 @@ void GameClient::render() {
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 		debugText->setText(debugStream.str());
 		textRenderer.render();
+		checkGlErrors("debug text rendering");
+		
+		textRenderer2.render();
 		checkGlErrors("debug text rendering");
 	}
 }
