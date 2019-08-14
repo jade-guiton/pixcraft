@@ -84,6 +84,7 @@ namespace TextureManager {
 			
 			stbi_image_free(data);
 		}
+		checkGlErrors("texture loading");
 	}
 	
 	void bindBlockTextureArray() {

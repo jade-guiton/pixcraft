@@ -11,6 +11,7 @@ Hotbar::Hotbar(FaceRenderer& renderer)
 void Hotbar::init() {
 	buffer.init(faceRenderer, 6);
 	prerender();
+	checkGlErrors("hotbar initialization");
 }
 
 void Hotbar::previous() {

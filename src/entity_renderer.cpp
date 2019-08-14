@@ -65,6 +65,7 @@ void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(unsigned int), indices, GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
+	checkGlErrors("entity renderer initialization");
 }
 
 glm::mat4 EntityModel::preModel() { return _preModel; }
