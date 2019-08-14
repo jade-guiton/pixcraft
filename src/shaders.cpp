@@ -46,13 +46,17 @@ GlId loadBlockProgram() {
 }
 
 GlId loadCursorProgram() {
-	return loadShaders(pixelVertexShaderSource, colorFragmentShaderSource);
+	return loadShaders(cursorVertexShaderSource, colorFragmentShaderSource);
 }
 
 GlId loadColorOverlayProgram() {
-	return loadShaders(identityVertexShaderSource, colorFragmentShaderSource);
+	return loadShaders(overlayVertexShaderSource, colorFragmentShaderSource);
 }
 
 GlId loadEntityProgram() {
 	return loadShaders(entityVertexShaderSource, entityFragmentShaderSource);
+}
+
+GlId loadTextProgram() {
+	return loadShaders(textVertexShaderSource, textFragmentShaderSource);
 }
