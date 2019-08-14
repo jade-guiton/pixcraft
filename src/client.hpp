@@ -9,7 +9,7 @@
 #include "entity_renderer.hpp"
 #include "hotbar.hpp"
 #include "input.hpp"
-#include "text2.hpp"
+#include "text.hpp"
 
 #include "world/world_module.hpp"
 #include "world/world.hpp"
@@ -23,7 +23,7 @@ public:
 	void mainLoop();
 	
 	InputManager& getInputManager();
-	TextRenderer2& getTextRenderer();
+	TextRenderer& getTextRenderer();
 	
 private:
 	static const int START_WIDTH = 800;
@@ -46,7 +46,7 @@ private:
 	EntityRenderer entityRenderer;
 	Hotbar hotbar;
 	
-	TextRenderer2 textRenderer;
+	TextRenderer textRenderer;
 	
 	GlId cursorProgram, cursorVAO;
 	GlId colorOverlayProgram, colorOverlayVAO;

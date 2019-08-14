@@ -1,4 +1,4 @@
-#include "text2.hpp"
+#include "text.hpp"
 
 #include <utility>
 #include <string>
@@ -11,7 +11,7 @@
 
 
 
-void TextRenderer2::init() {
+void TextRenderer::init() {
 	FT_Library ft;
 	if(FT_Init_FreeType(&ft))
 		throw std::runtime_error("Failed to initialize FreeType");
@@ -72,11 +72,11 @@ void TextRenderer2::init() {
 	glBindVertexArray(0);
 }
 
-void TextRenderer2::setViewport(int width2, int height2) {
+void TextRenderer::setViewport(int width2, int height2) {
 	width = width2; height = height2;
 }
 
-void TextRenderer2::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
+void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
 	glUseProgram(program);
 	glBindVertexArray(VAO);
 	

@@ -15,7 +15,7 @@ struct Character {
 };
 
 
-class TextRenderer2 {
+class TextRenderer {
 public:
 	void init();
 	

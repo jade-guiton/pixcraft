@@ -143,7 +143,7 @@ void GameClient::mainLoop() {
 }
 
 InputManager& GameClient::getInputManager() { return input; }
-TextRenderer2& GameClient::getTextRenderer() { return textRenderer; }
+TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
 void GameClient::update(float dt) {
 	glfwPollEvents();
