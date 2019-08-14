@@ -21,9 +21,10 @@ public:
 	
 	void setViewport(int width, int height);
 	
-	void render();
+	void renderText(std::string str, float x, float y, float scale, glm::vec3 color);
 	
 private:
+	int fontHeight;
 	GlId program, VAO, VBO;
 	int width, height;
 	std::unordered_map<char, Character> characters;

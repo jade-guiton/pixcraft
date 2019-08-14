@@ -24,7 +24,6 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	
 	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
 	client.getTextRenderer().setViewport(width, height);
-	client.getTextRenderer2().setViewport(width, height);
 }
 
 const float cursorVertices[] = {
@@ -84,7 +83,6 @@ GameClient::GameClient()
 	BlockRegistry::defineBlocks();
 	faceRenderer.init();
 	textRenderer.init();
-	textRenderer2.init();
 	entityRenderer.init();
 	hotbar.init();
 	
@@ -94,8 +92,6 @@ GameClient::GameClient()
 	
 	input.init(window);
 	input.capturingMouse(!paused);
-	
-	debugText = &textRenderer.createText("Loading debug...", 5, 5, 1.0, glm::vec4(1, 1, 1, 1));
 	
 	glfwSetTime(0.0);
 }
@@ -147,8 +143,7 @@ void GameClient::mainLoop() {
 }
 
 InputManager& GameClient::getInputManager() { return input; }
-TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
-TextRenderer2& GameClient::getTextRenderer2() { return textRenderer2; }
+TextRenderer2& GameClient::getTextRenderer() { return textRenderer; }
 
 void GameClient::update(float dt) {
 	glfwPollEvents();
@@ -325,11 +320,7 @@ void GameClient::render() {
 		debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode())] << std::endl;
 		debugStream << "Vertical speed: " << player->speed().y << std::endl;
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
-		debugText->setText(debugStream.str());
-		textRenderer.render();
-		checkGlErrors("debug text rendering");
-		
-		textRenderer2.render();
+		textRenderer.renderText(debugStream.str(), 5, 20, 1.0, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
 	}
 }
