@@ -59,6 +59,7 @@ void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	glEnableVertexAttribArray(4);
 	
 	glBindVertexArray(0);
+	checkGlErrors("face buffer initialization");
 }
 
 bool FaceBuffer::isInitialized() { return VAO != 0; }
@@ -121,6 +122,7 @@ void FaceRenderer::init() {
 	glGenBuffers(1, &faceVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(faceVertices), faceVertices, GL_STATIC_DRAW);
+	checkGlErrors("face renderer initialization");
 }
 
 void FaceRenderer::bindFaceAttributes() {

@@ -53,10 +53,6 @@ GameClient::GameClient()
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	glfwSwapInterval(-1);
 	
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	
 	cursorProgram = loadCursorProgram();
 	glGenVertexArrays(1, &cursorVAO);
 	GlId cursorVBO;
@@ -68,6 +64,7 @@ GameClient::GameClient()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
+	checkGlErrors("cursor renderer initialization");
 	
 	colorOverlayProgram = loadColorOverlayProgram();
 	glGenVertexArrays(1, &colorOverlayVAO);
@@ -80,6 +77,7 @@ GameClient::GameClient()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
+	checkGlErrors("color overlay initialization");
 	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
@@ -101,7 +99,6 @@ GameClient::GameClient()
 }
 
 GameClient::~GameClient() {
-	
 	glfwDestroyWindow(window);
 }
 
@@ -251,6 +248,10 @@ void GameClient::render() {
 	// Clear screen
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	// Start the face rendering
@@ -262,17 +263,24 @@ void GameClient::render() {
 	faceRenderer.startRendering(proj, view, params);
 	chunkRenderer.render(camChunkX, camChunkZ);
 	faceRenderer.stopRendering();
+	checkGlErrors("block rendering");
 	
 	entityRenderer.renderEntities(world, proj, view, params);
+	checkGlErrors("entity rendering");
 	
 	faceRenderer.startRendering(proj, view, params);
 	chunkRenderer.renderTranslucent(camChunkX, camChunkZ);
+	checkGlErrors("translucent block rendering");
 	
 	params.applyView = false;
 	params.applyFog = false;
 	faceRenderer.setParams(params);
 	hotbar.render();
 	faceRenderer.stopRendering();
+	checkGlErrors("held block rendering");
+	
+	// After this point, no depth testing needed
+	glDisable(GL_DEPTH_TEST);
 	
 	// Draw underwater overlay
 	if(player->isEyeUnderwater()) {
@@ -282,6 +290,7 @@ void GameClient::render() {
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 		glUseProgram(0);
+		checkGlErrors("water overlay rendering");
 	}
 	
 	// Draw cursor
@@ -295,6 +304,7 @@ void GameClient::render() {
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	checkGlErrors("cursor rendering");
 	
 	if(paused) {
 		glUseProgram(colorOverlayProgram);
@@ -303,6 +313,7 @@ void GameClient::render() {
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 		glUseProgram(0);
+		checkGlErrors("pause menu overlay rendering");
 	}
 	
 	// Draw debug data
@@ -314,4 +325,5 @@ void GameClient::render() {
 	debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 	debugText->setText(debugStream.str());
 	textRenderer.render();
+	checkGlErrors("text rendering");
 }

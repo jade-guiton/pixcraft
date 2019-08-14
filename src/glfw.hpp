@@ -10,6 +10,8 @@
 
 typedef uint32_t GlId;
 
+void checkGlErrors(const char* opDesc);
+
 struct RenderParams {
 	float skyColor[3];
 	
