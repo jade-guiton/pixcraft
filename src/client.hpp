@@ -37,6 +37,9 @@ private:
 	
 	GLFWwindow* window;
 	
+	bool antialiasing;
+	bool showDebug;
+	
 	InputManager input;
 	World world;
 	Player* player;
@@ -55,7 +58,7 @@ private:
 	bool firstFrame;
 	int FPS;
 	
-	std::tuple<bool, int, int, int> blockRaycast(bool offset);
+	void setAntialiasing(bool enabled);
 	
 	void update(float dt);
 	void render();
