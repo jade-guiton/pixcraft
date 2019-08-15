@@ -27,7 +27,17 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 const float cursorVertices[] = {
-	-10, 0, 10, 0, 0, -10, 0.0, 10
+	-1,  -1,   1,  -1,    1,  1,   -1,  1,
+	-1, -10,   1, -10,   10, -1,   10,  1,
+	 1,  10,  -1,  10,  -10,  1,  -10, -1
+};
+const size_t cursorIndexCount = 30;
+const unsigned int cursorIndices[] = {
+	0,  1,  2,    2,  3,  0,
+	0,  4,  5,    5,  1,  0,
+	1,  6,  7,    7,  2,  1,
+	2,  8,  9,    9,  3,  2,
+	3, 10, 11,   11,  0,  3
 };
 
 const float overlayVertices[] = {
@@ -39,6 +49,7 @@ GameClient::GameClient()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	
 	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, windowTitle, nullptr, nullptr);
@@ -58,14 +69,17 @@ GameClient::GameClient()
 	
 	cursorProgram = loadCursorProgram();
 	glGenVertexArrays(1, &cursorVAO);
-	GlId cursorVBO;
+	GlId cursorVBO, cursorEBO;
 	glGenBuffers(1, &cursorVBO);
+	glGenBuffers(1, &cursorEBO);
 	
 	glBindVertexArray(cursorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cursorVertices), cursorVertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cursorEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cursorIndices), cursorIndices, GL_STATIC_DRAW);
 	glBindVertexArray(0);
 	checkGlErrors("cursor renderer initialization");
 	
@@ -297,12 +311,11 @@ void GameClient::render() {
 	
 	// Draw cursor
 	glUseProgram(cursorProgram);
-	glLineWidth(2.0f);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
 	glUniform4f(glGetUniformLocation(cursorProgram, "color"), 1, 1, 1, 1);
 	glBindVertexArray(cursorVAO);
-	glDrawArrays(GL_LINES, 0, 4);
+	glDrawElements(GL_TRIANGLES, cursorIndexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -316,6 +329,7 @@ void GameClient::render() {
 		glBindVertexArray(0);
 		glUseProgram(0);
 		checkGlErrors("pause menu overlay rendering");
+	}
 		
 		// Draw debug data
 		std::stringstream debugStream;
@@ -326,5 +340,5 @@ void GameClient::render() {
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 		textRenderer.renderText(debugStream.str(), 5, 20, 1.0, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
-	}
+	//}
 }

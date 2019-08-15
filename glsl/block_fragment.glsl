@@ -13,7 +13,7 @@ uniform float fogEnd;
 
 in vec3 cameraCoords;
 in vec2 vertexUV;
-in flat int faceTexId;
+flat in int faceTexId;
 in vec3 normal;
 
 out vec4 fragColor;

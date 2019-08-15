@@ -14,7 +14,7 @@ layout (location = 4) in int instTexId;
 
 out vec3 cameraCoords;
 out vec2 vertexUV;
-out flat int faceTexId;
+flat out int faceTexId;
 out vec3 normal;
 
 void main() {
