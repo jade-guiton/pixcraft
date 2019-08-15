@@ -61,6 +61,10 @@ GameClient::GameClient()
 	if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
 		throw std::runtime_error("Failed to initialize GLAD");
 	
+	std::cout << "Using OpenGL version " << GLVersion.major << "." << GLVersion.minor << std::endl;
+	if(GLAD_GL_ARB_sample_shading)
+		std::cout << "Context supports sample shading." << std::endl;
+	
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	glfwSwapInterval(-1);

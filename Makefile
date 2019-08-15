@@ -7,7 +7,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 LDFLAGS   := -lglfw3 -lopengl32 -lgdi32 -lfreetype -lharfbuzz
 CPPFLAGS  := 
-CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused -IC:/lib/glad-core3.3/include -IC:/lib/stb -IC:/lib \
+CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused -Ilib \
 	-IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
 
 runRelease: test.exe
