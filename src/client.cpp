@@ -270,6 +270,7 @@ void GameClient::render() {
 	chunkRenderer.renderTranslucent(camChunkX, camChunkZ);
 	checkGlErrors("translucent block rendering");
 	
+	glClear(GL_DEPTH_BUFFER_BIT);
 	params.applyView = false;
 	params.applyFog = false;
 	faceRenderer.setParams(params);
