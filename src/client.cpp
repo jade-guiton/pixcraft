@@ -45,7 +45,8 @@ const float overlayVertices[] = {
 };
 
 GameClient::GameClient()
-	: chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false), firstFrame(true), FPS(0.0) {
+	: showDebug(false), chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false),
+	  firstFrame(true), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -62,14 +63,12 @@ GameClient::GameClient()
 		throw std::runtime_error("Failed to initialize GLAD");
 	
 	std::cout << "Using OpenGL version " << GLVersion.major << "." << GLVersion.minor << std::endl;
-	if(GLAD_GL_ARB_sample_shading)
-		std::cout << "Context supports sample shading." << std::endl;
+	
+	setAntialiasing(false);
 	
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	glfwSwapInterval(-1);
-	
-	glEnable(GL_MULTISAMPLE);
 	
 	cursorProgram = loadCursorProgram();
 	glGenVertexArrays(1, &cursorVAO);
@@ -166,6 +165,15 @@ void GameClient::mainLoop() {
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
+void GameClient::setAntialiasing(bool enabled) {
+	if(enabled) {
+		glEnable(GL_MULTISAMPLE);
+	} else {
+		glDisable(GL_MULTISAMPLE);
+	}
+	antialiasing = enabled;
+}
+
 void GameClient::update(float dt) {
 	glfwPollEvents();
 	
@@ -225,6 +233,12 @@ void GameClient::update(float dt) {
 	if(input.justPressed(GLFW_KEY_ESCAPE)) {
 		paused = !paused;
 		input.capturingMouse(!paused);
+	}
+	if(input.justPressed(GLFW_KEY_G)) {
+		showDebug = !showDebug;
+	}
+	if(input.justPressed(GLFW_KEY_H)) {
+		setAntialiasing(!antialiasing);
 	}
 	input.clearJustPressed();
 	
@@ -334,7 +348,8 @@ void GameClient::render() {
 		glUseProgram(0);
 		checkGlErrors("pause menu overlay rendering");
 	}
-		
+	
+	if(showDebug) {
 		// Draw debug data
 		std::stringstream debugStream;
 		debugStream << FPS << " FPS" << std::endl;
@@ -342,7 +357,8 @@ void GameClient::render() {
 		debugStream << "Mode: " << movementModeNames[static_cast<int>(player->movementMode())] << std::endl;
 		debugStream << "Vertical speed: " << player->speed().y << std::endl;
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
+		debugStream << "Antialiasing: " << (antialiasing ? "enabled" : "disabled") << std::endl;
 		textRenderer.renderText(debugStream.str(), 5, 20, 1.0, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
-	//}
+	}
 }
