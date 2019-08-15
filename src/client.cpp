@@ -11,6 +11,7 @@
 #include "util.hpp"
 #include "shaders.hpp"
 #include "textures.hpp"
+#include "view_frustum.hpp"
 
 #include "world/blocks.hpp"
 #include "world/player.hpp"
@@ -271,10 +272,16 @@ void GameClient::render() {
 	// Compute some rendering data based on player position
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
+	float fovy = glm::radians(90.0f);
 	float aspect = ((float) width) / height;
+	float near = 0.001f;
+	float far = 1000.0f;
 	glm::vec3 playerPos = player->eyePos();
-	glm::mat4 proj = glm::perspective(glm::radians(90.0f), aspect, 0.001f, 1000.0f);
+	glm::mat4 proj = glm::perspective(fovy, aspect, near, far);
 	glm::mat4 view = globalToLocal(playerPos, player->orient());
+	
+	ViewFrustum vf = computeViewFrustum(fovy, aspect, near, far, playerPos, player->orient());
+	
 	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
 	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
 	
@@ -291,10 +298,10 @@ void GameClient::render() {
 	RenderParams params = {
 		{ SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2] },
 		true, true,
-		FOG_START, FOG_END
+		FOG_START, FOG_END,
 	};
 	faceRenderer.startRendering(proj, view, params);
-	chunkRenderer.render(camChunkX, camChunkZ);
+	chunkRenderer.render(camChunkX, camChunkZ, vf);
 	faceRenderer.stopRendering();
 	checkGlErrors("block rendering");
 	
@@ -302,7 +309,7 @@ void GameClient::render() {
 	checkGlErrors("entity rendering");
 	
 	faceRenderer.startRendering(proj, view, params);
-	chunkRenderer.renderTranslucent(camChunkX, camChunkZ);
+	chunkRenderer.renderTranslucent(camChunkX, camChunkZ, vf);
 	checkGlErrors("translucent block rendering");
 	
 	glClear(GL_DEPTH_BUFFER_BIT);

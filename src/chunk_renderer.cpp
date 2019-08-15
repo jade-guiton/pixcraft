@@ -184,7 +184,7 @@ void ChunkRenderer::updateBlocks() {
 	}
 }
 
-void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
+void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ, ViewFrustum& vf) {
 	for(auto iter = renderedChunks.begin(); iter != renderedChunks.end();) {
 		int32_t chunkX, chunkZ;
 		std::tie(chunkX, chunkZ) = unpackCoords(iter->first);
@@ -192,7 +192,7 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 		if(dist >= (renderDist*2)*(renderDist*2)) {
 			iter = renderedChunks.erase(iter);
 		} else {
-			if(dist <= (renderDist+1)*(renderDist+1)) {
+			if(dist <= (renderDist+1)*(renderDist+1) && isVisible(vf, chunkX, chunkZ)) {
 				RenderedChunk& chunk = iter->second;
 				chunk.render(faceRenderer);
 			}
@@ -201,13 +201,13 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ) {
 	}
 }
 
-void ChunkRenderer::renderTranslucent(int32_t camChunkX, int32_t camChunkZ) {
+void ChunkRenderer::renderTranslucent(int32_t camChunkX, int32_t camChunkZ, ViewFrustum& vf) {
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 	for(int32_t x = camChunkX - renderDist; x <= camChunkX + renderDist; ++x) {
 		for(int32_t z = camChunkZ - renderDist; z <= camChunkZ + renderDist; ++z) {
 			auto chunkIter = renderedChunks.find(packCoords(x, z));
-			if(chunkIter != renderedChunks.end()) {
+			if(chunkIter != renderedChunks.end() && isVisible(vf, x, z)) {
 				chunkIter->second.renderTranslucent(faceRenderer);
 			}
 		}

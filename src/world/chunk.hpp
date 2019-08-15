@@ -6,8 +6,6 @@
 
 #include "world_module.hpp"
 
-#define CHUNK_SIZE 16
-#define CHUNK_HEIGHT 64
 #define CHUNK_BLOCKS (CHUNK_SIZE*CHUNK_SIZE*CHUNK_HEIGHT)
 #define MAX_CHUNK_FACES (CHUNK_BLOCKS*3)
 
