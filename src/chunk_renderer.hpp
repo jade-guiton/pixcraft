@@ -7,6 +7,7 @@
 
 #include "world/world.hpp"
 #include "face_renderer.hpp"
+#include "view_frustum.hpp"
 
 class RenderedChunk {
 public:
@@ -42,8 +43,8 @@ public:
 	void prerenderChunk(int32_t chunkX, int32_t chunkZ);
 	void updateBlocks();
 	
-	void render(int32_t camChunkX, int32_t chamChunkZ);
-	void renderTranslucent(int32_t camChunkX, int32_t chamChunkZ);
+	void render(int32_t camChunkX, int32_t chamChunkZ, ViewFrustum& vf);
+	void renderTranslucent(int32_t camChunkX, int32_t chamChunkZ, ViewFrustum& vf);
 	
 private:
 	World& world;
