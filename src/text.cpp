@@ -11,7 +11,7 @@ void TextRenderer::init() {
 	if(FT_Init_FreeType(&ft))
 		throw std::runtime_error("Failed to initialize FreeType");
 	
-	if(FT_New_Face(ft, "res/NotoSans-Regular.ttf", 0, &face))
+	if(FT_New_Face(ft, "res/unifont-12.1.03.ttf", 0, &face))
 		throw std::runtime_error("Failed to load font");
 	
 	fontHeight = 16;
@@ -20,6 +20,12 @@ void TextRenderer::init() {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
 	
 	glyphAtlas.init(512, 512);
+	
+	// Preload ASCII characters at least
+	glyphAtlas.bind();
+	for(uint32_t c = 0x20; c < 0x7F; ++c) {
+		prerenderCharacter(c);
+	}
 	
 	program = loadTextProgram();
 	
@@ -65,20 +71,21 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	float y = startY;
 	float lineHeight = fontHeight * 1.25;
 	
-	std::string::const_iterator c;
-	for(c = str.begin(); c != str.end(); ++c) {
-		char c2 = *c;
-		
-		if(c2 == '\n') {
+	std::string::const_iterator it = str.begin();
+	std::string::const_iterator end = str.end();
+	uint32_t cp;
+	while(it != end) {
+		cp = utf8::next(it, end);
+		if(cp == '\n') {
 			x = startX;
 			y += lineHeight;
 			continue;
 		}
 		
-		if(characters.count(c2) == 0)
-			prerenderCharacter(c2);
+		if(characters.count(cp) == 0)
+			prerenderCharacter(cp);
 		
-		Glyph ch = characters[c2];
+		Glyph ch = characters[cp];
 		
 		float xpos = x + ch.bearing.x * scale;
 		float ypos = y - ch.bearing.y * scale;
@@ -108,7 +115,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	}
 }
 
-void TextRenderer::prerenderCharacter(char c) {
+void TextRenderer::prerenderCharacter(uint32_t c) {
 	if(FT_Load_Char(face, c, FT_LOAD_RENDER))
 		throw std::runtime_error("Failed to load glyph");
 	

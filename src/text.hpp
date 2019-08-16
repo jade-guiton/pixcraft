@@ -7,6 +7,7 @@
 #include "glm.hpp"
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include "utf8.h"
 
 #include "texture_atlas.hpp"
 
@@ -33,11 +34,11 @@ private:
 	FT_Library ft;
 	FT_Face face;
 	TextureAtlas glyphAtlas;
-	std::unordered_map<char, Glyph> characters;
+	std::unordered_map<uint32_t, Glyph> characters;
 	
 	int winWidth, winHeight;
 	GlId program, VAO, VBO;
 	int fontHeight;
 	
-	void prerenderCharacter(char c);
+	void prerenderCharacter(uint32_t c);
 };

@@ -9,7 +9,7 @@ LDFLAGS   := -static -lglfw3 -lopengl32 \
 	-lfreetype -lharfbuzz -lfreetype -lpng16 -lz -lbz2 -lgraphite2 -lgdi32 -lrpcrt4
 CPPFLAGS  := 
 CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused \
-	-Ilib -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
+	-Ilib -IC:/lib/utf8-cpp-2.3.4 -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
 
 runRelease: test.exe
 	./test.exe
