@@ -5,10 +5,14 @@
 
 #include "glfw.hpp"
 #include "glm.hpp"
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include "texture_atlas.hpp"
 
 
-struct Character {
-	GlId texId;
+struct Glyph {
+	unsigned int atlasId;
 	glm::ivec2 size;
 	glm::ivec2 bearing;
 	int32_t advance;
@@ -19,13 +23,21 @@ class TextRenderer {
 public:
 	void init();
 	
+	~TextRenderer();
+	
 	void setViewport(int width, int height);
 	
 	void renderText(std::string str, float x, float y, float scale, glm::vec3 color);
 	
 private:
-	int fontHeight;
+	FT_Library ft;
+	FT_Face face;
+	TextureAtlas glyphAtlas;
+	std::unordered_map<char, Glyph> characters;
+	
+	int winWidth, winHeight;
 	GlId program, VAO, VBO;
-	int width, height;
-	std::unordered_map<char, Character> characters;
+	int fontHeight;
+	
+	void prerenderCharacter(char c);
 };

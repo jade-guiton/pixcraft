@@ -4,19 +4,13 @@
 #include <string>
 #include <cstddef>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
 #include "shaders.hpp"
 
 
-
 void TextRenderer::init() {
-	FT_Library ft;
 	if(FT_Init_FreeType(&ft))
 		throw std::runtime_error("Failed to initialize FreeType");
 	
-	FT_Face face;
 	if(FT_New_Face(ft, "res/NotoSans-Regular.ttf", 0, &face))
 		throw std::runtime_error("Failed to load font");
 	
@@ -25,33 +19,7 @@ void TextRenderer::init() {
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // Disable byte-alignment restriction
 	
-	for(unsigned char c = 0; c < 128; ++c) {
-		if(FT_Load_Char(face, c, FT_LOAD_RENDER))
-			throw std::runtime_error("Failed to load glyph");
-		
-		GlId texture;
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows,
-			0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
-		Character character = {
-			texture, 
-			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-			face->glyph->advance.x
-		};
-		characters[c] = character;
-	}
-	
-	FT_Done_Face(face);
-	FT_Done_FreeType(ft);
+	glyphAtlas.init(512, 512);
 	
 	program = loadTextProgram();
 	
@@ -70,21 +38,27 @@ void TextRenderer::init() {
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	
+	checkGlErrors("text renderer initialization");
 }
 
-void TextRenderer::setViewport(int width2, int height2) {
-	width = width2; height = height2;
+TextRenderer::~TextRenderer() {
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+}
+
+void TextRenderer::setViewport(int width, int height) {
+	winWidth = width; winHeight = height;
 }
 
 void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
 	glUseProgram(program);
 	glBindVertexArray(VAO);
 	
-	glUniform2f(glGetUniformLocation(program, "winSize"), width, height);
+	glyphAtlas.bind();
 	
+	glUniform2f(glGetUniformLocation(program, "winSize"), winWidth, winHeight);
 	glUniform3f(glGetUniformLocation(program, "textColor"), color.r, color.g, color.b);
-	
-	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0);
 	
 	float x = startX;
@@ -102,24 +76,27 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		}
 		
 		if(characters.count(c2) == 0)
-			c2 = '?';
+			prerenderCharacter(c2);
 		
-		Character ch = characters[c2];
+		Glyph ch = characters[c2];
 		
 		float xpos = x + ch.bearing.x * scale;
 		float ypos = y - ch.bearing.y * scale;
 		
+		float l = glyphAtlas.getL(ch.atlasId);
+		float r = glyphAtlas.getR(ch.atlasId);
+		float t = glyphAtlas.getT(ch.atlasId);
+		float b = glyphAtlas.getB(ch.atlasId);
+		
 		float w = ch.size.x * scale;
 		float h = ch.size.y * scale;
 		
-		float vertices[4][4] = {            
-			{ xpos,     ypos,       0.0, 0.0 },
-			{ xpos,     ypos + h,   0.0, 1.0 },
-			{ xpos + w, ypos,       1.0, 0.0 },
-			{ xpos + w, ypos + h,   1.0, 1.0 }
+		float vertices[4][4] = {
+			{ xpos,     ypos,       l, b },
+			{ xpos,     ypos + h,   l, t },
+			{ xpos + w, ypos,       r, b },
+			{ xpos + w, ypos + h,   r, t }
 		};
-		
-		glBindTexture(GL_TEXTURE_2D, ch.texId);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
@@ -129,4 +106,20 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		
 		x += (ch.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 	}
+}
+
+void TextRenderer::prerenderCharacter(char c) {
+	if(FT_Load_Char(face, c, FT_LOAD_RENDER))
+		throw std::runtime_error("Failed to load glyph");
+	
+	glm::ivec2 size(face->glyph->bitmap.width, face->glyph->bitmap.rows);
+	
+	unsigned int atlasId = glyphAtlas.addTexture(size.x, size.y, face->glyph->bitmap.buffer);
+	Glyph character = {
+		atlasId,
+		size,
+		glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+		face->glyph->advance.x
+	};
+	characters[c] = character;
 }

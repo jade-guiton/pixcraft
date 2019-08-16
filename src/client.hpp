@@ -55,7 +55,7 @@ private:
 	GlId colorOverlayProgram, colorOverlayVAO;
 	
 	bool paused;
-	bool firstFrame;
+	int frameNo;
 	int FPS;
 	
 	void setAntialiasing(bool enabled);
