@@ -47,7 +47,7 @@ const float overlayVertices[] = {
 
 GameClient::GameClient()
 	: showDebug(false), chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false),
-	  firstFrame(true), FPS(0.0) {
+	  frameNo(0), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -137,15 +137,14 @@ void GameClient::mainLoop() {
 		render();
 		
 		now = glfwGetTime();
-		if(!firstFrame) {
+		if(frameNo != 0) {
 			dt = now - lastFrame;
 			if(dt > 1 / 30.0) {
 				std::cout << "Can't keep up!" << std::endl;
 				dt = 1/60.0;
 			}
-		} else {
-			firstFrame = false;
 		}
+		++frameNo;
 		lastFrame = now;
 		
 		frameCounter++;
