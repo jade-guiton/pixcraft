@@ -39,7 +39,7 @@ namespace TextureManager {
 	const TexId LEAVES = requireBlockTexture("leaves");
 	const TexId WATER = requireBlockTexture("water");
 	
-	const TexId SLIME = requireTexture("slime");
+	const TexId SLIME = requireTexture("entity/slime");
 	
 	void loadTextures() {
 		glGenTextures(1, &blockTextureArray);
@@ -53,7 +53,7 @@ namespace TextureManager {
 		stbi_set_flip_vertically_on_load(true);
 		
 		for(unsigned int i = 0; i < blockTextureFiles.size(); ++i) {
-			std::string filename = "res/" + blockTextureFiles[i] + ".png";
+			std::string filename = "res/block/" + blockTextureFiles[i] + ".png";
 			unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 			if(!data) throw std::runtime_error("Failed to load block texture");
 			if(width != BLOCK_TEX_SIZE || height != BLOCK_TEX_SIZE) throw std::runtime_error("Block texture has incorrect dimensions");

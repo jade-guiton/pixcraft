@@ -11,22 +11,23 @@ CPPFLAGS  :=
 CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused \
 	-Ilib -IC:/lib/utf8-cpp-2.3.4 -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
 
-runRelease: test.exe
+run: release
 	./test.exe
-
-runDebug: test_debug.exe
-	./test_debug.exe
 
 clean:
 	rm -f test.exe
-	rm -f test_debug.exe
 	rm -fr  obj/*
 	mkdir obj/world
 
-test.exe: CXXFLAGS := -O3 $(CXXFLAGS)
-test_debug.exe: CXXFLAGS := -g $(CXXFLAGS)
+release: CXXFLAGS := -O3 $(CXXFLAGS)
+release: test.exe
+debug: CXXFLAGS := -g $(CXXFLAGS)
+debug: test.exe
+profiling: CXXFLAGS := -O3 -pg $(CXXFLAGS)
+profiling: LDFLAGS := -pg $(LDFLAGS)
+profiling: test.exe
 
-test.exe test_debug.exe: $(OBJ_FILES)
+test.exe: $(OBJ_FILES)
 	g++ -o $@ $^ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
