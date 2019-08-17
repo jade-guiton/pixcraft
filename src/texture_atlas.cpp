@@ -7,6 +7,9 @@
 #include <iostream>
 
 
+const GLint internalFormat = GL_RED;
+const GLenum format = GL_RED;
+
 Rect newRect(int left, int bottom, int width, int height) {
 	return Rect { left, left + width, bottom, bottom + height, width, height };
 }
@@ -22,8 +25,8 @@ void TextureAtlas::init(int width2, int height2) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0,
-		GL_RED, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0,
+		format, GL_UNSIGNED_BYTE, nullptr);
 	
 	freeSpace.push_back(newRect(0, 0, width, height));
 }
@@ -62,8 +65,7 @@ unsigned int TextureAtlas::addTexture(int width, int height, void* data) {
 	Rect texture = newRect(bestRect.left + 1, bestRect.bottom + 1, width, height);
 	textures.push_back(texture);
 	
-	checkGlErrors("something else");
-	glTexSubImage2D(GL_TEXTURE_2D, 0, texture.left, texture.bottom, texture.width, texture.height, GL_RED, GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, texture.left, texture.bottom, texture.width, texture.height, format, GL_UNSIGNED_BYTE, data);
 	checkGlErrors("rendering to glyph atlas");
 	
 	return textures.size() - 1;
