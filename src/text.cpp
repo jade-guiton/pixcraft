@@ -69,7 +69,7 @@ void TextRenderer::setViewport(int width, int height) {
 	winWidth = width; winHeight = height;
 }
 
-void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color, bool outline) {
+void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
 	glUseProgram(program);
 	glBindVertexArray(VAO);
 	
@@ -77,8 +77,31 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	
 	glUniform2f(glGetUniformLocation(program, "winSize"), winWidth, winHeight);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0);
+	glUniform3f(glGetUniformLocation(program, "textColor"), color.r, color.g, color.b);
 	
-	renderTextOnce(str, startX, startY, scale, color, false);
+	float x = startX;
+	float y = startY;
+	float lineHeight = round(fontHeight * 1.25);
+	
+	std::string::const_iterator it = str.begin();
+	std::string::const_iterator end = str.end();
+	uint32_t cp;
+	
+	while(it != end) {
+		cp = utf8::next(it, end);
+		if(cp == '\n') {
+			x = startX;
+			y += lineHeight;
+			continue;
+		}
+		
+		if(characters.count(cp) == 0) prerenderCharacter(cp);
+		CharacterData characterData = characters[cp];
+		
+		renderGlyphData(characterData.glyphData, x, y, scale);
+		
+		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+	}
 }
 
 void TextRenderer::loadFont(size_t priority, const char* filename) {
@@ -87,20 +110,6 @@ void TextRenderer::loadFont(size_t priority, const char* filename) {
 		errorMsg << "Failed to load font " << filename << "." << std::endl;
 		throw std::runtime_error(errorMsg.str());
 	}
-}
-
-GlyphData TextRenderer::prerenderGlyph(FT_Glyph glyph) {
-	FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true);
-	FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
-	
-	glm::ivec2 size(bitmapGlyph->bitmap.width, bitmapGlyph->bitmap.rows);
-	unsigned int atlasId = glyphAtlas.addTexture(size.x, size.y, bitmapGlyph->bitmap.buffer);
-	
-	return GlyphData {
-		atlasId,
-		size,
-		glm::ivec2(bitmapGlyph->left, bitmapGlyph->top)
-	};
 }
 
 void TextRenderer::prerenderCharacter(uint32_t cp) {
@@ -183,32 +192,4 @@ void TextRenderer::renderGlyphData(GlyphData& data, float x, float y, float scal
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
-void TextRenderer::renderTextOnce(std::string str, float startX, float startY, float scale, glm::vec3 color, bool outline) {
-	glUniform3f(glGetUniformLocation(program, "textColor"), color.r, color.g, color.b);
-	
-	float x = startX;
-	float y = startY;
-	float lineHeight = round(fontHeight * 1.25);
-	
-	std::string::const_iterator it = str.begin();
-	std::string::const_iterator end = str.end();
-	uint32_t cp;
-	
-	while(it != end) {
-		cp = utf8::next(it, end);
-		if(cp == '\n') {
-			x = startX;
-			y += lineHeight;
-			continue;
-		}
-		
-		if(characters.count(cp) == 0) prerenderCharacter(cp);
-		CharacterData characterData = characters[cp];
-		
-		renderGlyphData(characterData.glyphData, x, y, scale);
-		
-		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
-	}
 }

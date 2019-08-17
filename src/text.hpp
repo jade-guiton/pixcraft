@@ -33,7 +33,7 @@ public:
 	
 	void setViewport(int width, int height);
 	
-	void renderText(std::string str, float x, float y, float scale, glm::vec3 color, bool outline);
+	void renderText(std::string str, float x, float y, float scale, glm::vec3 color);
 	
 private:
 	static const int FONT_COUNT = 4;
@@ -50,9 +50,7 @@ private:
 	
 	void loadFont(size_t priority, const char* filename);
 	
-	GlyphData prerenderGlyph(FT_Glyph glyph);
 	void prerenderCharacter(uint32_t c);
 	
 	void renderGlyphData(GlyphData& data, float x, float y, float scale);
-	void renderTextOnce(std::string str, float x, float y, float scale, glm::vec3 color, bool outline);
 };
