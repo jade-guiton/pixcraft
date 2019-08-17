@@ -13,6 +13,7 @@ public:
 	void init(int width, int height);
 	
 	unsigned int addTexture(int width, int height, void* data);
+	//void overlay(unsigned int textureId, int overlayWidth, int overlayHeight, void* data);
 	
 	float getL(unsigned int textureId);
 	float getR(unsigned int textureId);

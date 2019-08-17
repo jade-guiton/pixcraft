@@ -7,8 +7,8 @@
 #include <iostream>
 
 
-const GLint internalFormat = GL_RED;
-const GLenum format = GL_RED;
+const GLint internalFormat = GL_RG8;
+const GLenum format = GL_RG;
 
 Rect newRect(int left, int bottom, int width, int height) {
 	return Rect { left, left + width, bottom, bottom + height, width, height };
@@ -90,5 +90,5 @@ float TextureAtlas::getT(unsigned int textureId) {
 void TextureAtlas::bind() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
 }

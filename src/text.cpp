@@ -78,8 +78,6 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	glUniform2f(glGetUniformLocation(program, "winSize"), winWidth, winHeight);
 	glUniform1i(glGetUniformLocation(program, "tex"), 0);
 	
-	if(outline)
-		renderTextOnce(str, startX, startY, scale, glm::vec3(1.0) - color, true);
 	renderTextOnce(str, startX, startY, scale, color, false);
 }
 
@@ -126,12 +124,38 @@ void TextRenderer::prerenderCharacter(uint32_t cp) {
 	FT_Glyph outlineGlyph = glyph;
 	FT_Glyph_StrokeBorder(&outlineGlyph, stroker, false, false);
 	
-	GlyphData glyphData = prerenderGlyph(glyph);
-	GlyphData outlineGlyphData = prerenderGlyph(outlineGlyph);
+	FT_Glyph_To_Bitmap(&outlineGlyph, FT_RENDER_MODE_NORMAL, nullptr, true);
+	FT_BitmapGlyph outlineBitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(outlineGlyph);
+	glm::ivec2 outlineSize(outlineBitmapGlyph->bitmap.width, outlineBitmapGlyph->bitmap.rows);
+	
+	FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true);
+	FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
+	glm::ivec2 size(bitmapGlyph->bitmap.width, bitmapGlyph->bitmap.rows);
+	glm::ivec2 offset(bitmapGlyph->left - outlineBitmapGlyph->left, outlineBitmapGlyph->top - bitmapGlyph->top);
+	
+	unsigned char* buffer = new unsigned char[outlineSize.x*outlineSize.y*2];
+	for(int x = 0; x < outlineSize.x; ++x) {
+		for(int y = 0; y < outlineSize.y; ++y) {
+			size_t i = x*2 + y*outlineSize.x*2;
+			buffer[i] = outlineBitmapGlyph->bitmap.buffer[x + y*outlineSize.x];
+			glm::ivec2 relPos(x - offset.x, y - offset.y);
+			if(relPos.x >= 0 && relPos.y >= 0 && relPos.x < size.x && relPos.y < size.y) {
+				buffer[i+1] = bitmapGlyph->bitmap.buffer[relPos.x + relPos.y*size.x];
+			} else {
+				buffer[i+1] = 0;
+			}
+		}
+	}
+	unsigned int atlasId = glyphAtlas.addTexture(outlineSize.x, outlineSize.y, buffer);
+	
+	GlyphData glyphData = GlyphData {
+		atlasId,
+		outlineSize,
+		glm::ivec2(outlineBitmapGlyph->left, outlineBitmapGlyph->top)
+	};
 	
 	characters[cp] = CharacterData {
 		glyphData,
-		outlineGlyphData,
 		advanceX
 	};
 }
@@ -182,10 +206,8 @@ void TextRenderer::renderTextOnce(std::string str, float startX, float startY, f
 		
 		if(characters.count(cp) == 0) prerenderCharacter(cp);
 		CharacterData characterData = characters[cp];
-		if(outline)
-			renderGlyphData(characterData.outlineGlyphData, x, y, scale);
-		else
-			renderGlyphData(characterData.glyphData, x, y, scale);
+		
+		renderGlyphData(characterData.glyphData, x, y, scale);
 		
 		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 	}

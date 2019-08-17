@@ -8,5 +8,11 @@ in vec2 vertUV;
 out vec4 fragColor;
 
 void main() {
-	fragColor = vec4(textColor, texture(tex, vertUV).r);
+	vec3 outlineColor = 1 - textColor;
+	float outlineSample = texture(tex, vertUV).r;
+	float sample = texture(tex, vertUV).g;
+	float outlineFactor = outlineSample*(1 - sample);
+	float alpha = sample + outlineFactor;
+	vec3 color = (textColor*sample + outlineColor*outlineFactor) / alpha;
+	fragColor = vec4(color, alpha);
 }
