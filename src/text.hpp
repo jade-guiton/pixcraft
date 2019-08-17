@@ -22,7 +22,6 @@ struct GlyphData {
 
 struct CharacterData {
 	GlyphData glyphData;
-	GlyphData outlineGlyphData;
 	int32_t advance;
 };
 
