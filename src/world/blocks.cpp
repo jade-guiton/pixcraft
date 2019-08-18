@@ -28,6 +28,7 @@ namespace BlockRegistry {
 	const BlockId TRUNK_ID = registerBlock(new TrunkBlock());
 	const BlockId LEAVES_ID = registerBlock(new Block());
 	const BlockId WATER_ID = registerBlock(new WaterBlock());
+	const BlockId PLANKS_ID = registerBlock(new Block());
 	
 	void defineBlocks() {
 		fromId(STONE_ID).mainTexture(TEX(STONE));
@@ -36,6 +37,7 @@ namespace BlockRegistry {
 		fromId(TRUNK_ID).define();
 		fromId(LEAVES_ID).mainTexture(TEX(LEAVES)).rendering(BlockRendering::transparentCube);
 		fromId(WATER_ID).define();
+		fromId(PLANKS_ID).mainTexture(TEX(PLANKS));
 	}
 
 	Block& fromId(BlockId id) {

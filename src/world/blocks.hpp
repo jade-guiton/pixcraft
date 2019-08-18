@@ -22,6 +22,7 @@ namespace BlockRegistry {
 	extern const BlockId TRUNK_ID;
 	extern const BlockId LEAVES_ID;
 	extern const BlockId WATER_ID;
+	extern const BlockId PLANKS_ID;
 };
 
 enum class BlockRendering {

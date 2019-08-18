@@ -38,6 +38,7 @@ namespace TextureManager {
 	const TexId TRUNK_INSIDE = requireBlockTexture("trunk_inside");
 	const TexId LEAVES = requireBlockTexture("leaves");
 	const TexId WATER = requireBlockTexture("water");
+	const TexId PLANKS = requireBlockTexture("planks");
 	
 	const TexId SLIME = requireTexture("entity/slime");
 	
