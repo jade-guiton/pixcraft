@@ -9,6 +9,7 @@ with open("src/shaders_src.cpp", "w") as out:
 			out.write(")glsl\";\n\n")
 	
 	include("glsl/block_vertex.glsl", "blockVertex")
+	include("glsl/block_geometry.glsl", "blockGeometry")
 	include("glsl/block_fragment.glsl", "blockFragment")
 	
 	include("glsl/cursor_vertex.glsl", "cursorVertex")
