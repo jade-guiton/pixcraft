@@ -1,5 +1,7 @@
 #include "input.hpp"
 
+#include "utf8.h"
+
 #include "client.hpp"
 
 InputManager::InputManager()
@@ -31,12 +33,19 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	}
 }
 
+void charCallback(GLFWwindow* window, unsigned int codepoint) {
+	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
+	InputManager& input = client.getInputManager();
+	input.inputCharacter(codepoint);
+}
+
 void InputManager::init(GLFWwindow* newWindow) {
 	window = newWindow;
 	
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 	glfwSetScrollCallback(window, scrollCallback);
+	glfwSetCharCallback(window, charCallback);
 }
 
 void InputManager::capturingMouse(bool capturingMouse) {
@@ -91,6 +100,16 @@ std::tuple<int,int,bool,bool> InputManager::getMovementKeys() {
 	bool up = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 	bool down = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 	return std::tuple<int,int,bool,bool>(dx, dz, up, down);
+}
+
+void InputManager::inputCharacter(uint32_t codepoint) {
+	utf8::append(codepoint, std::back_inserter(inputBuffer));
+}
+
+std::string InputManager::retrieveInputBuffer() {
+	std::string res;
+	inputBuffer.swap(res);
+	return res;
 }
 
 void InputManager::scrolled(int offset) { _justScrolled += offset; }

@@ -46,7 +46,7 @@ const float overlayVertices[] = {
 };
 
 GameClient::GameClient()
-	: showDebug(false), paused(false), chunkRenderer(world, faceRenderer), hotbar(faceRenderer),
+	: showDebug(false), paused(false), showCommandLine(false), chunkRenderer(world, faceRenderer), hotbar(faceRenderer),
 	  frameNo(0), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -182,25 +182,53 @@ void GameClient::setRenderDistance(int renderDist2) {
 	fogStart = fogEnd * 0.9;
 }
 
+void GameClient::executeCommand() {
+	if(commandBuffer.compare("fly") == 0) {
+		player->movementMode(MovementMode::flying);
+	} else if(commandBuffer.compare("fall") == 0) {
+		player->movementMode(MovementMode::normal);
+	} else if(commandBuffer.compare("noclip") == 0) {
+		player->movementMode(MovementMode::noClip);
+	} else if(commandBuffer.compare("debug") == 0) {
+		showDebug = !showDebug;
+	} else if(commandBuffer.compare("antialias") == 0) {
+		setAntialiasing(!antialiasing);
+	} else if(commandBuffer.compare("further") == 0) {
+		setRenderDistance(renderDist + 1);
+	} else if(commandBuffer.compare("closer") == 0) {
+		if(renderDist > 1)
+			setRenderDistance(renderDist - 1);
+	} else {
+		std::cout << "Unrecognized command: " << commandBuffer << std::endl;
+	}
+}
+
 void GameClient::update(float dt) {
 	glfwPollEvents();
 	
-	if(!paused) {
-		if(input.justPressed(GLFW_KEY_F)) {
-			if(player->movementMode() == MovementMode::flying) {
-				player->movementMode(MovementMode::normal);
-			} else {
-				player->movementMode(MovementMode::flying);
-			}
+	std::string inputText = input.retrieveInputBuffer();
+	if(showCommandLine) {
+		if(inputText.size() > 0) {
+			commandBuffer.append(inputText);
 		}
-		if(input.justPressed(GLFW_KEY_N)) {
-			if(player->movementMode() == MovementMode::noClip) {
-				player->movementMode(MovementMode::normal);
-			} else {
-				player->movementMode(MovementMode::noClip);
-			}
+		if(input.justPressed(GLFW_KEY_ENTER)) {
+			executeCommand();
 		}
-		
+		if(input.justPressed(GLFW_KEY_ESCAPE) || input.justPressed(GLFW_KEY_ENTER)) {
+			showCommandLine = false;
+			commandBuffer.clear();
+		}
+	} else {
+		if(input.justPressed(GLFW_KEY_T)) {
+			showCommandLine = true;
+		}
+		if(input.justPressed(GLFW_KEY_ESCAPE)) {
+			paused = !paused;
+			input.capturingMouse(!paused);
+		}
+	}
+	
+	if(!paused && !showCommandLine) {
 		player->handleKeys(input.getMovementKeys(), dt);
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
@@ -233,27 +261,11 @@ void GameClient::update(float dt) {
 			}
 		}
 	} else {
+		input.getMouseMovement();
 		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
 	input.clearJustClicked();
 	input.clearJustScrolled();
-	
-	if(input.justPressed(GLFW_KEY_ESCAPE)) {
-		paused = !paused;
-		input.capturingMouse(!paused);
-	}
-	if(input.justPressed(GLFW_KEY_G)) {
-		showDebug = !showDebug;
-	}
-	if(input.justPressed(GLFW_KEY_H)) {
-		setAntialiasing(!antialiasing);
-	}
-	if(input.justPressed(GLFW_KEY_P)) {
-		setRenderDistance(renderDist + 1);
-	}
-	if(input.justPressed(GLFW_KEY_M)) {
-		setRenderDistance(renderDist - 1);
-	}
 	input.clearJustPressed();
 	
 	world.updateBlocks();
@@ -381,5 +393,10 @@ void GameClient::render() {
 		//debugStream << "Unicode test: AéǄ‰₪ℝψЯאصखଇணఔฌ갃ば亶〠㊆😎😂" << std::endl;
 		textRenderer.renderText(debugStream.str(), 5, 20, 1.0, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
+	}
+	
+	if(showCommandLine) {
+		textRenderer.renderText(">> " + commandBuffer, 5, height - 5, 1.0, glm::vec3(1.0, 1.0, 1.0));
+		checkGlErrors("command line rendering");
 	}
 }

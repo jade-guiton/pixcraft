@@ -40,6 +40,9 @@ private:
 	int renderDist;
 	float fogStart, fogEnd;
 	
+	bool showCommandLine;
+	std::string commandBuffer;
+	
 	InputManager input;
 	World world;
 	Player* player;
@@ -48,7 +51,6 @@ private:
 	ChunkRenderer chunkRenderer;
 	EntityRenderer entityRenderer;
 	Hotbar hotbar;
-	
 	TextRenderer textRenderer;
 	
 	GlId cursorProgram, cursorVAO;
@@ -60,6 +62,7 @@ private:
 	void setAntialiasing(bool enabled);
 	void setRenderDistance(int renderDist);
 	
+	void executeCommand();
 	void update(float dt);
 	void render();
 	

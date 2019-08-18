@@ -2,6 +2,8 @@
 
 #include <unordered_set>
 #include <tuple>
+#include <string>
+#include <iterator>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -23,6 +25,9 @@ public:
 	void clearJustPressed();
 	std::tuple<int,int,bool,bool> getMovementKeys();
 	
+	void inputCharacter(uint32_t codepoint);
+	std::string retrieveInputBuffer();
+	
 	void scrolled(int offset);
 	int justScrolled();
 	void clearJustScrolled();
@@ -39,4 +44,6 @@ private:
 	bool _justClicked[2];
 	
 	int _justScrolled;
+	
+	std::string inputBuffer;
 };
