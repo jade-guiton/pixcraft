@@ -30,15 +30,15 @@ private:
 	static const int START_HEIGHT = 600;
 	static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
 	
-	static const int RENDER_DIST = 8;
-	static constexpr float FOG_END = RENDER_DIST * CHUNK_SIZE;
-	static constexpr float FOG_START = FOG_END * 0.9f;
 	static const int LOADS_PER_FRAME = 2;
 	
 	GLFWwindow* window;
 	
 	bool antialiasing;
 	bool showDebug;
+	bool paused;
+	int renderDist;
+	float fogStart, fogEnd;
 	
 	InputManager input;
 	World world;
@@ -54,11 +54,11 @@ private:
 	GlId cursorProgram, cursorVAO;
 	GlId colorOverlayProgram, colorOverlayVAO;
 	
-	bool paused;
 	int frameNo;
 	int FPS;
 	
 	void setAntialiasing(bool enabled);
+	void setRenderDistance(int renderDist);
 	
 	void update(float dt);
 	void render();
