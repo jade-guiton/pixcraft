@@ -12,16 +12,16 @@ uniform float fogStart;
 uniform float fogEnd;
 
 in GS_OUT {
+	flat int texId;
+	flat vec3 normal;
 	vec3 cameraCoords;
 	vec2 vertexUV;
-	flat int faceTexId;
-	vec3 normal;
 } fs_in;
 
 out vec4 fragColor;
 
 void main() {
-	fragColor = texture(texArray, vec3(fs_in.vertexUV, fs_in.faceTexId));
+	fragColor = texture(texArray, vec3(fs_in.vertexUV, fs_in.texId));
 	
 	if(fragColor.a == 0) discard;
 	
