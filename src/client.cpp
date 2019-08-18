@@ -365,7 +365,7 @@ void GameClient::render() {
 		debugStream << "Vertical speed: " << player->speed().y << std::endl;
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 		debugStream << "Antialiasing: " << (antialiasing ? "enabled" : "disabled") << std::endl;
-		debugStream << "Unicode test: AéǄ‰₪ℝψЯאصखଇணఔฌ갃ば亶〠㊆😎😂" << std::endl;
+		//debugStream << "Unicode test: AéǄ‰₪ℝψЯאصखଇணఔฌ갃ば亶〠㊆😎😂" << std::endl;
 		textRenderer.renderText(debugStream.str(), 5, 20, 1.0, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
 	}

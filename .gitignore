@@ -6,4 +6,4 @@ src/shaders_src.cpp
 *.sublime-workspace
 *.zip
 gmon.out
-analysis.txt
+*.txt
