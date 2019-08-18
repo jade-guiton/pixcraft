@@ -4,6 +4,7 @@
 
 extern const char* blockVertexShaderSource;
 extern const char* blockFragmentShaderSource;
+extern const char* blockGeometryShaderSource;
 
 extern const char* cursorVertexShaderSource;
 extern const char* overlayVertexShaderSource;

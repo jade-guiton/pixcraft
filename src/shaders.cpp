@@ -19,11 +19,19 @@ void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	}
 }
 
-GlId loadShaders(const char* vertexSrc, const char* fragmentSrc) {
+GlId loadShaders(const char* vertexSrc, const char* fragmentSrc, const char* geometrySrc) {
 	GlId vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, nullptr);
 	glCompileShader(vertexShader);
 	checkShaderStatus(vertexShader, false, "Vertex shader compilation");
+	
+	GlId geometryShader;
+	if(geometrySrc != nullptr) {
+		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(geometryShader, 1, &geometrySrc, NULL);
+		glCompileShader(geometryShader);
+		checkShaderStatus(geometryShader, false, "Geometry shader compilation");
+	}
 	
 	GlId fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSrc, nullptr);
@@ -33,6 +41,8 @@ GlId loadShaders(const char* vertexSrc, const char* fragmentSrc) {
 	GlId shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
+	if(geometrySrc != nullptr)
+		glAttachShader(shaderProgram, geometryShader);
 	glLinkProgram(shaderProgram);
 	checkShaderStatus(shaderProgram, true, "Shader program linking");
 	glDeleteShader(vertexShader);
@@ -42,25 +52,25 @@ GlId loadShaders(const char* vertexSrc, const char* fragmentSrc) {
 }
 
 GlId loadBlockProgram() {
-	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource);
+	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource, blockGeometryShaderSource);
 }
 
 GlId loadCursorProgram() {
-	return loadShaders(cursorVertexShaderSource, colorFragmentShaderSource);
+	return loadShaders(cursorVertexShaderSource, colorFragmentShaderSource, nullptr);
 }
 
 GlId loadColorOverlayProgram() {
-	return loadShaders(overlayVertexShaderSource, colorFragmentShaderSource);
+	return loadShaders(overlayVertexShaderSource, colorFragmentShaderSource, nullptr);
 }
 
 GlId loadEntityProgram() {
-	return loadShaders(entityVertexShaderSource, entityFragmentShaderSource);
+	return loadShaders(entityVertexShaderSource, entityFragmentShaderSource, nullptr);
 }
 
 GlId loadTextProgram() {
-	return loadShaders(textVertexShaderSource, textFragmentShaderSource);
+	return loadShaders(textVertexShaderSource, textFragmentShaderSource, nullptr);
 }
 
 GlId loadBlockOverlayProgram() {
-	return loadShaders(blockOverlayVertexShaderSource, colorFragmentShaderSource);
+	return loadShaders(blockOverlayVertexShaderSource, colorFragmentShaderSource, nullptr);
 }
