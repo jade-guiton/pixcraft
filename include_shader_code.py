@@ -20,3 +20,5 @@ with open("src/shaders_src.cpp", "w") as out:
 	
 	include("glsl/text_vertex.glsl", "textVertex")
 	include("glsl/text_fragment.glsl", "textFragment")
+	
+	include("glsl/block_overlay_vertex.glsl", "blockOverlayVertex")
