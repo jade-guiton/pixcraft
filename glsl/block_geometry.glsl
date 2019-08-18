@@ -1,5 +1,7 @@
 #version 330 core
 
+#pragma optionNV (unroll all)
+
 uniform mat4 model;
 uniform bool applyView;
 uniform mat4 view;

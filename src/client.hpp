@@ -30,7 +30,7 @@ private:
 	static const int START_HEIGHT = 600;
 	static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
 	
-	static const int LOADS_PER_FRAME = 2;
+	static const int LOADS_PER_FRAME = 1;
 	
 	static constexpr float PLAYER_REACH = 3.0f;
 	
