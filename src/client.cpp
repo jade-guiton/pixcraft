@@ -46,7 +46,7 @@ const float overlayVertices[] = {
 };
 
 GameClient::GameClient()
-	: showDebug(false), chunkRenderer(world, faceRenderer, RENDER_DIST), hotbar(faceRenderer), paused(false),
+	: showDebug(false), paused(false), chunkRenderer(world, faceRenderer), hotbar(faceRenderer),
 	  frameNo(0), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -66,6 +66,7 @@ GameClient::GameClient()
 	std::cout << "Using OpenGL version " << GLVersion.major << "." << GLVersion.minor << std::endl;
 	
 	setAntialiasing(false);
+	setRenderDistance(8);
 	
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
@@ -175,6 +176,12 @@ void GameClient::setAntialiasing(bool enabled) {
 	antialiasing = enabled;
 }
 
+void GameClient::setRenderDistance(int renderDist2) {
+	renderDist = renderDist2;
+	fogEnd = renderDist * CHUNK_SIZE;
+	fogStart = fogEnd * 0.9;
+}
+
 void GameClient::update(float dt) {
 	glfwPollEvents();
 	
@@ -241,6 +248,12 @@ void GameClient::update(float dt) {
 	if(input.justPressed(GLFW_KEY_H)) {
 		setAntialiasing(!antialiasing);
 	}
+	if(input.justPressed(GLFW_KEY_P)) {
+		setRenderDistance(renderDist + 1);
+	}
+	if(input.justPressed(GLFW_KEY_M)) {
+		setRenderDistance(renderDist - 1);
+	}
 	input.clearJustPressed();
 	
 	world.updateBlocks();
@@ -252,7 +265,7 @@ void GameClient::update(float dt) {
 	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
 	int loads = 0;
 	SpiralIterator iter(camChunkX, camChunkZ);
-	while(iter.withinDistance(RENDER_DIST)) {
+	while(iter.withinDistance(renderDist)) {
 		int x = iter.getX();
 		int z = iter.getZ();
 		if(!world.isChunkLoaded(x, z)) {
@@ -298,10 +311,10 @@ void GameClient::render() {
 	RenderParams params = {
 		{ SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2] },
 		true, true,
-		FOG_START, FOG_END,
+		fogStart, fogEnd,
 	};
 	faceRenderer.startRendering(proj, view, params);
-	chunkRenderer.render(camChunkX, camChunkZ, vf);
+	chunkRenderer.render(camChunkX, camChunkZ, renderDist, vf);
 	faceRenderer.stopRendering();
 	checkGlErrors("block rendering");
 	
@@ -309,7 +322,7 @@ void GameClient::render() {
 	checkGlErrors("entity rendering");
 	
 	faceRenderer.startRendering(proj, view, params);
-	chunkRenderer.renderTranslucent(camChunkX, camChunkZ, vf);
+	chunkRenderer.renderTranslucent(camChunkX, camChunkZ, renderDist, vf);
 	checkGlErrors("translucent block rendering");
 	
 	glClear(GL_DEPTH_BUFFER_BIT);

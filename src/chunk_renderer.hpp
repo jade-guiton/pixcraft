@@ -35,7 +35,7 @@ private:
 
 class ChunkRenderer {
 public:
-	ChunkRenderer(World& world, FaceRenderer& renderer, int renderDist);
+	ChunkRenderer(World& world, FaceRenderer& renderer);
 	
 	bool isChunkRendered(int32_t chunkX, int32_t chunkZ);
 	size_t renderedChunkCount();
@@ -43,13 +43,12 @@ public:
 	void prerenderChunk(int32_t chunkX, int32_t chunkZ);
 	void updateBlocks();
 	
-	void render(int32_t camChunkX, int32_t chamChunkZ, ViewFrustum& vf);
-	void renderTranslucent(int32_t camChunkX, int32_t chamChunkZ, ViewFrustum& vf);
+	void render(int32_t camChunkX, int32_t chamChunkZ, int renderDist, ViewFrustum& vf);
+	void renderTranslucent(int32_t camChunkX, int32_t chamChunkZ, int renderDist, ViewFrustum& vf);
 	
 private:
 	World& world;
 	FaceRenderer& faceRenderer;
-	const int renderDist;
 	
 	std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 	
