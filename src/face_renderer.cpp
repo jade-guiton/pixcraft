@@ -40,7 +40,7 @@ void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	
 	glBindVertexArray(VAO);
 	
-	faceRenderer.bindFaceAttributes();
+	//faceRenderer.bindFaceAttributes();
 	
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	size_t faceDataSize = sizeof(FaceData);
@@ -48,15 +48,15 @@ void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
 	faces.reserve(newCapacity);
 	capacity = newCapacity;
 	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, faceDataSize, (void*) offsetof(FaceData, offsetX));
-	glVertexAttribDivisor(2, 1);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, faceDataSize, (void*) offsetof(FaceData, offsetX));
+	//glVertexAttribDivisor(2, 1);
+	glEnableVertexAttribArray(0);
+	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, faceDataSize, (void*) offsetof(FaceData, side));
+	//glVertexAttribDivisor(3, 1);
+	glEnableVertexAttribArray(1);
+	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, faceDataSize, (void*) offsetof(FaceData, texId));
+	//glVertexAttribDivisor(4, 1);
 	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(3, 1, GL_UNSIGNED_BYTE, faceDataSize, (void*) offsetof(FaceData, side));
-	glVertexAttribDivisor(3, 1);
-	glEnableVertexAttribArray(3);
-	glVertexAttribIPointer(4, 1, GL_UNSIGNED_INT, faceDataSize, (void*) offsetof(FaceData, texId));
-	glVertexAttribDivisor(4, 1);
-	glEnableVertexAttribArray(4);
 	
 	glBindVertexArray(0);
 	checkGlErrors("face buffer initialization");
@@ -109,7 +109,8 @@ void FaceBuffer::erasePlaneZ(int8_t z) {
 
 void FaceBuffer::render() {
 	glBindVertexArray(VAO);
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faces.size());
+	//glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, faces.size());
+	glDrawArrays(GL_POINTS, 0, faces.size());
 	glBindVertexArray(0);
 }
 
