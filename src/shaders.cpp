@@ -60,3 +60,7 @@ GlId loadEntityProgram() {
 GlId loadTextProgram() {
 	return loadShaders(textVertexShaderSource, textFragmentShaderSource);
 }
+
+GlId loadBlockOverlayProgram() {
+	return loadShaders(blockOverlayVertexShaderSource, colorFragmentShaderSource);
+}

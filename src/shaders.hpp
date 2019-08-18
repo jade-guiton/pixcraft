@@ -15,8 +15,11 @@ extern const char* entityFragmentShaderSource;
 extern const char* textVertexShaderSource;
 extern const char* textFragmentShaderSource;
 
+extern const char* blockOverlayVertexShaderSource;
+
 GlId loadBlockProgram();
 GlId loadCursorProgram();
 GlId loadColorOverlayProgram();
 GlId loadEntityProgram();
 GlId loadTextProgram();
+GlId loadBlockOverlayProgram();

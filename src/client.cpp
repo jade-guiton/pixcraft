@@ -45,6 +45,24 @@ const float overlayVertices[] = {
 	1, -1, 1, 1, -1, -1, -1, 1
 };
 
+const float blockOverlayVertices[] = {
+	-0.505, -0.505, -0.505,
+	 0.505, -0.505, -0.505,
+	-0.505,  0.505, -0.505,
+	-0.505, -0.505,  0.505,
+	 0.505,  0.505, -0.505,
+	-0.505,  0.505,  0.505,
+	 0.505, -0.505,  0.505,
+	 0.505,  0.505,  0.505
+};
+const unsigned int blockOverlayIndices[] = {
+	0, 1,  0, 2,  0, 3,
+	4, 7,  5, 7,  6, 7,
+	1, 4,  1, 6,
+	2, 4,  2, 5,
+	3, 5,  3, 6
+};
+
 GameClient::GameClient()
 	: showDebug(false), paused(false), showCommandLine(false), chunkRenderer(world, faceRenderer), hotbar(faceRenderer),
 	  frameNo(0), FPS(0.0) {
@@ -100,6 +118,22 @@ GameClient::GameClient()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 	checkGlErrors("color overlay initialization");
+	
+	blockOverlayProgram = loadBlockOverlayProgram();
+	glGenVertexArrays(1, &blockOverlayVAO);
+	GlId blockOverlayVBO, blockOverlayEBO;
+	glGenBuffers(1, &blockOverlayVBO);
+	glGenBuffers(1, &blockOverlayEBO);
+	
+	glBindVertexArray(blockOverlayVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, blockOverlayVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(blockOverlayVertices), blockOverlayVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*) 0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, blockOverlayEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockOverlayIndices), blockOverlayIndices, GL_STATIC_DRAW);
+	glBindVertexArray(0);
+	checkGlErrors("block overlay initialization");
 	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
@@ -250,7 +284,7 @@ void GameClient::update(float dt) {
 		if(click1 || click2) {
 			bool hit;
 			int x, y, z;
-			std::tie(hit, x, y, z) = player->castRay(5, !click1, false);
+			std::tie(hit, x, y, z) = player->castRay(PLAYER_REACH, !click1, false);
 			if(hit && World::isValidHeight(y)) {
 				if(click2) {
 					if(!world.hasSolidBlock(x, y, z) && !world.containsMobs(x, y, z))
@@ -332,6 +366,23 @@ void GameClient::render() {
 	
 	entityRenderer.renderEntities(world, proj, view, params);
 	checkGlErrors("entity rendering");
+	
+	bool hit;
+	int x, y, z;
+	std::tie(hit, x, y, z) = player->castRay(PLAYER_REACH, false, false);
+	if(hit) {
+		glUseProgram(blockOverlayProgram);
+		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
+		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3((float) x, (float) y, (float) z));
+		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform4f(glGetUniformLocation(blockOverlayProgram, "color"), 0.0f, 0.0f, 0.0f, 1.0f);
+		glBindVertexArray(blockOverlayVAO);
+		glDrawElements(GL_LINES, sizeof(blockOverlayIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+		checkGlErrors("block overlay rendering");
+	}
 	
 	faceRenderer.startRendering(proj, view, params);
 	chunkRenderer.renderTranslucent(camChunkX, camChunkZ, renderDist, vf);

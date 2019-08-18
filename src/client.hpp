@@ -32,6 +32,8 @@ private:
 	
 	static const int LOADS_PER_FRAME = 2;
 	
+	static constexpr float PLAYER_REACH = 3.0f;
+	
 	GLFWwindow* window;
 	
 	bool antialiasing;
@@ -55,6 +57,7 @@ private:
 	
 	GlId cursorProgram, cursorVAO;
 	GlId colorOverlayProgram, colorOverlayVAO;
+	GlId blockOverlayProgram, blockOverlayVAO;
 	
 	int frameNo;
 	int FPS;
