@@ -21,6 +21,7 @@ namespace TextureManager {
 	extern const TexId TRUNK_INSIDE;
 	extern const TexId LEAVES;
 	extern const TexId WATER;
+	extern const TexId PLANKS;
 	
 	// Other textures
 	extern const TexId SLIME;
