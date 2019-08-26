@@ -6,8 +6,6 @@
 #include <cmath>
 #include <sstream>
 
-#include "glm.hpp"
-
 #include "util.hpp"
 #include "shaders.hpp"
 #include "textures.hpp"
@@ -107,6 +105,10 @@ GameClient::GameClient()
 	checkGlErrors("cursor renderer initialization");
 	
 	colorOverlayProgram.init(ShaderSources::overlayVS, ShaderSources::colorFS);
+	colorOverlayBuffer.init(0, 2*sizeof(float));
+	colorOverlayBuffer.loadData(overlayVertices, 4, GL_STATIC_DRAW);
+	checkGlErrors("color overlay initialization");
+	/*
 	glGenVertexArrays(1, &colorOverlayVAO);
 	GlId colorOverlayVBO;
 	glGenBuffers(1, &colorOverlayVBO);
@@ -117,7 +119,7 @@ GameClient::GameClient()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
-	checkGlErrors("color overlay initialization");
+	*/
 	
 	blockOverlayProgram.init(ShaderSources::blockOverlayVS, ShaderSources::colorFS);
 	glGenVertexArrays(1, &blockOverlayVAO);
@@ -134,9 +136,6 @@ GameClient::GameClient()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockOverlayIndices), blockOverlayIndices, GL_STATIC_DRAW);
 	glBindVertexArray(0);
 	checkGlErrors("block overlay initialization");
-	
-	VertexBuffer<uint32_t, uint32_t> testBuffer;
-	testBuffer.init(0, 4, 8);
 	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
@@ -406,9 +405,9 @@ void GameClient::render() {
 	if(player->isEyeUnderwater()) {
 		colorOverlayProgram.use();
 		colorOverlayProgram.setUniform("color", 0.11f, 0.43f, 0.97f, 0.3f);
-		glBindVertexArray(colorOverlayVAO);
+		colorOverlayBuffer.bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
+		colorOverlayBuffer.unbind();
 		colorOverlayProgram.unuse();
 		checkGlErrors("water overlay rendering");
 	}
@@ -428,9 +427,9 @@ void GameClient::render() {
 	if(paused) {
 		colorOverlayProgram.use();
 		colorOverlayProgram.setUniform("color", 0.0f, 0.0f, 0.0f, 0.5f);
-		glBindVertexArray(colorOverlayVAO);
+		colorOverlayBuffer.bind();
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
+		colorOverlayBuffer.unbind();
 		colorOverlayProgram.unuse();
 		checkGlErrors("pause menu overlay rendering");
 	}

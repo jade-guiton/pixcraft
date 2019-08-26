@@ -7,6 +7,12 @@ void ShaderProgram::setUniformArray(const char* name, std::array<glm::mat3, N> a
 }
 
 template<typename... Ts>
+void VertexBuffer<Ts...>::loadData(const void* data, size_t vertexCount, GLenum usage) {
+	glBindBuffer(GL_ARRAY_BUFFER, vboId);
+	glBufferData(GL_ARRAY_BUFFER, vertexSize*vertexCount, data, usage);
+}
+
+template<typename... Ts>
 void VertexBuffer<Ts...>::initLocation(int location, size_t vertexSize2) {
 	vertexSize = vertexSize2;
 	VertexArray::init();
