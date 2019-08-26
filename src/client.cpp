@@ -90,7 +90,7 @@ GameClient::GameClient()
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	glfwSwapInterval(-1);
 	
-	cursorProgram = loadCursorProgram();
+	cursorProgram.init(ShaderSources::cursorVS, ShaderSources::colorFS);
 	glGenVertexArrays(1, &cursorVAO);
 	GlId cursorVBO, cursorEBO;
 	glGenBuffers(1, &cursorVBO);
@@ -106,7 +106,7 @@ GameClient::GameClient()
 	glBindVertexArray(0);
 	checkGlErrors("cursor renderer initialization");
 	
-	colorOverlayProgram = loadColorOverlayProgram();
+	colorOverlayProgram.init(ShaderSources::overlayVS, ShaderSources::colorFS);
 	glGenVertexArrays(1, &colorOverlayVAO);
 	GlId colorOverlayVBO;
 	glGenBuffers(1, &colorOverlayVBO);
@@ -119,7 +119,7 @@ GameClient::GameClient()
 	glBindVertexArray(0);
 	checkGlErrors("color overlay initialization");
 	
-	blockOverlayProgram = loadBlockOverlayProgram();
+	blockOverlayProgram.init(ShaderSources::blockOverlayVS, ShaderSources::colorFS);
 	glGenVertexArrays(1, &blockOverlayVAO);
 	GlId blockOverlayVBO, blockOverlayEBO;
 	glGenBuffers(1, &blockOverlayVBO);
@@ -371,16 +371,16 @@ void GameClient::render() {
 	int x, y, z;
 	std::tie(hit, x, y, z) = player->castRay(PLAYER_REACH, false, false);
 	if(hit) {
-		glUseProgram(blockOverlayProgram);
-		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
+		blockOverlayProgram.use();
+		blockOverlayProgram.setUniform("view", view);
+		blockOverlayProgram.setUniform("proj", proj);
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3((float) x, (float) y, (float) z));
-		glUniformMatrix4fv(glGetUniformLocation(blockOverlayProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform4f(glGetUniformLocation(blockOverlayProgram, "color"), 0.0f, 0.0f, 0.0f, 1.0f);
+		blockOverlayProgram.setUniform("model", model);
+		blockOverlayProgram.setUniform("color", 0.0f, 0.0f, 0.0f, 1.0f);
 		glBindVertexArray(blockOverlayVAO);
 		glDrawElements(GL_LINES, sizeof(blockOverlayIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
-		glUseProgram(0);
+		blockOverlayProgram.unuse();
 		checkGlErrors("block overlay rendering");
 	}
 	
@@ -401,34 +401,34 @@ void GameClient::render() {
 	
 	// Draw underwater overlay
 	if(player->isEyeUnderwater()) {
-		glUseProgram(colorOverlayProgram);
-		glUniform4f(glGetUniformLocation(colorOverlayProgram, "color"), 0.11f, 0.43f, 0.97f, 0.3f);
+		colorOverlayProgram.use();
+		colorOverlayProgram.setUniform("color", 0.11f, 0.43f, 0.97f, 0.3f);
 		glBindVertexArray(colorOverlayVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
-		glUseProgram(0);
+		colorOverlayProgram.unuse();
 		checkGlErrors("water overlay rendering");
 	}
 	
 	// Draw cursor
-	glUseProgram(cursorProgram);
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
-	glUniform2f(glGetUniformLocation(cursorProgram, "winSize"), width, height);
-	glUniform4f(glGetUniformLocation(cursorProgram, "color"), 1, 1, 1, 1);
+	cursorProgram.use();
+	cursorProgram.setUniform("winSize", (float) width, (float) height);
+	cursorProgram.setUniform("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	glBindVertexArray(cursorVAO);
 	glDrawElements(GL_TRIANGLES, cursorIndexCount, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-	glUseProgram(0);
+	cursorProgram.unuse();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	checkGlErrors("cursor rendering");
 	
 	if(paused) {
-		glUseProgram(colorOverlayProgram);
-		glUniform4f(glGetUniformLocation(colorOverlayProgram, "color"), 0.0f, 0.0f, 0.0f, 0.5f);
+		colorOverlayProgram.use();
+		colorOverlayProgram.setUniform("color", 0.0f, 0.0f, 0.0f, 0.5f);
 		glBindVertexArray(colorOverlayVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
-		glUseProgram(0);
+		colorOverlayProgram.unuse();
 		checkGlErrors("pause menu overlay rendering");
 	}
 	

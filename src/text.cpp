@@ -7,8 +7,6 @@
 #include <stdexcept>
 #include <cmath>
 
-#include "shaders.hpp"
-
 
 void TextRenderer::init() {
 	if(FT_Init_FreeType(&ft))
@@ -37,7 +35,7 @@ void TextRenderer::init() {
 		prerenderCharacter(c);
 	}
 	
-	program = loadTextProgram();
+	program.init(ShaderSources::textVS, ShaderSources::textFS);
 	
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -70,14 +68,14 @@ void TextRenderer::setViewport(int width, int height) {
 }
 
 void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
-	glUseProgram(program);
+	program.use();
 	glBindVertexArray(VAO);
 	
 	glyphAtlas.bind();
 	
-	glUniform2f(glGetUniformLocation(program, "winSize"), winWidth, winHeight);
-	glUniform1i(glGetUniformLocation(program, "tex"), 0);
-	glUniform3f(glGetUniformLocation(program, "textColor"), color.r, color.g, color.b);
+	program.setUniform("winSize", (float) winWidth, (float) winHeight);
+	program.setUniform("tex", (uint32_t) 0);
+	program.setUniform("textColor", color.r, color.g, color.b);
 	
 	float x = startX;
 	float y = startY;
@@ -102,6 +100,8 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		
 		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 	}
+	
+	program.unuse();
 }
 
 void TextRenderer::loadFont(size_t priority, const char* filename) {

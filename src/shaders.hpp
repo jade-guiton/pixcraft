@@ -1,26 +1,52 @@
 #pragma once
 
+#include <array>
+
 #include "glfw.hpp"
+#include "glm.hpp"
 
-extern const char* blockVertexShaderSource;
-extern const char* blockFragmentShaderSource;
-extern const char* blockGeometryShaderSource;
+namespace ShaderSources {
+	extern const char *blockVS, *blockGS, *blockFS;
+	extern const char *entityVS, *entityFS;
+	extern const char *textVS, *textFS;
+	
+	extern const char *cursorVS;
+	extern const char *overlayVS;
+	extern const char *blockOverlayVS;
+	extern const char *colorFS;
+}
 
-extern const char* cursorVertexShaderSource;
-extern const char* overlayVertexShaderSource;
-extern const char* colorFragmentShaderSource;
+class ShaderProgram {
+public:
+	void init(const char* vertexSrc, const char* geometrySrc, const char* fragmentSrc);
+	void init(const char* vertexSrc, const char* fragmentSrc);
+	
+	void setUniform(const char* name, bool val);
+	void setUniform(const char* name, uint32_t val);
+	void setUniform(const char* name, float val);
+	void setUniform(const char* name, float x, float y);
+	void setUniform(const char* name, glm::vec3 val);
+	void setUniform(const char* name, float r, float g, float b);
+	void setUniform(const char* name, float r, float g, float b, float a);
+	void setUniform(const char* name, glm::mat4& val);
+	
+	template<std::size_t N>
+	void setUniformArray(const char* name, std::array<glm::mat3, N> array) {
+		glUniformMatrix3fv(glGetUniformLocation(programId, name), N, GL_FALSE, glm::value_ptr(array[0]));
+	}
+	
+	void use();
+	void unuse();
+	
+private:
+	GlId programId;
+};
 
-extern const char* entityVertexShaderSource;
-extern const char* entityFragmentShaderSource;
-
-extern const char* textVertexShaderSource;
-extern const char* textFragmentShaderSource;
-
-extern const char* blockOverlayVertexShaderSource;
-
+/*
 GlId loadBlockProgram();
 GlId loadCursorProgram();
 GlId loadColorOverlayProgram();
 GlId loadEntityProgram();
 GlId loadTextProgram();
 GlId loadBlockOverlayProgram();
+*/

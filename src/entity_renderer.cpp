@@ -3,8 +3,6 @@
 #include <cstddef>
 #include <typeinfo>
 
-#include "shaders.hpp"
-
 #include "world/world.hpp"
 #include "world/mob.hpp"
 #include "world/slime.hpp"
@@ -84,7 +82,7 @@ void EntityModel::render() {
 EntityRenderer::EntityRenderer() {}
 
 void EntityRenderer::init() {
-	program = loadEntityProgram();
+	program.init(ShaderSources::entityVS, ShaderSources::entityFS);
 	
 	glm::mat4 preModel = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f)), glm::vec3(0.0f, 1.0f, 0.0f));
 	slimeModel.init(TEX(SLIME), slimeVertices, 14, slimeIndices, 36, preModel);
@@ -110,30 +108,30 @@ void EntityRenderer::renderEntities(World& world, glm::mat4 proj, glm::mat4 view
 }
 
 void EntityRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
-	glUseProgram(program);
+	program.use();
 	
-	glUniform1i(glGetUniformLocation(program, "applyView"), params.applyView);
-	glUniform1i(glGetUniformLocation(program, "applyFog"), params.applyFog);
-	glUniform4f(glGetUniformLocation(program, "fogColor"), params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
-	glUniform1f(glGetUniformLocation(program, "fogStart"), params.fogStart);
-	glUniform1f(glGetUniformLocation(program, "fogEnd"), params.fogEnd);
+	program.setUniform("applyView", params.applyView);
+	program.setUniform("applyFog", params.applyFog);
+	program.setUniform("fogColor", params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
+	program.setUniform("fogStart", params.fogStart);
+	program.setUniform("fogEnd", params.fogEnd);
 	
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
+	program.setUniform("view", view);
+	program.setUniform("proj", proj);
 	
-	glUniform1i(glGetUniformLocation(program, "tex"), 0);
+	program.setUniform("tex", (uint32_t) 0);
 	
-	glUniform1f(glGetUniformLocation(program, "ambientLight"), 0.7);
+	program.setUniform("ambientLight", 0.7f);
 }
 
 void EntityRenderer::render(EntityModel& model, glm::mat4 modelMat) {
 	glm::mat4 preModel = model.preModel();
 	modelMat = modelMat * preModel;
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(modelMat));
+	program.setUniform("model", modelMat);
 	
 	model.render();
 }
 
 void EntityRenderer::stopRendering() {
-	glUseProgram(0);
+	program.unuse();
 }

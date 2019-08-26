@@ -55,9 +55,12 @@ private:
 	Hotbar hotbar;
 	TextRenderer textRenderer;
 	
-	GlId cursorProgram, cursorVAO;
-	GlId colorOverlayProgram, colorOverlayVAO;
-	GlId blockOverlayProgram, blockOverlayVAO;
+	ShaderProgram cursorProgram;
+	GlId cursorVAO;
+	ShaderProgram colorOverlayProgram;
+	GlId colorOverlayVAO;
+	ShaderProgram blockOverlayProgram;
+	GlId blockOverlayVAO;
 	
 	int frameNo;
 	int FPS;
