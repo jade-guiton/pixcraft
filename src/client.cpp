@@ -135,6 +135,9 @@ GameClient::GameClient()
 	glBindVertexArray(0);
 	checkGlErrors("block overlay initialization");
 	
+	VertexBuffer<uint32_t, uint32_t> testBuffer;
+	testBuffer.init(0, 4, 8);
+	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
 	faceRenderer.init();
