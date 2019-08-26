@@ -86,29 +86,3 @@ void ShaderProgram::use() {
 void ShaderProgram::unuse() {
 	glUseProgram(0);
 }
-
-/*
-GlId loadBlockProgram() {
-	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource, blockGeometryShaderSource);
-}
-
-GlId loadCursorProgram() {
-	return loadShaders(cursorVertexShaderSource, colorFragmentShaderSource, nullptr);
-}
-
-GlId loadColorOverlayProgram() {
-	return loadShaders(overlayVertexShaderSource, colorFragmentShaderSource, nullptr);
-}
-
-GlId loadEntityProgram() {
-	return loadShaders(entityVertexShaderSource, entityFragmentShaderSource, nullptr);
-}
-
-GlId loadTextProgram() {
-	return loadShaders(textVertexShaderSource, textFragmentShaderSource, nullptr);
-}
-
-GlId loadBlockOverlayProgram() {
-	return loadShaders(blockOverlayVertexShaderSource, colorFragmentShaderSource, nullptr);
-}
-*/

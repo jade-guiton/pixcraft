@@ -41,12 +41,3 @@ public:
 private:
 	GlId programId;
 };
-
-/*
-GlId loadBlockProgram();
-GlId loadCursorProgram();
-GlId loadColorOverlayProgram();
-GlId loadEntityProgram();
-GlId loadTextProgram();
-GlId loadBlockOverlayProgram();
-*/
