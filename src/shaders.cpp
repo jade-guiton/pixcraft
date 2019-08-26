@@ -86,3 +86,24 @@ void ShaderProgram::use() {
 void ShaderProgram::unuse() {
 	glUseProgram(0);
 }
+
+
+void VertexArray::init() {
+	glGenVertexArrays(1, &vaoId);
+	genBuffers();
+	
+	glBindVertexArray(vaoId);
+	setVAO();
+	glBindVertexArray(0);
+}
+
+void VertexArray::genBuffers() {}
+void VertexArray::setVAO() {}
+
+template<>
+void setAttributePointer<uint32_t>(int location, size_t offset, size_t totalSize) {
+	std::cout << "Setting attribute pointer (location = " << location
+		<< ", offset = " << offset << ", totalSize = " << totalSize
+		<< ")" << std::endl;
+	glVertexAttribIPointer(location, 1, GL_UNSIGNED_INT, totalSize, (void*) offset);
+}

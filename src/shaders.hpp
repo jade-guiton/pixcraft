@@ -31,9 +31,7 @@ public:
 	void setUniform(const char* name, glm::mat4& val);
 	
 	template<std::size_t N>
-	void setUniformArray(const char* name, std::array<glm::mat3, N> array) {
-		glUniformMatrix3fv(glGetUniformLocation(programId, name), N, GL_FALSE, glm::value_ptr(array[0]));
-	}
+	void setUniformArray(const char* name, std::array<glm::mat3, N> array);
 	
 	void use();
 	void unuse();
@@ -41,3 +39,54 @@ public:
 private:
 	GlId programId;
 };
+
+
+class VertexArray {
+public:
+	void init();
+	
+protected:
+	virtual void genBuffers();
+	virtual void setVAO();
+	
+private:
+	GlId vaoId;
+};
+
+template<typename... Ts>
+class VertexBuffer : private VertexArray {
+protected:
+	size_t vertexSize;
+	
+	void initLocation(int location, size_t vertexSize);
+	
+	void genBuffers() override;
+	void setVAO() override;
+	
+	virtual void setAttributes();
+
+private:
+	GlId vboId;
+};
+
+template<typename T>
+void setAttributePointer(int location, size_t offset, size_t totalSize);
+
+template<typename T, typename... Ts>
+class VertexBuffer<T, Ts...> : protected VertexBuffer<Ts...> {
+public:
+	template<typename... Args>
+	void init(size_t offset, Args... offsets);
+	
+protected:
+	template<typename... Args>
+	void initLocation(int location, size_t offset, Args... offsets);
+	
+	void setAttributes() override;
+	
+private:
+	int location;
+	size_t offset;
+};
+
+#include "shaders_impl.hpp"
