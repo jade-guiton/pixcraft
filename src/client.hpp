@@ -61,7 +61,7 @@ private:
 	ShaderProgram colorOverlayProgram;
 	VertexBuffer<glm::vec2> colorOverlayBuffer;
 	ShaderProgram blockOverlayProgram;
-	GlId blockOverlayVAO;
+	IndexBuffer<glm::vec3> blockOverlayBuffer;
 	
 	int frameNo;
 	int FPS;

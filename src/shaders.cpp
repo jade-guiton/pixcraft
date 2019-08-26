@@ -111,3 +111,8 @@ template<>
 void setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }
+
+template<>
+void setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
+}

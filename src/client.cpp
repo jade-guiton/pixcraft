@@ -100,19 +100,9 @@ GameClient::GameClient()
 	checkGlErrors("color overlay initialization");
 	
 	blockOverlayProgram.init(ShaderSources::blockOverlayVS, ShaderSources::colorFS);
-	glGenVertexArrays(1, &blockOverlayVAO);
-	GlId blockOverlayVBO, blockOverlayEBO;
-	glGenBuffers(1, &blockOverlayVBO);
-	glGenBuffers(1, &blockOverlayEBO);
-	
-	glBindVertexArray(blockOverlayVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, blockOverlayVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(blockOverlayVertices), blockOverlayVertices.data(), GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, blockOverlayEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockOverlayIndices), blockOverlayIndices.data(), GL_STATIC_DRAW);
-	glBindVertexArray(0);
+	blockOverlayBuffer.init(0, 3*sizeof(float));
+	blockOverlayBuffer.loadData(blockOverlayVertices.data(), blockOverlayVertices.size()/3, GL_STATIC_DRAW);
+	blockOverlayBuffer.loadIndices(blockOverlayIndices.data(), blockOverlayIndices.size());
 	checkGlErrors("block overlay initialization");
 	
 	TextureManager::loadTextures();
@@ -357,9 +347,9 @@ void GameClient::render() {
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3((float) x, (float) y, (float) z));
 		blockOverlayProgram.setUniform("model", model);
 		blockOverlayProgram.setUniform("color", 0.0f, 0.0f, 0.0f, 1.0f);
-		glBindVertexArray(blockOverlayVAO);
+		blockOverlayBuffer.bind();
 		glDrawElements(GL_LINES, sizeof(blockOverlayIndices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		blockOverlayBuffer.unbind();
 		blockOverlayProgram.unuse();
 		checkGlErrors("block overlay rendering");
 	}
