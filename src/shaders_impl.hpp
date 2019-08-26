@@ -53,3 +53,21 @@ void VertexBuffer<T, Ts...>::setAttributes() {
 	glEnableVertexAttribArray(location);
 	VertexBuffer<Ts...>::setAttributes();
 }
+
+template<typename... Ts>
+void IndexBuffer<Ts...>::loadIndices(const void* data, size_t indexCount) {
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(unsigned int), data, GL_STATIC_DRAW);
+}
+
+template<typename... Ts>
+void IndexBuffer<Ts...>::genBuffers() {
+	VertexBuffer<Ts...>::genBuffers();
+	glGenBuffers(1, &eboId);
+}
+
+template<typename... Ts>
+void IndexBuffer<Ts...>::setVAO() {
+	VertexBuffer<Ts...>::setVAO();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+}

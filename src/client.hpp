@@ -57,7 +57,7 @@ private:
 	TextRenderer textRenderer;
 	
 	ShaderProgram cursorProgram;
-	GlId cursorVAO;
+	IndexBuffer<glm::vec2> cursorBuffer;
 	ShaderProgram colorOverlayProgram;
 	VertexBuffer<glm::vec2> colorOverlayBuffer;
 	ShaderProgram blockOverlayProgram;
