@@ -43,9 +43,12 @@ private:
 
 class VertexArray {
 public:
-	void init();
+	void bind();
+	void unbind();
 	
 protected:
+	void init();
+	
 	virtual void genBuffers();
 	virtual void setVAO();
 	
@@ -54,7 +57,10 @@ private:
 };
 
 template<typename... Ts>
-class VertexBuffer : private VertexArray {
+class VertexBuffer : public VertexArray {
+public:
+	void loadData(const void* data, size_t vertexCount, GLenum usage);
+	
 protected:
 	size_t vertexSize;
 	
@@ -73,7 +79,7 @@ template<typename T>
 void setAttributePointer(int location, size_t offset, size_t totalSize);
 
 template<typename T, typename... Ts>
-class VertexBuffer<T, Ts...> : protected VertexBuffer<Ts...> {
+class VertexBuffer<T, Ts...> : public VertexBuffer<Ts...> {
 public:
 	template<typename... Args>
 	void init(size_t offset, Args... offsets);

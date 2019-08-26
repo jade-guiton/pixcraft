@@ -97,13 +97,17 @@ void VertexArray::init() {
 	glBindVertexArray(0);
 }
 
+void VertexArray::bind() {
+	glBindVertexArray(vaoId);
+}
+void VertexArray::unbind() {
+	glBindVertexArray(0);
+}
+
 void VertexArray::genBuffers() {}
 void VertexArray::setVAO() {}
 
 template<>
-void setAttributePointer<uint32_t>(int location, size_t offset, size_t totalSize) {
-	std::cout << "Setting attribute pointer (location = " << location
-		<< ", offset = " << offset << ", totalSize = " << totalSize
-		<< ")" << std::endl;
-	glVertexAttribIPointer(location, 1, GL_UNSIGNED_INT, totalSize, (void*) offset);
+void setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }

@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include "glfw.hpp"
+#include "glm.hpp"
 
 #include "face_renderer.hpp"
 #include "chunk_renderer.hpp"
@@ -58,7 +59,7 @@ private:
 	ShaderProgram cursorProgram;
 	GlId cursorVAO;
 	ShaderProgram colorOverlayProgram;
-	GlId colorOverlayVAO;
+	VertexBuffer<glm::vec2> colorOverlayBuffer;
 	ShaderProgram blockOverlayProgram;
 	GlId blockOverlayVAO;
 	
