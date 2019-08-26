@@ -95,4 +95,19 @@ private:
 	size_t offset;
 };
 
+template<typename... Ts>
+class IndexBuffer : public VertexBuffer<Ts...> {
+public:
+	using VertexBuffer<Ts...>::init;
+	
+	void loadIndices(const void* data, size_t indexCount);
+	
+protected:
+	void genBuffers() override;
+	void setVAO() override;
+	
+private:
+	GlId eboId;
+};
+
 #include "shaders_impl.hpp"

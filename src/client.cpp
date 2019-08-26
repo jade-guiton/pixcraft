@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cmath>
 #include <sstream>
+#include <array>
 
 #include "util.hpp"
 #include "shaders.hpp"
@@ -25,13 +26,12 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	client.getTextRenderer().setViewport(width, height);
 }
 
-const float cursorVertices[] = {
+const std::array<float, 24> cursorVertices = {
 	-1,  -1,   1,  -1,    1,  1,   -1,  1,
 	-1, -10,   1, -10,   10, -1,   10,  1,
 	 1,  10,  -1,  10,  -10,  1,  -10, -1
 };
-const size_t cursorIndexCount = 30;
-const unsigned int cursorIndices[] = {
+const std::array<unsigned int, 30> cursorIndices = {
 	0,  1,  2,    2,  3,  0,
 	0,  4,  5,    5,  1,  0,
 	1,  6,  7,    7,  2,  1,
@@ -39,11 +39,11 @@ const unsigned int cursorIndices[] = {
 	3, 10, 11,   11,  0,  3
 };
 
-const float overlayVertices[] = {
+const std::array<float, 8> overlayVertices = {
 	1, -1, 1, 1, -1, -1, -1, 1
 };
 
-const float blockOverlayVertices[] = {
+const std::array<float, 24> blockOverlayVertices = {
 	-0.505, -0.505, -0.505,
 	 0.505, -0.505, -0.505,
 	-0.505,  0.505, -0.505,
@@ -53,7 +53,7 @@ const float blockOverlayVertices[] = {
 	 0.505, -0.505,  0.505,
 	 0.505,  0.505,  0.505
 };
-const unsigned int blockOverlayIndices[] = {
+const std::array<unsigned int, 24> blockOverlayIndices = {
 	0, 1,  0, 2,  0, 3,
 	4, 7,  5, 7,  6, 7,
 	1, 4,  1, 6,
@@ -89,37 +89,15 @@ GameClient::GameClient()
 	glfwSwapInterval(-1);
 	
 	cursorProgram.init(ShaderSources::cursorVS, ShaderSources::colorFS);
-	glGenVertexArrays(1, &cursorVAO);
-	GlId cursorVBO, cursorEBO;
-	glGenBuffers(1, &cursorVBO);
-	glGenBuffers(1, &cursorEBO);
-	
-	glBindVertexArray(cursorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, cursorVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cursorVertices), cursorVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cursorEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cursorIndices), cursorIndices, GL_STATIC_DRAW);
-	glBindVertexArray(0);
+	cursorBuffer.init(0, 2*sizeof(float));
+	cursorBuffer.loadData(cursorVertices.data(), cursorVertices.size()/2, GL_STATIC_DRAW);
+	cursorBuffer.loadIndices(cursorIndices.data(), cursorIndices.size());
 	checkGlErrors("cursor renderer initialization");
 	
 	colorOverlayProgram.init(ShaderSources::overlayVS, ShaderSources::colorFS);
 	colorOverlayBuffer.init(0, 2*sizeof(float));
-	colorOverlayBuffer.loadData(overlayVertices, 4, GL_STATIC_DRAW);
+	colorOverlayBuffer.loadData(overlayVertices.data(), overlayVertices.size()/2, GL_STATIC_DRAW);
 	checkGlErrors("color overlay initialization");
-	/*
-	glGenVertexArrays(1, &colorOverlayVAO);
-	GlId colorOverlayVBO;
-	glGenBuffers(1, &colorOverlayVBO);
-	
-	glBindVertexArray(colorOverlayVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, colorOverlayVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(overlayVertices), overlayVertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
-	*/
 	
 	blockOverlayProgram.init(ShaderSources::blockOverlayVS, ShaderSources::colorFS);
 	glGenVertexArrays(1, &blockOverlayVAO);
@@ -129,11 +107,11 @@ GameClient::GameClient()
 	
 	glBindVertexArray(blockOverlayVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, blockOverlayVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(blockOverlayVertices), blockOverlayVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(blockOverlayVertices), blockOverlayVertices.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, blockOverlayEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockOverlayIndices), blockOverlayIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(blockOverlayIndices), blockOverlayIndices.data(), GL_STATIC_DRAW);
 	glBindVertexArray(0);
 	checkGlErrors("block overlay initialization");
 	
@@ -417,9 +395,9 @@ void GameClient::render() {
 	cursorProgram.use();
 	cursorProgram.setUniform("winSize", (float) width, (float) height);
 	cursorProgram.setUniform("color", 1.0f, 1.0f, 1.0f, 1.0f);
-	glBindVertexArray(cursorVAO);
-	glDrawElements(GL_TRIANGLES, cursorIndexCount, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	cursorBuffer.bind();
+	glDrawElements(GL_TRIANGLES, cursorIndices.size(), GL_UNSIGNED_INT, 0);
+	cursorBuffer.unbind();
 	cursorProgram.unuse();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	checkGlErrors("cursor rendering");
