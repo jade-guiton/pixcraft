@@ -19,10 +19,13 @@ void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	}
 }
 
-GlId loadShaders(const char* vertexSrc, const char* fragmentSrc, const char* geometrySrc) {
+void ShaderProgram::init(const char* vertexSrc, const char* geometrySrc, const char* fragmentSrc) {
+	programId = glCreateProgram();
+	
 	GlId vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSrc, nullptr);
 	glCompileShader(vertexShader);
+	glAttachShader(programId, vertexShader);
 	checkShaderStatus(vertexShader, false, "Vertex shader compilation");
 	
 	GlId geometryShader;
@@ -30,27 +33,61 @@ GlId loadShaders(const char* vertexSrc, const char* fragmentSrc, const char* geo
 		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
 		glShaderSource(geometryShader, 1, &geometrySrc, NULL);
 		glCompileShader(geometryShader);
+		glAttachShader(programId, geometryShader);
 		checkShaderStatus(geometryShader, false, "Geometry shader compilation");
 	}
 	
 	GlId fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSrc, nullptr);
 	glCompileShader(fragmentShader);
+	glAttachShader(programId, fragmentShader);
 	checkShaderStatus(fragmentShader, false, "Fragment shader compilation");
 	
-	GlId shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	if(geometrySrc != nullptr)
-		glAttachShader(shaderProgram, geometryShader);
-	glLinkProgram(shaderProgram);
-	checkShaderStatus(shaderProgram, true, "Shader program linking");
+	glLinkProgram(programId);
+	checkShaderStatus(programId, true, "Shader program linking");
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	
-	return shaderProgram;
+	if(geometrySrc != nullptr)
+		glDeleteShader(geometryShader);
 }
 
+void ShaderProgram::init(const char* vertexSrc, const char* fragmentSrc) {
+	init(vertexSrc, nullptr, fragmentSrc);
+}
+
+void ShaderProgram::setUniform(const char* name, bool val) {
+	glUniform1i(glGetUniformLocation(programId, name), val);
+}
+void ShaderProgram::setUniform(const char* name, uint32_t val) {
+	glUniform1i(glGetUniformLocation(programId, name), val);
+}
+void ShaderProgram::setUniform(const char* name, float val) {
+	glUniform1f(glGetUniformLocation(programId, name), val);
+}
+void ShaderProgram::setUniform(const char* name, float x, float y) {
+	glUniform2f(glGetUniformLocation(programId, name), x, y);
+}
+void ShaderProgram::setUniform(const char* name, glm::vec3 val) {
+	glUniform3fv(glGetUniformLocation(programId, name), 1, glm::value_ptr(val));
+}
+void ShaderProgram::setUniform(const char* name, float r, float g, float b) {
+	glUniform3f(glGetUniformLocation(programId, name), r, g, b);
+}
+void ShaderProgram::setUniform(const char* name, float r, float g, float b, float a) {
+	glUniform4f(glGetUniformLocation(programId, name), r, g, b, a);
+}
+void ShaderProgram::setUniform(const char* name, glm::mat4& val) {
+	glUniformMatrix4fv(glGetUniformLocation(programId, name), 1, GL_FALSE, glm::value_ptr(val));
+}
+
+void ShaderProgram::use() {
+	glUseProgram(programId);
+}
+void ShaderProgram::unuse() {
+	glUseProgram(0);
+}
+
+/*
 GlId loadBlockProgram() {
 	return loadShaders(blockVertexShaderSource, blockFragmentShaderSource, blockGeometryShaderSource);
 }
@@ -74,3 +111,4 @@ GlId loadTextProgram() {
 GlId loadBlockOverlayProgram() {
 	return loadShaders(blockOverlayVertexShaderSource, colorFragmentShaderSource, nullptr);
 }
+*/

@@ -4,17 +4,10 @@
 #include <string>
 #include <cstddef>
 
-#include "shaders.hpp"
 #include "util.hpp"
 
-const float faceVertices[] = {
-	 0.5f, -0.5f,  0.5f,  1.0, 0.0,
-	 0.5f,  0.5f,  0.5f,  1.0, 1.0,
-	-0.5f, -0.5f,  0.5f,  0.0, 0.0,
-	-0.5f,  0.5f,  0.5f,  0.0, 1.0
-};
 
-const glm::mat3 sideTransforms[6] = {
+const std::array<glm::mat3, 6> sideTransforms = {
 	glm::mat3(1.0f),
 	glm::mat3(glm::rotate(glm::mat4(1.0f), TAU/4, glm::vec3(0.0f, 1.0f, 0.0f))),
 	glm::mat3(glm::rotate(glm::mat4(1.0f), TAU/2, glm::vec3(0.0f, 1.0f, 0.0f))),
@@ -118,56 +111,43 @@ void FaceBuffer::render() {
 FaceRenderer::FaceRenderer() { }
 
 void FaceRenderer::init() {
-	program = loadBlockProgram();
-	
-	glGenBuffers(1, &faceVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(faceVertices), faceVertices, GL_STATIC_DRAW);
+	program.init(ShaderSources::blockVS, ShaderSources::blockGS, ShaderSources::blockFS);
 	checkGlErrors("face renderer initialization");
 }
 
-void FaceRenderer::bindFaceAttributes() {
-	glBindBuffer(GL_ARRAY_BUFFER, faceVBO);
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (0));
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3*sizeof(float)));
-	glEnableVertexAttribArray(1);
-}
-
 void FaceRenderer::setParams(RenderParams params) {
-	glUniform1i(glGetUniformLocation(program, "applyView"), params.applyView);
-	glUniform1i(glGetUniformLocation(program, "applyFog"), params.applyFog);
-	glUniform4f(glGetUniformLocation(program, "fogColor"), params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
-	glUniform1f(glGetUniformLocation(program, "fogStart"), params.fogStart);
-	glUniform1f(glGetUniformLocation(program, "fogEnd"), params.fogEnd);
+	program.setUniform("applyView", params.applyView);
+	program.setUniform("applyFog", params.applyFog);
+	program.setUniform("fogColor", params.skyColor[0], params.skyColor[1], params.skyColor[2], 1.0f);
+	program.setUniform("fogStart", params.fogStart);
+	program.setUniform("fogEnd", params.fogEnd);
 }
 
 void FaceRenderer::startRendering(glm::mat4 proj, glm::mat4 view, RenderParams params) {
-	glUseProgram(program);
+	program.use();
 	
 	setParams(params);
 	
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_FALSE, glm::value_ptr(proj));
-	glUniformMatrix3fv(glGetUniformLocation(program, "sideTransforms"), 6, GL_FALSE, glm::value_ptr(sideTransforms[0]));
+	program.setUniform("view", view);
+	program.setUniform("proj", proj);
+	program.setUniformArray("sideTransforms", sideTransforms);
 	
-	glUniform1i(glGetUniformLocation(program, "texArray"), 0);
+	program.setUniform("texArray", (uint32_t) 0);
 	
-	glUniform1f(glGetUniformLocation(program, "ambientLight"), 0.7);
-	glUniform1f(glGetUniformLocation(program, "diffuseLight"), 0.3);
+	program.setUniform("ambientLight", 0.7f);
+	program.setUniform("diffuseLight", 0.3f);
 	glm::vec3 lightSrcDir = glm::normalize(glm::vec3(0.5f, 1.0f, 0.1f));
-	glUniform3fv(glGetUniformLocation(program, "lightSrcDir"), 1, glm::value_ptr(lightSrcDir));
+	program.setUniform("lightSrcDir", lightSrcDir);
 	
 	TextureManager::bindBlockTextureArray();
 }
 
 void FaceRenderer::render(FaceBuffer& buffer, glm::mat4 model) {
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	program.setUniform("model", model);
 	
 	buffer.render();
 }
 
 void FaceRenderer::stopRendering() {
-	glUseProgram(0);
+	program.unuse();
 }

@@ -1,25 +1,27 @@
 with open("src/shaders_src.cpp", "w") as out:
 	out.write("#include \"shaders.hpp\"\n\n")
+	out.write("namespace ShaderSources {\n\n")
 	
 	def include(path, shaderName):
 		with open(path) as f:
 			code = f.read()
-			out.write("const char* {}ShaderSource = R\"glsl(\n".format(shaderName))
+			out.write("const char* {} = R\"glsl(\n".format(shaderName))
 			out.write(code)
 			out.write(")glsl\";\n\n")
 	
-	include("glsl/block_vertex.glsl", "blockVertex")
-	include("glsl/block_geometry.glsl", "blockGeometry")
-	include("glsl/block_fragment.glsl", "blockFragment")
+	include("glsl/block.vs", "blockVS")
+	include("glsl/block.gs", "blockGS")
+	include("glsl/block.fs", "blockFS")
 	
-	include("glsl/cursor_vertex.glsl", "cursorVertex")
-	include("glsl/overlay_vertex.glsl", "overlayVertex")
-	include("glsl/color_fragment.glsl", "colorFragment")
+	include("glsl/entity.vs", "entityVS")
+	include("glsl/entity.fs", "entityFS")
 	
-	include("glsl/entity_vertex.glsl", "entityVertex")
-	include("glsl/entity_fragment.glsl", "entityFragment")
+	include("glsl/text.vs", "textVS")
+	include("glsl/text.fs", "textFS")
 	
-	include("glsl/text_vertex.glsl", "textVertex")
-	include("glsl/text_fragment.glsl", "textFragment")
+	include("glsl/cursor.vs", "cursorVS")
+	include("glsl/overlay.vs", "overlayVS")
+	include("glsl/block_overlay.vs", "blockOverlayVS")
+	include("glsl/color.fs", "colorFS")
 	
-	include("glsl/block_overlay_vertex.glsl", "blockOverlayVertex")
+	out.write("}\n")

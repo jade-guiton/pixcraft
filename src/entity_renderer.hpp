@@ -5,6 +5,7 @@
 #include "glfw.hpp"
 #include "glm.hpp"
 
+#include "shaders.hpp"
 #include "textures.hpp"
 
 #include "world/world_module.hpp"
@@ -35,7 +36,7 @@ public:
 	void renderEntities(World& world, glm::mat4 proj, glm::mat4 view, RenderParams params);
 	
 private:
-	GlId program;
+	ShaderProgram program;
 	
 	EntityModel slimeModel;
 	

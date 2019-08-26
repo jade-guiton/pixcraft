@@ -11,6 +11,7 @@
 #include FT_STROKER_H
 #include "utf8.h"
 
+#include "shaders.hpp"
 #include "texture_atlas.hpp"
 
 
@@ -45,7 +46,8 @@ private:
 	std::unordered_map<uint32_t, CharacterData> characters;
 	
 	int winWidth, winHeight;
-	GlId program, VAO, VBO;
+	ShaderProgram program;
+	GlId VAO, VBO;
 	int fontHeight;
 	
 	void loadFont(size_t priority, const char* filename);
