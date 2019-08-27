@@ -131,6 +131,11 @@ void setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSiz
 }
 
 template<>
+void setAttributePointer<glm::uvec3>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribIPointer(location, 3, GL_UNSIGNED_BYTE, totalSize, (void*) offset);
+}
+
+template<>
 void setAttributePointer<uint8_t>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribIPointer(location, 1, GL_UNSIGNED_BYTE, totalSize, (void*) offset);
 }

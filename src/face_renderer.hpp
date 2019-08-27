@@ -10,9 +10,9 @@
 #include "textures.hpp"
 
 struct FaceData {
-	float offsetX;
-	float offsetY;
-	float offsetZ;
+	uint8_t offsetX;
+	uint8_t offsetY;
+	uint8_t offsetZ;
 	uint8_t side;
 	TexId texId;
 } __attribute__((packed));
@@ -35,7 +35,7 @@ public:
 	void render();
 	
 private:
-	VertexBuffer<glm::vec3, uint8_t, uint32_t> buffer;
+	VertexBuffer<glm::uvec3, uint8_t, uint32_t> buffer;
 };
 
 class FaceRenderer {
