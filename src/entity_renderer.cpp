@@ -2,12 +2,13 @@
 
 #include <cstddef>
 #include <typeinfo>
+#include <array>
 
 #include "world/world.hpp"
 #include "world/mob.hpp"
 #include "world/slime.hpp"
 
-const float slimeVertices[70] = {
+const std::array<float, 70> slimeVertices = {
 	 1, -1,  1,  1.0/4, 0.0/3,
 	-1, -1,  1,  2.0/4, 0.0/3,
 	 1, -1,  1,  0.0/4, 1.0/3,
@@ -24,7 +25,7 @@ const float slimeVertices[70] = {
 	-1,  1,  1,  2.0/4, 3.0/3
 };
 
-const unsigned int slimeIndices[36] = {
+const std::array<unsigned int, 36> slimeIndices = {
 	0,  1,  3,    3,  1,  4, // bottom
 	2,  3,  7,    7,  3,  8, // left
 	3,  4,  8,    8,  4,  9, // front
@@ -33,37 +34,16 @@ const unsigned int slimeIndices[36] = {
 	8,  9,  12,   12, 9,  13
 };
 
-EntityModel::EntityModel() : VAO(0) {}
-
-void EntityModel::init(TexId texture2, const float* vertices, size_t vertexCount, const unsigned int* indices,
-		size_t indexCount2, glm::mat4 preModel) {
+template<size_t vertexCount, size_t indexCount>
+void EntityModel::init(TexId texture2, const std::array<float, vertexCount>& vertices,
+		const std::array<unsigned int, indexCount>& indices, glm::mat4 preModel) {
 	texture = texture2;
-	indexCount = indexCount2;
 	_preModel = preModel;
 	
-	glGenVertexArrays(1, &VAO);
-	GlId VBO, EBO;
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	
-	glBindVertexArray(VAO);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	
-	size_t floatSize = sizeof(float);
-	size_t vertexSize = floatSize*5;
-	glBufferData(GL_ARRAY_BUFFER, vertexSize*vertexCount, vertices, GL_STATIC_DRAW);
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (void*) 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*) (floatSize*3));
-	glEnableVertexAttribArray(1);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(unsigned int), indices, GL_STATIC_DRAW);
-	
-	glBindVertexArray(0);
-	checkGlErrors("entity renderer initialization");
+	buffer.init(0, 3*sizeof(float), 5*sizeof(float));
+	buffer.loadData(vertices.data(), vertexCount / 5, GL_STATIC_DRAW);
+	buffer.loadIndices(indices.data(), indexCount);
+	checkGlErrors("entity model initialization");
 }
 
 glm::mat4 EntityModel::preModel() { return _preModel; }
@@ -73,9 +53,9 @@ void EntityModel::bindTexture() {
 }
 
 void EntityModel::render() {
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	buffer.bind();
+	glDrawElements(GL_TRIANGLES, buffer.indexCount(), GL_UNSIGNED_INT, 0);
+	buffer.unbind();
 }
 
 
@@ -85,7 +65,7 @@ void EntityRenderer::init() {
 	program.init(ShaderSources::entityVS, ShaderSources::entityFS);
 	
 	glm::mat4 preModel = glm::translate(glm::scale(glm::mat4(1.0), glm::vec3(0.3f, 0.3f, 0.3f)), glm::vec3(0.0f, 1.0f, 0.0f));
-	slimeModel.init(TEX(SLIME), slimeVertices, 14, slimeIndices, 36, preModel);
+	slimeModel.init(TEX(SLIME), slimeVertices, slimeIndices, preModel);
 }
 
 void EntityRenderer::renderEntities(World& world, glm::mat4 proj, glm::mat4 view, RenderParams params) {

@@ -18,6 +18,8 @@ namespace ShaderSources {
 
 class ShaderProgram {
 public:
+	ShaderProgram();
+	
 	void init(const char* vertexSrc, const char* geometrySrc, const char* fragmentSrc);
 	void init(const char* vertexSrc, const char* fragmentSrc);
 	
@@ -43,6 +45,8 @@ private:
 
 class VertexArray {
 public:
+	VertexArray();
+	
 	void bind();
 	void unbind();
 	
@@ -59,7 +63,10 @@ private:
 template<typename... Ts>
 class VertexBuffer : public VertexArray {
 public:
+	VertexBuffer();
+	
 	void loadData(const void* data, size_t vertexCount, GLenum usage);
+	size_t vertexCount();
 	
 protected:
 	size_t vertexSize;
@@ -73,6 +80,7 @@ protected:
 
 private:
 	GlId vboId;
+	size_t _vertexCount;
 };
 
 template<typename T>
@@ -81,6 +89,8 @@ void setAttributePointer(int location, size_t offset, size_t totalSize);
 template<typename T, typename... Ts>
 class VertexBuffer<T, Ts...> : public VertexBuffer<Ts...> {
 public:
+	VertexBuffer();
+	
 	template<typename... Args>
 	void init(size_t offset, Args... offsets);
 	
@@ -98,9 +108,12 @@ private:
 template<typename... Ts>
 class IndexBuffer : public VertexBuffer<Ts...> {
 public:
+	IndexBuffer();
+	
 	using VertexBuffer<Ts...>::init;
 	
 	void loadIndices(const void* data, size_t indexCount);
+	size_t indexCount();
 	
 protected:
 	void genBuffers() override;
@@ -108,6 +121,7 @@ protected:
 	
 private:
 	GlId eboId;
+	size_t _indexCount;
 };
 
 #include "shaders_impl.hpp"
