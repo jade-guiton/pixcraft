@@ -92,6 +92,11 @@ void ShaderProgram::unuse() {
 
 VertexArray::VertexArray() : vaoId(0) {}
 
+VertexArray::~VertexArray() {
+	if(vaoId == 0) return;
+	glDeleteVertexArrays(1, &vaoId);
+}
+
 void VertexArray::init() {
 	glGenVertexArrays(1, &vaoId);
 	genBuffers();
@@ -108,6 +113,10 @@ void VertexArray::unbind() {
 	glBindVertexArray(0);
 }
 
+bool VertexArray::isInitialized() {
+	return vaoId != 0;
+}
+
 void VertexArray::genBuffers() {}
 void VertexArray::setVAO() {}
 
@@ -119,4 +128,14 @@ void setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSiz
 template<>
 void setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
+}
+
+template<>
+void setAttributePointer<uint8_t>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribIPointer(location, 1, GL_UNSIGNED_BYTE, totalSize, (void*) offset);
+}
+
+template<>
+void setAttributePointer<uint32_t>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribIPointer(location, 1, GL_UNSIGNED_INT, totalSize, (void*) offset);
 }

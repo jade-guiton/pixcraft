@@ -34,6 +34,7 @@ public:
 	
 	int getX();
 	int getZ();
+	bool withinSquareDistance(int dist);
 	bool withinDistance(int dist);
 	
 	void next();
