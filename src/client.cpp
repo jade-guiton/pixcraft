@@ -301,6 +301,10 @@ void GameClient::update(float dt) {
 	}
 }
 
+void printElapsedTime(const char* operation, double before) {
+	std::cout << operation << ": " << round((glfwGetTime() - before)*10000) / 10.0 << " ms" << std::endl;
+}
+
 void GameClient::render() {
 	// Compute some rendering data based on player position
 	int width, height;
