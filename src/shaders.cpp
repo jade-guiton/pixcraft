@@ -19,6 +19,8 @@ void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	}
 }
 
+ShaderProgram::ShaderProgram() : programId(0) {};
+
 void ShaderProgram::init(const char* vertexSrc, const char* geometrySrc, const char* fragmentSrc) {
 	programId = glCreateProgram();
 	
@@ -87,6 +89,8 @@ void ShaderProgram::unuse() {
 	glUseProgram(0);
 }
 
+
+VertexArray::VertexArray() : vaoId(0) {}
 
 void VertexArray::init() {
 	glGenVertexArrays(1, &vaoId);

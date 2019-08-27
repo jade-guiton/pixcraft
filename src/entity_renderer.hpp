@@ -12,9 +12,9 @@
 
 class EntityModel {
 public:
-	EntityModel();
-	void init(TexId texture, const float* vertices, size_t vertexCount, const unsigned int* indices,
-		size_t indexCount, glm::mat4 preModel);
+	template<size_t vertexCount, size_t indexCount>
+	void init(TexId texture, const std::array<float, vertexCount>& vertices,
+		const std::array<unsigned int, indexCount>& indices, glm::mat4 preModel);
 	
 	glm::mat4 preModel();
 	
@@ -22,9 +22,8 @@ public:
 	void render();
 	
 private:
-	GlId VAO;
+	IndexBuffer<glm::vec3, glm::vec2> buffer;
 	TexId texture;
-	size_t indexCount;
 	glm::mat4 _preModel;
 };
 
