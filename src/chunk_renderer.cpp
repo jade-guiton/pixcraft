@@ -109,7 +109,7 @@ void RenderedChunk::prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t r
 		}
 		if(renderFace) {
 			FaceData face = {
-				(float) relX, (float) y, (float) relZ, side, block->getFaceTexture(side)
+				relX, y, relZ, side, block->getFaceTexture(side)
 			};
 			if(block->rendering() == BlockRendering::translucentCube) {
 				translucentBuffer.faces.push_back(face);
