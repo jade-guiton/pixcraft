@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
-#include <vector>
+#include <array>
 
 #include "glfw.hpp"
 #include "glm.hpp"
@@ -39,6 +39,9 @@ public:
 private:
 	static const int FONT_COUNT = 4;
 	
+	static const size_t QUAD_SIZE = 24;
+	static const int BUFFER_SIZE = 32;
+	
 	FT_Library ft;
 	FT_Stroker stroker;
 	FT_Face faces[FONT_COUNT];
@@ -54,5 +57,5 @@ private:
 	
 	void prerenderCharacter(uint32_t c);
 	
-	void renderGlyphData(GlyphData& data, float x, float y, float scale);
+	void renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y, float scale);
 };

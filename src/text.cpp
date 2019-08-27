@@ -6,6 +6,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <cmath>
+#include <array>
+#include <algorithm>
 
 
 void TextRenderer::init() {
@@ -37,7 +39,7 @@ void TextRenderer::init() {
 	
 	program.init(ShaderSources::textVS, ShaderSources::textFS);
 	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
-	buffer.loadData(nullptr, 4, GL_STREAM_DRAW);
+	buffer.loadData(nullptr, 6*BUFFER_SIZE, GL_STREAM_DRAW);
 	checkGlErrors("text renderer initialization");
 }
 
@@ -70,6 +72,9 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	std::string::const_iterator end = str.end();
 	uint32_t cp;
 	
+	std::array<float, QUAD_SIZE*BUFFER_SIZE> quadBuffer;
+	auto bufferIt = quadBuffer.begin();
+	
 	while(it != end) {
 		cp = utf8::next(it, end);
 		if(cp == '\n') {
@@ -81,9 +86,21 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		if(characters.count(cp) == 0) prerenderCharacter(cp);
 		CharacterData characterData = characters[cp];
 		
-		renderGlyphData(characterData.glyphData, x, y, scale);
+		renderGlyphData(bufferIt, characterData.glyphData, x, y, scale);
+		
+		if(bufferIt == quadBuffer.end()) {
+			bufferIt = quadBuffer.begin();
+			buffer.updateData(quadBuffer.data(), quadBuffer.size()/4);
+			glDrawArrays(GL_TRIANGLES, 0, quadBuffer.size()/4);
+		}
 		
 		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+	}
+	
+	if(bufferIt != quadBuffer.begin()) {
+		size_t vertices = (bufferIt - quadBuffer.begin())/4;
+		buffer.updateData(quadBuffer.data(), vertices);
+		glDrawArrays(GL_TRIANGLES, 0, vertices);
 	}
 	
 	buffer.unbind();
@@ -155,7 +172,7 @@ void TextRenderer::prerenderCharacter(uint32_t cp) {
 	};
 }
 
-void TextRenderer::renderGlyphData(GlyphData& data, float x, float y, float scale) {
+void TextRenderer::renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y, float scale) {
 	float l = glyphAtlas.getL(data.atlasId);
 	float r = glyphAtlas.getR(data.atlasId);
 	float t = glyphAtlas.getT(data.atlasId);
@@ -166,14 +183,14 @@ void TextRenderer::renderGlyphData(GlyphData& data, float x, float y, float scal
 	float xpos = x + data.bearing.x * scale;
 	float ypos = y - data.bearing.y * scale;
 	
-	float vertices[4][4] = {
-		{ xpos,     ypos,       l, b },
-		{ xpos,     ypos + h,   l, t },
-		{ xpos + w, ypos,       r, b },
-		{ xpos + w, ypos + h,   r, t }
+	float vertices[QUAD_SIZE] = {
+		xpos,     ypos,       l, b,
+		xpos,     ypos + h,   l, t,
+		xpos + w, ypos,       r, b,
+		xpos + w, ypos,       r, b,
+		xpos,     ypos + h,   l, t,
+		xpos + w, ypos + h,   r, t
 	};
-	
-	buffer.updateData(vertices, 4);
-	
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	std::copy(vertices, vertices + QUAD_SIZE, bufferIt);
+	bufferIt += QUAD_SIZE;
 }
