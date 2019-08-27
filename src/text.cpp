@@ -36,23 +36,8 @@ void TextRenderer::init() {
 	}
 	
 	program.init(ShaderSources::textVS, ShaderSources::textFS);
-	
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 4, nullptr, GL_DYNAMIC_DRAW);
-	
-	size_t vertexSize = 4 * sizeof(float);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertexSize, 0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertexSize, (void*) (2*sizeof(float)));
-	glEnableVertexAttribArray(1);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	
+	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
+	buffer.loadData(nullptr, 4, GL_STREAM_DRAW);
 	checkGlErrors("text renderer initialization");
 }
 
@@ -69,7 +54,7 @@ void TextRenderer::setViewport(int width, int height) {
 
 void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
 	program.use();
-	glBindVertexArray(VAO);
+	buffer.bind();
 	
 	glyphAtlas.bind();
 	
@@ -101,6 +86,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
 	}
 	
+	buffer.unbind();
 	program.unuse();
 }
 
@@ -187,9 +173,7 @@ void TextRenderer::renderGlyphData(GlyphData& data, float x, float y, float scal
 		{ xpos + w, ypos + h,   r, t }
 	};
 	
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	buffer.updateData(vertices, 4);
 	
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

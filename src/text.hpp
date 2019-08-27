@@ -47,7 +47,7 @@ private:
 	
 	int winWidth, winHeight;
 	ShaderProgram program;
-	GlId VAO, VBO;
+	VertexBuffer<glm::vec2, glm::vec2> buffer;
 	int fontHeight;
 	
 	void loadFont(size_t priority, const char* filename);
