@@ -22,8 +22,6 @@ class FaceRenderer;
 
 class FaceBuffer {
 public:
-	FaceBuffer();
-	~FaceBuffer();
 	void init(FaceRenderer& faceRenderer, int capacity);
 	bool isInitialized();
 	
@@ -37,8 +35,7 @@ public:
 	void render();
 	
 private:
-	GlId VAO, VBO;
-	size_t capacity;
+	VertexBuffer<glm::vec3, uint8_t, uint32_t> buffer;
 };
 
 class FaceRenderer {

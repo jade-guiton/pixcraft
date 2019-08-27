@@ -53,8 +53,12 @@ SpiralIterator::SpiralIterator(int startX, int startZ)
 int SpiralIterator::getX() { return startX + x; }
 int SpiralIterator::getZ() { return startZ + z; }
 
-bool SpiralIterator::withinDistance(int dist) {
+bool SpiralIterator::withinSquareDistance(int dist) {
 	return abs(x) <= dist && abs(z) <= dist;
+}
+
+bool SpiralIterator::withinDistance(int dist) {
+	return x*x + z*z <= dist*dist;
 }
 
 void SpiralIterator::next() {

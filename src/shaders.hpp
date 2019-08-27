@@ -46,9 +46,11 @@ private:
 class VertexArray {
 public:
 	VertexArray();
+	virtual ~VertexArray();
 	
 	void bind();
 	void unbind();
+	bool isInitialized();
 	
 protected:
 	void init();
@@ -64,9 +66,12 @@ template<typename... Ts>
 class VertexBuffer : public VertexArray {
 public:
 	VertexBuffer();
+	virtual ~VertexBuffer();
 	
 	void loadData(const void* data, size_t vertexCount, GLenum usage);
 	size_t vertexCount();
+	
+	void updateData(const void* data, size_t vertexCount);
 	
 protected:
 	size_t vertexSize;
@@ -109,6 +114,7 @@ template<typename... Ts>
 class IndexBuffer : public VertexBuffer<Ts...> {
 public:
 	IndexBuffer();
+	virtual ~IndexBuffer();
 	
 	using VertexBuffer<Ts...>::init;
 	

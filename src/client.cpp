@@ -277,22 +277,26 @@ void GameClient::update(float dt) {
 	
 	world.updateEntities(dt);
 	
-	int32_t camChunkX = floor(player->pos().x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(player->pos().z / CHUNK_SIZE);
+	int32_t camX, camY, camZ;
+	std::tie(camX, camY, camZ) = getBlockCoordsAt(player->pos());
+	int32_t camChunkX, camChunkZ;
+	std::tie(camChunkX, camChunkZ) = World::getChunkPosAt(camX, camZ);
 	int loads = 0;
 	SpiralIterator iter(camChunkX, camChunkZ);
-	while(iter.withinDistance(renderDist)) {
-		int x = iter.getX();
-		int z = iter.getZ();
-		if(!world.isChunkLoaded(x, z)) {
-			world.genChunk(x, z);
-			loads++;
+	while(iter.withinSquareDistance(renderDist + 1)) {
+		if(iter.withinDistance(renderDist + 2)) {
+			int x = iter.getX();
+			int z = iter.getZ();
+			if(!world.isChunkLoaded(x, z)) {
+				world.genChunk(x, z);
+				loads++;
+			}
+			if(!chunkRenderer.isChunkRendered(x, z)) {
+				chunkRenderer.prerenderChunk(x, z);
+				loads++;
+			}
+			if(loads >= LOADS_PER_FRAME) break;
 		}
-		if(!chunkRenderer.isChunkRendered(x, z)) {
-			chunkRenderer.prerenderChunk(x, z);
-			loads++;
-		}
-		if(loads >= LOADS_PER_FRAME) break;
 		iter.next();
 	}
 }
@@ -311,8 +315,10 @@ void GameClient::render() {
 	
 	ViewFrustum vf = computeViewFrustum(fovy, aspect, near, far, playerPos, player->orient());
 	
-	int32_t camChunkX = floor(playerPos.x / CHUNK_SIZE);
-	int32_t camChunkZ = floor(playerPos.z / CHUNK_SIZE);
+	int32_t camX, camY, camZ;
+	std::tie(camX, camY, camZ) = getBlockCoordsAt(player->pos());
+	int32_t camChunkX, camChunkZ;
+	std::tie(camChunkX, camChunkZ) = World::getChunkPosAt(camX, camZ);
 	
 	// Clear screen
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0f);
@@ -386,7 +392,7 @@ void GameClient::render() {
 	cursorProgram.setUniform("winSize", (float) width, (float) height);
 	cursorProgram.setUniform("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	cursorBuffer.bind();
-	glDrawElements(GL_TRIANGLES, cursorIndices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, cursorBuffer.indexCount(), GL_UNSIGNED_INT, 0);
 	cursorBuffer.unbind();
 	cursorProgram.unuse();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -189,10 +189,10 @@ void ChunkRenderer::render(int32_t camChunkX, int32_t camChunkZ, int renderDist,
 		int32_t chunkX, chunkZ;
 		std::tie(chunkX, chunkZ) = unpackCoords(iter->first);
 		int32_t dist = (chunkX-camChunkX)*(chunkX-camChunkX) + (chunkZ-camChunkZ)*(chunkZ-camChunkZ);
-		if(dist >= (renderDist*2)*(renderDist*2)) {
+		if(dist >= (renderDist+5)*(renderDist+5)) {
 			iter = renderedChunks.erase(iter);
 		} else {
-			if(dist <= (renderDist+1)*(renderDist+1) && isVisible(vf, chunkX, chunkZ)) {
+			if(dist <= (renderDist+2)*(renderDist+2) && isVisible(vf, chunkX, chunkZ)) {
 				RenderedChunk& chunk = iter->second;
 				chunk.render(faceRenderer);
 			}

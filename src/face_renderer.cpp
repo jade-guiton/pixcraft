@@ -17,46 +17,22 @@ const std::array<glm::mat3, 6> sideTransforms = {
 };
 
 
-FaceBuffer::FaceBuffer()
-	: VAO(0), VBO(0), capacity(0) { }
-
-FaceBuffer::~FaceBuffer() {
-	if(VAO != 0) {
-		glDeleteBuffers(1, &VBO);
-		glDeleteVertexArrays(1, &VAO);
-	}
-}
-
-void FaceBuffer::init(FaceRenderer& faceRenderer, int newCapacity) {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	
-	glBindVertexArray(VAO);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	size_t faceDataSize = sizeof(FaceData);
-	glBufferData(GL_ARRAY_BUFFER, faceDataSize*newCapacity, nullptr, GL_STATIC_DRAW);
-	faces.reserve(newCapacity);
-	capacity = newCapacity;
-	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, faceDataSize, (void*) offsetof(FaceData, offsetX));
-	glEnableVertexAttribArray(0);
-	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, faceDataSize, (void*) offsetof(FaceData, side));
-	glEnableVertexAttribArray(1);
-	glVertexAttribIPointer(2, 1, GL_UNSIGNED_INT, faceDataSize, (void*) offsetof(FaceData, texId));
-	glEnableVertexAttribArray(2);
-	
-	glBindVertexArray(0);
+void FaceBuffer::init(FaceRenderer& faceRenderer, int capacity) {
+	buffer.init(offsetof(FaceData, offsetX), offsetof(FaceData, side),
+		offsetof(FaceData, texId), sizeof(FaceData));
+	buffer.loadData(nullptr, capacity, GL_STATIC_DRAW);
+	faces.reserve(capacity);
 	checkGlErrors("face buffer initialization");
 }
 
-bool FaceBuffer::isInitialized() { return VAO != 0; }
+bool FaceBuffer::isInitialized() {
+	return buffer.isInitialized();
+}
 
 void FaceBuffer::prerender() {
 	size_t faceCount = faces.size();
-	if(faceCount > capacity) throw std::logic_error("Too many faces loaded into FaceBuffer");
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, faceCount * sizeof(FaceData), faces.data());
+	if(faceCount > buffer.vertexCount()) throw std::logic_error("Too many faces loaded into FaceBuffer");
+	buffer.updateData(faces.data(), faceCount);
 }
 
 void FaceBuffer::eraseFaces(int8_t x, int8_t y, int8_t z) {
@@ -96,9 +72,9 @@ void FaceBuffer::erasePlaneZ(int8_t z) {
 }
 
 void FaceBuffer::render() {
-	glBindVertexArray(VAO);
+	buffer.bind();
 	glDrawArrays(GL_POINTS, 0, faces.size());
-	glBindVertexArray(0);
+	buffer.unbind();
 }
 
 
