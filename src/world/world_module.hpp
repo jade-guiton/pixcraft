@@ -1,6 +1,6 @@
 #pragma once
 
-typedef uint32_t BlockId;
+typedef uint16_t BlockId;
 class Block;
 class Mob;
 class Slime;
