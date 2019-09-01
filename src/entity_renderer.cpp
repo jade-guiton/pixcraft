@@ -8,6 +8,8 @@
 #include "world/mob.hpp"
 #include "world/slime.hpp"
 
+using namespace PixCraft;
+
 const std::array<float, 70> slimeVertices = {
 	 1, -1,  1,  1.0/4, 0.0/3,
 	-1, -1,  1,  2.0/4, 0.0/3,

@@ -5,6 +5,8 @@
 
 #include "client.hpp"
 
+using namespace PixCraft;
+
 void glfwErrorCallback(int error, const char* desc) {
 	std::cout << "GLFW error " << error << ": " << desc << std::endl;
 }

@@ -16,6 +16,8 @@
 #include "world/player.hpp"
 #include "world/slime.hpp"
 
+using namespace PixCraft;
+
 const char windowTitle[] = "OpenGL Test 2";
 
 void windowResizeCallback(GLFWwindow* window, int width, int height) {

@@ -15,6 +15,8 @@
 #include "world/chunk.hpp"
 #include "util.hpp"
 
+using namespace PixCraft;
+
 void RenderedChunk::init(World& world2, FaceRenderer& faceRenderer, int32_t chunkX2, int32_t chunkZ2) {
 	world = &world2;
 	buffer.init(faceRenderer, MAX_CHUNK_FACES);

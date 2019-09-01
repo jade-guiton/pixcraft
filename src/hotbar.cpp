@@ -5,6 +5,8 @@
 
 #include "glm.hpp"
 
+using namespace PixCraft;
+
 Hotbar::Hotbar(FaceRenderer& renderer)
 	: _held(1), faceRenderer(renderer) { }
 

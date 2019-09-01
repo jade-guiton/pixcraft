@@ -4,6 +4,8 @@
 
 #include "../util.hpp"
 
+using namespace PixCraft;
+
 const float JUMP_HEIGHT = 1.1f;
 const float JUMP_SPEED = sqrt(2*JUMP_HEIGHT*GRAVITY);
 

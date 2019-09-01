@@ -5,6 +5,8 @@
 #include "blocks.hpp"
 #include "mob.hpp"
 
+using namespace PixCraft;
+
 World::World() { }
 
 bool World::isValidHeight(int32_t y) {

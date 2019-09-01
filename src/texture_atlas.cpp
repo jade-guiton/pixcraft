@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+using namespace PixCraft;
 
 const GLint internalFormat = GL_RG8;
 const GLenum format = GL_RG;

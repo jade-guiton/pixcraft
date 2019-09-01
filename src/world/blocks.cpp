@@ -9,8 +9,9 @@
 
 #include "world.hpp"
 
+using namespace PixCraft;
 
-namespace BlockRegistry {
+namespace PixCraft::BlockRegistry {
 	namespace {
 		std::vector<std::unique_ptr<Block>> protoBlocks;
 	}

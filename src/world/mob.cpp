@@ -7,6 +7,7 @@
 #include "blocks.hpp"
 #include "world.hpp"
 
+using namespace PixCraft;
 
 const float BUOYANCY = 20.0f;
 

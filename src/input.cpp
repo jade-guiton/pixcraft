@@ -4,6 +4,8 @@
 
 #include "client.hpp"
 
+using namespace PixCraft;
+
 InputManager::InputManager()
 	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false},
 	  _justScrolled(0) { }

@@ -6,6 +6,7 @@
 
 #include "util.hpp"
 
+using namespace PixCraft;
 
 const std::array<glm::mat3, 6> sideTransforms = {
 	glm::mat3(1.0f),

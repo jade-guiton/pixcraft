@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+using namespace PixCraft;
+
 void checkShaderStatus(GlId shader, bool isProgram, const char* opDesc) {
 	int succ;
 	char infoLog[512];
@@ -121,26 +123,26 @@ void VertexArray::genBuffers() {}
 void VertexArray::setVAO() {}
 
 template<>
-void setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSize) {
+void PixCraft::setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }
 
 template<>
-void setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSize) {
+void PixCraft::setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }
 
 template<>
-void setAttributePointer<glm::uvec3>(int location, size_t offset, size_t totalSize) {
+void PixCraft::setAttributePointer<glm::uvec3>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribIPointer(location, 3, GL_UNSIGNED_BYTE, totalSize, (void*) offset);
 }
 
 template<>
-void setAttributePointer<uint8_t>(int location, size_t offset, size_t totalSize) {
+void PixCraft::setAttributePointer<uint8_t>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribIPointer(location, 1, GL_UNSIGNED_BYTE, totalSize, (void*) offset);
 }
 
 template<>
-void setAttributePointer<uint32_t>(int location, size_t offset, size_t totalSize) {
+void PixCraft::setAttributePointer<uint32_t>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribIPointer(location, 1, GL_UNSIGNED_INT, totalSize, (void*) offset);
 }
