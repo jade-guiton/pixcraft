@@ -11,14 +11,13 @@
 #include "shaders.hpp"
 #include "textures.hpp"
 #include "view_frustum.hpp"
+#include "version.hpp"
 
 #include "world/blocks.hpp"
 #include "world/player.hpp"
 #include "world/slime.hpp"
 
 using namespace PixCraft;
-
-const char windowTitle[] = "OpenGL Test 2";
 
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -72,7 +71,8 @@ GameClient::GameClient()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	
-	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, windowTitle, nullptr, nullptr);
+	std::string title = "PixCraft " + VERSION_STR;
+	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, title.c_str(), nullptr, nullptr);
 	if(window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
 	glfwSetWindowUserPointer(window, (void*) this);

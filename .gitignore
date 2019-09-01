@@ -1,9 +1,9 @@
-obj
-test.exe
 src/glad.cpp
 src/shaders_src.cpp
+obj
+*.exe
 *.sublime-project
 *.sublime-workspace
 *.zip
-gmon.out
+*.out
 *.txt
