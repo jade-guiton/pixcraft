@@ -12,22 +12,22 @@ CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused \
 	-Ilib -IC:/lib/utf8-cpp-2.3.4 -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
 
 run: release
-	./test.exe
+	./pixcraft.exe
 
 clean:
-	rm -f test.exe
+	rm -f pixcraft.exe
 	rm -fr  obj/*
 	mkdir obj/world
 
 release: CXXFLAGS := -O3 $(CXXFLAGS)
-release: test.exe
+release: pixcraft.exe
 debug: CXXFLAGS := -g $(CXXFLAGS)
-debug: test.exe
+debug: pixcraft.exe
 profiling: CXXFLAGS := -O3 -pg $(CXXFLAGS)
 profiling: LDFLAGS := -pg $(LDFLAGS)
-profiling: test.exe
+profiling: pixcraft.exe
 
-test.exe: $(OBJ_FILES)
+pixcraft.exe: $(OBJ_FILES)
 	g++ -o $@ $^ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
