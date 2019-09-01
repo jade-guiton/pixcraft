@@ -71,7 +71,7 @@ GameClient::GameClient()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	
-	std::string title = "PixCraft " + VERSION_STR;
+	std::string title = "PixCraft " + getVersionString();
 	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, title.c_str(), nullptr, nullptr);
 	if(window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");

@@ -1,5 +1,6 @@
 src/glad.cpp
 src/shaders_src.cpp
+src/commit_hash.cpp
 obj
 *.exe
 *.sublime-project
