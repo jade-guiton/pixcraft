@@ -36,4 +36,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(SRC_DIR)/shaders_src.cpp: include_shader_code.py $(GLSL_DIR)/*
 	python include_shader_code.py
 
+$(SRC_DIR)/serializer_generated.h: serializer.fbs
+	flatc -c -o $(SRC_DIR) serializer.fbs
+
 -include $(OBJ_FILES:.o=.d)
