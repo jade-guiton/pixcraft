@@ -1,0 +1,50 @@
+namespace serialize;
+
+enum BlockType:uint16 {
+  Air,
+  Stone, Dirt, Grass,
+  Trunk, Leaves,
+  Water, 
+  Planks
+}
+
+struct Vec3 {
+  x:float; y:float; z:float;
+}
+
+table MobBase {
+  pos:Vec3;
+  orient:Vec3;
+  speed:Vec3;
+}
+
+enum MovementMode:uint8 {
+  Normal, Flying, NoClip
+}
+
+table Player {
+  mob:MobBase;
+  movement_mode:MovementMode;
+}
+
+table Slime {
+  mob:MobBase;
+}
+
+union Mob {
+  Player,
+  Slime
+}
+
+table Chunk {
+  chunk_x:int32;
+  chunk_z:int32;
+  blocks:[BlockType];
+}
+
+table World {
+  chunks:[Chunk];
+  mobs:[Mob];
+}
+
+root_type World;
