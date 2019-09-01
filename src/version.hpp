@@ -3,8 +3,9 @@
 #include <string>
 
 namespace PixCraft {
-	extern const int VERSION_MAJOR;
-	extern const int VERSION_MINOR;
-	extern const std::string COMMIT_HASH;
-	extern const std::string VERSION_STR;
+	const int VERSION_MAJOR = 0;
+	const int VERSION_MINOR = 0;
+	extern const char* COMMIT_HASH;
+	
+	std::string getVersionString();
 }

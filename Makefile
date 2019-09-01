@@ -27,14 +27,17 @@ profiling: CXXFLAGS := -O3 -pg $(CXXFLAGS)
 profiling: LDFLAGS := -pg $(LDFLAGS)
 profiling: pixcraft.exe
 
-pixcraft.exe: $(OBJ_FILES)
-	g++ -o $@ $^ $(LDFLAGS)
+pixcraft.exe: getCommitHash $(OBJ_FILES)
+	g++ -o $@ $(OBJ_FILES) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(SRC_DIR)/shaders_src.cpp: include_shader_code.py $(GLSL_DIR)/*
 	python include_shader_code.py
+
+getCommitHash: get_commit_hash.py
+	python get_commit_hash.py
 
 $(SRC_DIR)/serializer_generated.h: serializer.fbs
 	flatc -c -o $(SRC_DIR) serializer.fbs
