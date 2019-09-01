@@ -4,22 +4,24 @@
 #include <random>
 #include <cmath>
 
-uint64_t generateSeed() {
+using namespace PixCraft;
+
+uint64_t PixCraft::generateSeed() {
 	uint64_t a = static_cast<uint64_t>(time(nullptr));
 	std::random_device rand;
 	uint64_t b = ((uint64_t) rand()) << 32 | ((uint64_t) rand());
 	return wyhash64(a, b);
 }
 
-uint64_t getFeatureSeed(uint64_t seed, FeatureType feature) {
+uint64_t PixCraft::getFeatureSeed(uint64_t seed, FeatureType feature) {
 	return wyhash64(seed, static_cast<uint64_t>(feature));
 }
 
-uint64_t randFromPosition(uint64_t seed, int32_t x, int32_t z) {
+uint64_t PixCraft::randFromPosition(uint64_t seed, int32_t x, int32_t z) {
 	return wyhash64(seed, packCoords(x, z));
 }
 
-std::vector<float> distributeObjects(uint64_t seed, float minX, float minZ, float chunkSize, float minDist, float size) {
+std::vector<float> PixCraft::distributeObjects(uint64_t seed, float minX, float minZ, float chunkSize, float minDist, float size) {
 	int32_t minX2 = minX - size;
 	int32_t minZ2 = minZ - size;
 	int32_t maxX2 = minX + chunkSize + size;

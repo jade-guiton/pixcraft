@@ -7,6 +7,8 @@
 
 #include "chunk.hpp"
 
+using namespace PixCraft;
+
 WorldGenerator::WorldGenerator()
 	: seed(generateSeed()), terrainHeightNoise(getFeatureSeed(seed, FeatureType::terrainHeight)) { }
 

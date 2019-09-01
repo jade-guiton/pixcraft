@@ -5,9 +5,11 @@
 #include "world_module.hpp"
 #include "mob.hpp"
 
-class Slime : public Mob {
-public:
-	Slime(World& world, glm::vec3 pos);
-	
-	void update(float dt) override;
-};
+namespace PixCraft {
+	class Slime : public Mob {
+	public:
+		Slime(World& world, glm::vec3 pos);
+		
+		void update(float dt) override;
+	};
+}

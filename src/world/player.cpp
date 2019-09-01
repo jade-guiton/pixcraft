@@ -7,8 +7,9 @@
 #include "blocks.hpp"
 #include "world.hpp"
 
+using namespace PixCraft;
 
-const char* movementModeNames[3] = {
+const char* PixCraft::movementModeNames[3] = {
 	"Normal", "Flying", "Noclip"
 };
 

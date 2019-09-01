@@ -5,6 +5,8 @@
 #include "blocks.hpp"
 #include "world.hpp"
 
+using namespace PixCraft;
+
 inline uint32_t blockIdx(uint8_t x, uint8_t y, uint8_t z) {
 	return x + CHUNK_SIZE*z + CHUNK_SIZE*CHUNK_SIZE*y;
 }

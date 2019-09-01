@@ -8,16 +8,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-typedef uint32_t GlId;
-
-void checkGlErrors(const char* opDesc);
-
-struct RenderParams {
-	float skyColor[3];
+namespace PixCraft {
+	typedef uint32_t GlId;
 	
-	bool applyView;
-	bool applyFog;
+	void checkGlErrors(const char* opDesc);
 	
-	float fogStart;
-	float fogEnd;
-};
+	struct RenderParams {
+		float skyColor[3];
+		
+		bool applyView;
+		bool applyFog;
+		
+		float fogStart;
+		float fogEnd;
+	};
+}

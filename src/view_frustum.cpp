@@ -5,6 +5,8 @@
 #include "world/world_module.hpp"
 #include "util.hpp"
 
+using namespace PixCraft;
+
 // Takes a normal and a point in camera space, and returns the corresponding plane in world space.
 // Also computes the n- and p-vertices of AABBs relative to the plane.
 ViewPlane computeViewPlane(glm::vec3 normal, glm::vec3 point, glm::mat4 trans) {
@@ -16,7 +18,7 @@ ViewPlane computeViewPlane(glm::vec3 normal, glm::vec3 point, glm::mat4 trans) {
 	return viewPlane;
 }
 
-ViewFrustum computeViewFrustum(float fovy, float screenRatio, float near, float far, glm::vec3 pos, glm::vec3 orient) {
+ViewFrustum PixCraft::computeViewFrustum(float fovy, float screenRatio, float near, float far, glm::vec3 pos, glm::vec3 orient) {
 	float fovx = 2*atan(screenRatio * tan(fovy / 2));
 	ViewFrustum vf;
 	glm::vec3 forward(0.0f, 0.0f, -1.0f);
@@ -36,7 +38,7 @@ ViewFrustum computeViewFrustum(float fovy, float screenRatio, float near, float 
 	return vf;
 }
 
-bool isVisible(ViewFrustum& vf, int32_t chunkX, int32_t chunkZ) {
+bool PixCraft::isVisible(ViewFrustum& vf, int32_t chunkX, int32_t chunkZ) {
 	glm::vec3 corner(CHUNK_SIZE*chunkX - 0.5, -0.5, CHUNK_SIZE*chunkZ - 0.5);
 	
 	glm::vec3 nPoint;

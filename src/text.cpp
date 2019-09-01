@@ -9,6 +9,7 @@
 #include <array>
 #include <algorithm>
 
+using namespace PixCraft;
 
 void TextRenderer::init() {
 	if(FT_Init_FreeType(&ft))
