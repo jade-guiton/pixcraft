@@ -1,4 +1,4 @@
-namespace serialize;
+namespace PixCraft.Serializer;
 
 enum BlockType:uint16 {
   Air,

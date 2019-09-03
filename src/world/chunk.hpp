@@ -5,6 +5,7 @@
 #include <tuple>
 
 #include "world_module.hpp"
+#include "../serializer_generated.h"
 
 namespace PixCraft {
 	#define CHUNK_BLOCKS (CHUNK_SIZE*CHUNK_SIZE*CHUNK_HEIGHT)
@@ -16,6 +17,8 @@ namespace PixCraft {
 	public:
 		Chunk();
 		void init(World* world);
+		
+		flatbuffers::Offset<Serializer::Chunk> serialize(int32_t chunkX, int32_t chunkZ, flatbuffers::FlatBufferBuilder& builder);
 		
 		bool hasBlock(uint8_t x, uint8_t y, uint8_t z);
 		Block* getBlock(uint8_t x, uint8_t y, uint8_t z);

@@ -1,7 +1,9 @@
 src/glad.cpp
 src/shaders_src.cpp
 src/commit_hash.cpp
+src/serializer_generated.h
 obj
+data
 *.exe
 *.sublime-project
 *.sublime-workspace
