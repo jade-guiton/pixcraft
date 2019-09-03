@@ -21,6 +21,8 @@ namespace PixCraft {
 		
 		World();
 		
+		void saveToFile();
+		
 		// Chunks
 		static bool isValidHeight(int32_t y);
 		static std::pair<int32_t, int32_t> getChunkPosAt(int32_t x, int32_t z);

@@ -204,6 +204,9 @@ void GameClient::executeCommand() {
 	} else if(commandBuffer.compare("closer") == 0) {
 		if(renderDist > 1)
 			setRenderDistance(renderDist - 1);
+	} else if(commandBuffer.compare("save") == 0) {
+		world.saveToFile();
+		std::cout << "Saved world to file." << std::endl;
 	} else {
 		std::cout << "Unrecognized command: " << commandBuffer << std::endl;
 	}

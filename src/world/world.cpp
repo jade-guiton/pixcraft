@@ -1,13 +1,40 @@
 #include "world.hpp"
 
 #include <cmath>
+#include <fstream>
 
 #include "blocks.hpp"
 #include "mob.hpp"
 
+#include "../serializer_generated.h"
+
 using namespace PixCraft;
 
 World::World() { }
+
+void World::saveToFile() {
+	flatbuffers::FlatBufferBuilder builder;
+	
+	std::vector<flatbuffers::Offset<Serializer::Chunk>> chunkOffsets;
+	for(auto& pair : loadedChunks) {
+		int32_t chunkX, chunkZ;
+		std::tie(chunkX, chunkZ) = unpackCoords(pair.first);
+		chunkOffsets.push_back(pair.second.serialize(chunkX, chunkZ, builder));
+	}
+	auto chunkVector = builder.CreateVector(chunkOffsets);
+	
+	std::vector<flatbuffers::Offset<void>> mobOffsets;
+	std::vector<uint8_t> mobTypes;
+	auto mobVector = builder.CreateVector(mobOffsets);
+	auto mobTypeVector = builder.CreateVector(mobTypes);
+	auto world = Serializer::CreateWorld(builder, chunkVector, mobTypeVector, mobVector);
+	
+	builder.Finish(world);
+	std::ofstream file("data/world.bin", std::ios::binary);
+	uint8_t* buf = builder.GetBufferPointer();
+	file.write(reinterpret_cast<const char*>(buf), builder.GetSize());
+	file.close();
+}
 
 bool World::isValidHeight(int32_t y) {
 	return 0 <= y && y < CHUNK_HEIGHT;
