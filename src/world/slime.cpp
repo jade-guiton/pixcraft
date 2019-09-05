@@ -27,3 +27,12 @@ void Slime::update(float dt) {
 	}
 	Mob::update(dt);
 }
+
+flatbuffers::Offset<void> Slime::serialize(flatbuffers::FlatBufferBuilder& builder) {
+	auto mobBase = serializeMobBase(builder);
+	return Serializer::CreateSlime(builder, mobBase).Union();
+}
+
+uint8_t Slime::serializedType() {
+	return Serializer::Mob_Slime;
+}

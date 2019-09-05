@@ -25,6 +25,10 @@ void World::saveToFile() {
 	
 	std::vector<flatbuffers::Offset<void>> mobOffsets;
 	std::vector<uint8_t> mobTypes;
+	for(auto& mobPointer : mobs) {
+		mobOffsets.push_back(mobPointer->serialize(builder));
+		mobTypes.push_back(mobPointer->serializedType());
+	}
 	auto mobVector = builder.CreateVector(mobOffsets);
 	auto mobTypeVector = builder.CreateVector(mobTypes);
 	auto world = Serializer::CreateWorld(builder, chunkVector, mobTypeVector, mobVector);
