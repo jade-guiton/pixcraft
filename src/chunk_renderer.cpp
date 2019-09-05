@@ -133,6 +133,10 @@ size_t ChunkRenderer::renderedChunkCount() {
 	return renderedChunks.size();
 }
 
+void ChunkRenderer::reset() {
+	renderedChunks.clear();
+}
+
 void ChunkRenderer::updateBlocks() {
 	std::unordered_set<uint64_t> updatedChunks;
 	

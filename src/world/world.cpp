@@ -97,6 +97,10 @@ BlockPosSet World::retrieveDirtyBlocks() {
 	return res;
 }
 
+void World::markChunkDirty(int32_t chunkX, int32_t chunkZ) {
+	dirtyChunks.insert(packCoords(chunkX, chunkZ));
+}
+
 std::unordered_set<uint64_t> World::retrieveDirtyChunks() {
 	std::unordered_set<uint64_t> res;
 	res.swap(dirtyChunks);

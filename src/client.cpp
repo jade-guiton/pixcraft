@@ -204,6 +204,8 @@ void GameClient::executeCommand() {
 	} else if(commandBuffer.compare("closer") == 0) {
 		if(renderDist > 1)
 			setRenderDistance(renderDist - 1);
+	} else if(commandBuffer.compare("rerender") == 0) {
+		chunkRenderer.reset();
 	} else if(commandBuffer.compare("save") == 0) {
 		world.saveToFile();
 		std::cout << "Saved world to file." << std::endl;
@@ -289,6 +291,9 @@ void GameClient::update(float dt) {
 			int z = iter.getZ();
 			if(!world.isChunkLoaded(x, z)) {
 				world.genChunk(x, z);
+				loads++;
+			} else if(!chunkRenderer.isChunkRendered(x, z)) {
+				world.markChunkDirty(x, z);
 				loads++;
 			}
 			if(loads >= LOADS_PER_FRAME) break;
