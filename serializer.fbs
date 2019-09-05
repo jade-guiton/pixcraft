@@ -40,7 +40,7 @@ table Chunk {
   chunk_x:int32;
   chunk_z:int32;
   blocks:[BlockType];
-  update_requests:[uint32];
+  scheduled_updates:[uint32];
 }
 
 table World {

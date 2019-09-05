@@ -21,8 +21,8 @@ void Chunk::init(World* world2) { world = world2; }
 
 flatbuffers::Offset<Serializer::Chunk> Chunk::serialize(int32_t chunkX, int32_t chunkZ, flatbuffers::FlatBufferBuilder& builder) {
 	auto blockVector = builder.CreateVector(blocks, CHUNK_BLOCKS);
-	std::vector<uint32_t> updateRequests(updateRequests.begin(), updateRequests.end());
-	auto updateVector = builder.CreateVector(updateRequests);
+	std::vector<uint32_t> scheduledUpdates(scheduledUpdates.begin(), scheduledUpdates.end());
+	auto updateVector = builder.CreateVector(scheduledUpdates);
 	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector, updateVector);
 }
 
@@ -55,12 +55,12 @@ void Chunk::removeBlock(uint8_t x, uint8_t y, uint8_t z) {
 
 void Chunk::requestUpdate(uint8_t x, uint8_t y, uint8_t z) {
 	if(INVALID_BLOCK_POS(x, y, z)) return;
-	updateRequests.insert(blockIdx(x, y, z));
+	scheduledUpdates.insert(blockIdx(x, y, z));
 }
 
 void Chunk::updateBlocks(int32_t chunkX, int32_t chunkZ) {
 	std::unordered_set<uint32_t> updates;
-	updateRequests.swap(updates);
+	scheduledUpdates.swap(updates);
 	for(uint32_t blockIdx : updates) {
 		BlockId id = blocks[blockIdx];
 		if(id != 0) {

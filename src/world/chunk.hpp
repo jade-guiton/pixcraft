@@ -37,6 +37,6 @@ namespace PixCraft {
 		
 		BlockId blocks[CHUNK_BLOCKS];
 		bool opaqueCubeCache[CHUNK_BLOCKS];
-		std::unordered_set<uint32_t> updateRequests;
+		std::unordered_set<uint32_t> scheduledUpdates;
 	};
 }

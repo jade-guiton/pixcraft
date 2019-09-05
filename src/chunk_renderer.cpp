@@ -38,8 +38,6 @@ void RenderedChunk::prerender() {
 			}
 		}
 	}
-	
-	updateBuffers();
 }
 
 void RenderedChunk::updateBuffers() {
@@ -135,44 +133,22 @@ size_t ChunkRenderer::renderedChunkCount() {
 	return renderedChunks.size();
 }
 
-void ChunkRenderer::prerenderChunk(int32_t chunkX, int32_t chunkZ) {
-	uint64_t key = packCoords(chunkX, chunkZ);
-	RenderedChunk& renderedChunk = renderedChunks[key];
-	if(!renderedChunk.isInitialized())
-		renderedChunk.init(world, faceRenderer, chunkX, chunkZ);
-	renderedChunk.prerender();
-	
-	// Update nearby chunks
-	auto chunkIter = renderedChunks.find(packCoords(chunkX - 1, chunkZ));
-	if(chunkIter != renderedChunks.end()) {
-		chunkIter->second.updatePlaneX(CHUNK_SIZE - 1);
-		chunkIter->second.updateBuffers();
-	}
-	chunkIter = renderedChunks.find(packCoords(chunkX + 1, chunkZ));
-	if(chunkIter != renderedChunks.end()) {
-		chunkIter->second.updatePlaneX(0);
-		chunkIter->second.updateBuffers();
-	}
-	chunkIter = renderedChunks.find(packCoords(chunkX, chunkZ - 1));
-	if(chunkIter != renderedChunks.end()) {
-		chunkIter->second.updatePlaneZ(CHUNK_SIZE - 1);
-		chunkIter->second.updateBuffers();
-	}
-	chunkIter = renderedChunks.find(packCoords(chunkX, chunkZ + 1));
-	if(chunkIter != renderedChunks.end()) {
-		chunkIter->second.updatePlaneZ(0);
-		chunkIter->second.updateBuffers();
-	}
-}
-
 void ChunkRenderer::updateBlocks() {
-	int32_t x, y, z;
 	std::unordered_set<uint64_t> updatedChunks;
+	
+	std::unordered_set<uint64_t> toPrerender = world.retrieveDirtyChunks();
+	for(uint64_t chunkIdx : toPrerender) {
+		int32_t chunkX, chunkZ;
+		std::tie(chunkX, chunkZ) = unpackCoords(chunkIdx);
+		prerenderChunk(updatedChunks, chunkX, chunkZ);
+	}
+	
 	BlockPosSet toUpdate = world.retrieveDirtyBlocks();
 	BlockPosSet neighbors;
+	int32_t x, y, z;
 	for(BlockPos blockPos : toUpdate) {
+		std::tie(x, y, z) = blockPos;
 		for(int side = 0; side < 6; ++side) {
-			std::tie(x, y, z) = blockPos;
 			neighbors.emplace(x + sideVectors[side][0], y + sideVectors[side][1], z + sideVectors[side][2]);
 		}
 	}
@@ -181,6 +157,7 @@ void ChunkRenderer::updateBlocks() {
 		std::tie(x, y, z) = blockPos;
 		updateBlock(updatedChunks, x, y, z);
 	}
+	
 	for(uint64_t chunkIdx : updatedChunks) {
 		renderedChunks[chunkIdx].updateBuffers();
 	}
@@ -216,6 +193,38 @@ void ChunkRenderer::renderTranslucent(int32_t camChunkX, int32_t camChunkZ, int 
 	}
 	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
+}
+
+void ChunkRenderer::prerenderChunk(std::unordered_set<uint64_t>& updated, int32_t chunkX, int32_t chunkZ) {
+	uint64_t key = packCoords(chunkX, chunkZ);
+	RenderedChunk& renderedChunk = renderedChunks[key];
+	if(!renderedChunk.isInitialized())
+		renderedChunk.init(world, faceRenderer, chunkX, chunkZ);
+	renderedChunk.prerender();
+	updated.insert(key);
+	
+	// Update nearby chunks
+	key = packCoords(chunkX - 1, chunkZ);
+	std::unordered_map<uint64_t, RenderedChunk>::iterator chunkIter;
+	if((chunkIter = renderedChunks.find(key)) != renderedChunks.end()) {
+		chunkIter->second.updatePlaneX(CHUNK_SIZE - 1);
+		updated.insert(key);
+	}
+	key = packCoords(chunkX + 1, chunkZ);
+	if((chunkIter = renderedChunks.find(key)) != renderedChunks.end()) {
+		chunkIter->second.updatePlaneX(0);
+		updated.insert(key);
+	}
+	key = packCoords(chunkX, chunkZ - 1);
+	if((chunkIter = renderedChunks.find(key)) != renderedChunks.end()) {
+		chunkIter->second.updatePlaneZ(CHUNK_SIZE - 1);
+		updated.insert(key);
+	}
+	key = packCoords(chunkX, chunkZ + 1);
+	if((chunkIter = renderedChunks.find(key)) != renderedChunks.end()) {
+		chunkIter->second.updatePlaneZ(0);
+		updated.insert(key);
+	}
 }
 
 void ChunkRenderer::updateBlock(std::unordered_set<uint64_t>& updated, int32_t x, int32_t y, int32_t z) {
