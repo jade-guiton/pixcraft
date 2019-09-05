@@ -6,6 +6,7 @@
 
 #include "world_module.hpp"
 #include "mob.hpp"
+#include "../serializer_generated.h"
 
 namespace PixCraft {
 	enum class MovementMode { normal, flying, noClip };
@@ -26,6 +27,9 @@ namespace PixCraft {
 		float getMaxHorSpeed();
 		
 		void handleKeys(std::tuple<int,int,bool,bool> mvtKeys, float dt);
+		
+		flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) override;
+		uint8_t serializedType() override;
 		
 	private:
 		MovementMode _movementMode;

@@ -5,6 +5,7 @@
 #include "../glm.hpp"
 
 #include "world_module.hpp"
+#include "../serializer_generated.h"
 
 namespace PixCraft {
 	constexpr float GRAVITY = 32.0f;
@@ -27,6 +28,9 @@ namespace PixCraft {
 		
 		virtual void update(float dt);
 		
+		virtual flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) = 0;
+		virtual uint8_t serializedType() = 0;
+		
 	protected:
 		World& world;
 		
@@ -41,5 +45,7 @@ namespace PixCraft {
 		glm::vec3 _speed;
 		
 		Mob(World& world, float height, float radius, bool canFly, bool collidesWithBlocks, glm::vec3 pos, glm::vec3 orient);
+		
+		flatbuffers::Offset<Serializer::MobBase> serializeMobBase(flatbuffers::FlatBufferBuilder& builder);
 	};
 }

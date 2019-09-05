@@ -101,3 +101,18 @@ void Player::handleKeys(std::tuple<int,int,bool,bool> mvtKeys, float dt) {
 		}
 	}
 }
+
+flatbuffers::Offset<void> Player::serialize(flatbuffers::FlatBufferBuilder& builder) {
+	auto mobBase = serializeMobBase(builder);
+	Serializer::MovementMode movementMode;
+	switch(_movementMode) {
+	case MovementMode::normal: movementMode = Serializer::MovementMode_Normal; break;
+	case MovementMode::flying: movementMode = Serializer::MovementMode_Flying; break;
+	case MovementMode::noClip: movementMode = Serializer::MovementMode_NoClip; break;
+	}
+	return Serializer::CreatePlayer(builder, mobBase, movementMode).Union();
+}
+
+uint8_t Player::serializedType() {
+	return Serializer::Mob_Player;
+}

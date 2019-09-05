@@ -108,3 +108,10 @@ void Mob::update(float dt) {
 Mob::Mob(World& world, float height, float radius, bool canFly, bool collidesWithBlocks, glm::vec3 pos, glm::vec3 orient)
 	: world(world), height(height), radius(radius), canFly(canFly), collidesWithBlocks(collidesWithBlocks), onGround(false),
 	  _pos(pos), _orient(orient), _speed(0.0) {}
+
+flatbuffers::Offset<Serializer::MobBase> Mob::serializeMobBase(flatbuffers::FlatBufferBuilder& builder) {
+	auto pos = Serializer::Vec3(_pos.x, _pos.y, _pos.z);
+	auto orient = Serializer::Vec3(_orient.x, _orient.y, _orient.z);
+	auto speed = Serializer::Vec3(_speed.x, _speed.y, _speed.z);
+	return Serializer::CreateMobBase(builder, &pos, &orient, &speed);
+}

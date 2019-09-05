@@ -11,5 +11,8 @@ namespace PixCraft {
 		Slime(World& world, glm::vec3 pos);
 		
 		void update(float dt) override;
+		
+		flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) override;
+		uint8_t serializedType() override;
 	};
 }

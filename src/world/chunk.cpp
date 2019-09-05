@@ -21,7 +21,9 @@ void Chunk::init(World* world2) { world = world2; }
 
 flatbuffers::Offset<Serializer::Chunk> Chunk::serialize(int32_t chunkX, int32_t chunkZ, flatbuffers::FlatBufferBuilder& builder) {
 	auto blockVector = builder.CreateVector(blocks, CHUNK_BLOCKS);
-	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector);
+	std::vector<uint32_t> updateRequests(updateRequests.begin(), updateRequests.end());
+	auto updateVector = builder.CreateVector(updateRequests);
+	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector, updateVector);
 }
 
 bool Chunk::hasBlock(uint8_t x, uint8_t y, uint8_t z) {
