@@ -277,11 +277,6 @@ void GameClient::update(float dt) {
 	input.clearJustScrolled();
 	input.clearJustPressed();
 	
-	world.updateBlocks();
-	chunkRenderer.updateBlocks();
-	
-	world.updateEntities(dt);
-	
 	int32_t camX, camY, camZ;
 	std::tie(camX, camY, camZ) = getBlockCoordsAt(player->pos());
 	int32_t camChunkX, camChunkZ;
@@ -296,14 +291,15 @@ void GameClient::update(float dt) {
 				world.genChunk(x, z);
 				loads++;
 			}
-			if(!chunkRenderer.isChunkRendered(x, z)) {
-				chunkRenderer.prerenderChunk(x, z);
-				loads++;
-			}
 			if(loads >= LOADS_PER_FRAME) break;
 		}
 		iter.next();
 	}
+	
+	world.updateBlocks();
+	chunkRenderer.updateBlocks();
+	
+	world.updateEntities(dt);
 }
 
 void printElapsedTime(const char* operation, double before) {

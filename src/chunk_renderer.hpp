@@ -41,7 +41,6 @@ namespace PixCraft {
 		bool isChunkRendered(int32_t chunkX, int32_t chunkZ);
 		size_t renderedChunkCount();
 		
-		void prerenderChunk(int32_t chunkX, int32_t chunkZ);
 		void updateBlocks();
 		
 		void render(int32_t camChunkX, int32_t chamChunkZ, int renderDist, ViewFrustum& vf);
@@ -53,6 +52,7 @@ namespace PixCraft {
 		
 		std::unordered_map<uint64_t, RenderedChunk> renderedChunks;
 		
+		void prerenderChunk(std::unordered_set<uint64_t>& updated, int32_t chunkX, int32_t chunkZ);
 		void updateBlock(std::unordered_set<uint64_t>& updated, int32_t x, int32_t y, int32_t z);
 	};
 }

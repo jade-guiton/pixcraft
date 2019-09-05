@@ -70,6 +70,7 @@ Chunk& World::genChunk(int32_t x, int32_t z) {
 	Chunk& chunk = loadedChunks[key];
 	chunk.init(this);
 	gen.generateChunk(chunk, x, z);
+	dirtyChunks.insert(key);
 	return chunk;
 }
 
@@ -96,6 +97,12 @@ BlockPosSet World::retrieveDirtyBlocks() {
 	return res;
 }
 
+std::unordered_set<uint64_t> World::retrieveDirtyChunks() {
+	std::unordered_set<uint64_t> res;
+	res.swap(dirtyChunks);
+	return res;
+}
+
 void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
 	if(!isValidHeight(y)) return;
 	Chunk* chunk; int relX, relZ;
@@ -103,7 +110,7 @@ void World::requestUpdate(int32_t x, int32_t y, int32_t z) {
 	// TODO: if chunk doesn't exist yet, stash the update maybe?
 	if(chunk == nullptr) return;
 	chunk->requestUpdate(relX, y, relZ);
-	updateRequests.insert(getChunkIdxAt(x, z));
+	scheduledUpdates.insert(getChunkIdxAt(x, z));
 }
 
 void World::requestUpdatesAround(int32_t x, int32_t y, int32_t z) {
@@ -114,7 +121,7 @@ void World::requestUpdatesAround(int32_t x, int32_t y, int32_t z) {
 
 void World::updateBlocks() {
 	std::unordered_set<uint64_t> updates;
-	updateRequests.swap(updates);
+	scheduledUpdates.swap(updates);
 	for(uint64_t chunkIdx : updates) {
 		int32_t chunkX, chunkZ;
 		std::tie(chunkX, chunkZ) = unpackCoords(chunkIdx);

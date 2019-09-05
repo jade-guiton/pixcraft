@@ -37,6 +37,7 @@ namespace PixCraft {
 		// Block updates
 		void markDirty(int32_t x, int32_t y, int32_t z);
 		BlockPosSet retrieveDirtyBlocks();
+		std::unordered_set<uint64_t> retrieveDirtyChunks();
 		void requestUpdate(int32_t x, int32_t y, int32_t z);
 		void requestUpdatesAround(int32_t x, int32_t y, int32_t z);
 		void updateBlocks();
@@ -78,7 +79,9 @@ namespace PixCraft {
 		WorldGenerator gen;
 		
 		std::unordered_map<uint64_t, Chunk> loadedChunks;
-		std::unordered_set<uint64_t> updateRequests;
+		std::unordered_set<uint64_t> scheduledUpdates;
+		
 		BlockPosSet dirtyBlocks;
+		std::unordered_set<uint64_t> dirtyChunks;
 	};
 }
