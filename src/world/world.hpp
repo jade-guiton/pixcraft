@@ -37,6 +37,7 @@ namespace PixCraft {
 		// Block updates
 		void markDirty(int32_t x, int32_t y, int32_t z);
 		BlockPosSet retrieveDirtyBlocks();
+		void markChunkDirty(int32_t chunkX, int32_t chunkZ);
 		std::unordered_set<uint64_t> retrieveDirtyChunks();
 		void requestUpdate(int32_t x, int32_t y, int32_t z);
 		void requestUpdatesAround(int32_t x, int32_t y, int32_t z);

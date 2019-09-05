@@ -41,6 +41,8 @@ namespace PixCraft {
 		bool isChunkRendered(int32_t chunkX, int32_t chunkZ);
 		size_t renderedChunkCount();
 		
+		void reset();
+		
 		void updateBlocks();
 		
 		void render(int32_t camChunkX, int32_t chamChunkZ, int renderDist, ViewFrustum& vf);
