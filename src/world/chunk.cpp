@@ -1,6 +1,7 @@
 #include "chunk.hpp"
 
 #include <stdexcept>
+#include <algorithm>
 
 #include "blocks.hpp"
 #include "world.hpp"
@@ -24,6 +25,17 @@ flatbuffers::Offset<Serializer::Chunk> Chunk::serialize(int32_t chunkX, int32_t 
 	std::vector<uint32_t> scheduledUpdates(scheduledUpdates.begin(), scheduledUpdates.end());
 	auto updateVector = builder.CreateVector(scheduledUpdates);
 	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector, updateVector);
+}
+
+void Chunk::unserialize(const Serializer::Chunk* chunkData) {
+	if(chunkData->blocks()->Length() != CHUNK_BLOCKS) {
+		throw std::runtime_error("Wrong number of blocks in loaded chunk");
+	}
+	std::copy(chunkData->blocks()->begin(), chunkData->blocks()->end(), blocks);
+	for(int i = 0; i < CHUNK_BLOCKS; ++i) {
+		opaqueCubeCache[i] = blocks[i] == 0 ? false : Block::fromId(blocks[i]).rendering() == BlockRendering::opaqueCube;
+	}
+	scheduledUpdates.insert(chunkData->scheduled_updates()->begin(), chunkData->scheduled_updates()->end());
 }
 
 bool Chunk::hasBlock(uint8_t x, uint8_t y, uint8_t z) {

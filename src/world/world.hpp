@@ -5,6 +5,7 @@
 #include <utility>
 #include <tuple>
 #include <vector>
+#include <string>
 
 #include "../glm.hpp"
 
@@ -21,7 +22,8 @@ namespace PixCraft {
 		
 		World();
 		
-		void saveToFile();
+		void saveToFile(std::string path);
+		Player* loadFromFile(std::string path);
 		
 		// Chunks
 		static bool isValidHeight(int32_t y);

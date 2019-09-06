@@ -207,8 +207,12 @@ void GameClient::executeCommand() {
 	} else if(commandBuffer.compare("rerender") == 0) {
 		chunkRenderer.reset();
 	} else if(commandBuffer.compare("save") == 0) {
-		world.saveToFile();
+		world.saveToFile("data/world.bin");
 		std::cout << "Saved world to file." << std::endl;
+	} else if(commandBuffer.compare("load") == 0) {
+		player = world.loadFromFile("data/world.bin");
+		chunkRenderer.reset();
+		std::cout << "Loaded world from file." << std::endl;
 	} else {
 		std::cout << "Unrecognized command: " << commandBuffer << std::endl;
 	}

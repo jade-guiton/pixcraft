@@ -19,6 +19,7 @@ namespace PixCraft {
 		void init(World* world);
 		
 		flatbuffers::Offset<Serializer::Chunk> serialize(int32_t chunkX, int32_t chunkZ, flatbuffers::FlatBufferBuilder& builder);
+		void unserialize(const Serializer::Chunk* chunkData);
 		
 		bool hasBlock(uint8_t x, uint8_t y, uint8_t z);
 		Block* getBlock(uint8_t x, uint8_t y, uint8_t z);

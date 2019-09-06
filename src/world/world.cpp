@@ -2,9 +2,12 @@
 
 #include <cmath>
 #include <fstream>
+#include <iostream>
+#include <stdexcept>
 
 #include "blocks.hpp"
 #include "mob.hpp"
+#include "player.hpp"
 
 #include "../serializer_generated.h"
 
@@ -12,7 +15,7 @@ using namespace PixCraft;
 
 World::World() { }
 
-void World::saveToFile() {
+void World::saveToFile(std::string path) {
 	flatbuffers::FlatBufferBuilder builder;
 	
 	std::vector<flatbuffers::Offset<Serializer::Chunk>> chunkOffsets;
@@ -34,10 +37,47 @@ void World::saveToFile() {
 	auto world = Serializer::CreateWorld(builder, chunkVector, mobTypeVector, mobVector);
 	
 	builder.Finish(world);
-	std::ofstream file("data/world.bin", std::ios::binary);
+	std::ofstream file(path.c_str(), std::ios::binary);
 	uint8_t* buf = builder.GetBufferPointer();
 	file.write(reinterpret_cast<const char*>(buf), builder.GetSize());
 	file.close();
+}
+
+Player* World::loadFromFile(std::string path) {
+	std::ifstream file(path.c_str(), std::ios::binary | std::ios::ate);
+	std::ifstream::pos_type size = file.tellg();
+	file.seekg(0, std::ios::beg);
+	
+	std::vector<uint8_t> buffer(size);
+	if(!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+		throw std::runtime_error("Can't load world file!");
+	}
+	
+	auto world = Serializer::GetWorld(buffer.data());
+	
+	loadedChunks.clear();
+	scheduledUpdates.clear();
+	dirtyBlocks.clear();
+	dirtyChunks.clear();
+	mobs.clear();
+	
+	auto chunks = world->chunks();
+	auto chunkCount = chunks->Length();
+	for(unsigned int i = 0; i < chunkCount; ++i) {
+		const Serializer::Chunk* chunkData = chunks->Get(i);
+		int32_t chunkX = chunkData->chunk_x();
+		int32_t chunkZ = chunkData->chunk_z();
+		uint64_t key = packCoords(chunkX, chunkZ);
+		Chunk& chunk = loadedChunks[key];
+		chunk.init(this);
+		chunk.unserialize(chunkData);
+		if(chunkData->scheduled_updates()->Length() != 0) {
+			scheduledUpdates.insert(key);
+		}
+	}
+	
+	mobs.emplace_back(new Player(*this, glm::vec3(8.0f, 50.0f, 8.0f)));
+	return (Player*) mobs.back().get();
 }
 
 bool World::isValidHeight(int32_t y) {
