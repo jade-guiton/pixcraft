@@ -241,7 +241,7 @@ std::tuple<bool, int,int,int> World::raycast(glm::vec3 pos, glm::vec3 dir, float
 		hit = hitFluids ? hasBlock(ray.getX(), ray.getY(), ray.getZ())
 	                    : hasSolidBlock(ray.getX(), ray.getY(), ray.getZ());;
 	}
-	if(hit) {
+	if(hit && ray.getDistance() <= maxDist) {
 		int32_t x = ray.getX();
 		int32_t y = ray.getY();
 		int32_t z = ray.getZ();

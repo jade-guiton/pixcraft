@@ -114,6 +114,7 @@ int PixCraft::Ray::getLastFace() { return lastFace; }
 
 void PixCraft::Ray::nextFace() {
 	if(tMaxX < tMaxY && tMaxX < tMaxZ) { // next face on X axis
+		dist = tMaxX;
 		tMaxX += tDeltaX;
 		x += stepX;
 		lastFace = 2 + stepX; // west or east faces
