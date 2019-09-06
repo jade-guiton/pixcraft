@@ -34,7 +34,7 @@ namespace PixCraft {
 		
 		static const int LOADS_PER_FRAME = 1;
 		
-		static constexpr float PLAYER_REACH = 3.0f;
+		static constexpr float PLAYER_REACH = 5.0f;
 		
 		GLFWwindow* window;
 		
