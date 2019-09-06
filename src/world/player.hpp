@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tuple>
+#include <memory>
 
 #include "../glm.hpp"
 
@@ -30,6 +31,8 @@ namespace PixCraft {
 		
 		flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) override;
 		uint8_t serializedType() override;
+		
+		static std::unique_ptr<Player> unserialize(World& world, const Serializer::Player* playerData);
 		
 	private:
 		MovementMode _movementMode;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include <memory>
 
 #include "../glm.hpp"
 
@@ -31,6 +32,8 @@ namespace PixCraft {
 		virtual flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) = 0;
 		virtual uint8_t serializedType() = 0;
 		
+		static std::unique_ptr<Mob> unserialize(World& world, const void* mobData, uint8_t mobType);
+		
 	protected:
 		World& world;
 		
@@ -47,5 +50,6 @@ namespace PixCraft {
 		Mob(World& world, float height, float radius, bool canFly, bool collidesWithBlocks, glm::vec3 pos, glm::vec3 orient);
 		
 		flatbuffers::Offset<Serializer::MobBase> serializeMobBase(flatbuffers::FlatBufferBuilder& builder);
+		void unserializeMobBase(const Serializer::MobBase* mobBase);
 	};
 }

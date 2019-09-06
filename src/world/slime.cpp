@@ -36,3 +36,9 @@ flatbuffers::Offset<void> Slime::serialize(flatbuffers::FlatBufferBuilder& build
 uint8_t Slime::serializedType() {
 	return Serializer::Mob_Slime;
 }
+
+std::unique_ptr<Slime> Slime::unserialize(World& world, const Serializer::Slime* slimeData) {
+	std::unique_ptr<Slime> slime(new Slime(world, glm::vec3(0.0,0.0,0.0)));
+	slime->unserializeMobBase(slimeData->mob());
+	return slime;
+}

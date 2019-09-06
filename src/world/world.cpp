@@ -34,7 +34,7 @@ void World::saveToFile(std::string path) {
 	}
 	auto mobVector = builder.CreateVector(mobOffsets);
 	auto mobTypeVector = builder.CreateVector(mobTypes);
-	auto world = Serializer::CreateWorld(builder, chunkVector, mobTypeVector, mobVector);
+	auto world = Serializer::CreateWorld(builder, chunkVector, mobTypeVector, mobVector, gen.seed());
 	
 	builder.Finish(world);
 	std::ofstream file(path.c_str(), std::ios::binary);
@@ -61,6 +61,8 @@ Player* World::loadFromFile(std::string path) {
 	dirtyChunks.clear();
 	mobs.clear();
 	
+	gen = WorldGenerator(world->seed());
+	
 	auto chunks = world->chunks();
 	auto chunkCount = chunks->Length();
 	for(unsigned int i = 0; i < chunkCount; ++i) {
@@ -76,8 +78,19 @@ Player* World::loadFromFile(std::string path) {
 		}
 	}
 	
-	mobs.emplace_back(new Player(*this, glm::vec3(8.0f, 50.0f, 8.0f)));
-	return (Player*) mobs.back().get();
+	auto mobsData = world->mobs();
+	auto mobsType = world->mobs_type();
+	auto mobCount = mobsData->Length();
+	Player* player = nullptr;
+	for(unsigned int i = 0; i < mobCount; ++i) {
+		auto mobType = mobsType->Get(i);
+		mobs.push_back(Mob::unserialize(*this, mobsData->Get(i), mobType));
+		if(player == nullptr && mobType == Serializer::Mob_Player) {
+			player = static_cast<Player*>(mobs.back().get());
+		}
+	}
+	
+	return player;
 }
 
 bool World::isValidHeight(int32_t y) {

@@ -1,11 +1,14 @@
 #include "mob.hpp"
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "../util.hpp"
 
 #include "blocks.hpp"
 #include "world.hpp"
+#include "player.hpp"
+#include "slime.hpp"
 
 using namespace PixCraft;
 
@@ -105,6 +108,17 @@ void Mob::update(float dt) {
 	_pos += dpos;
 }
 
+std::unique_ptr<Mob> Mob::unserialize(World& world, const void* mobData, uint8_t mobType) {
+	switch(mobType) {
+	case Serializer::Mob_Player:
+		return Player::unserialize(world, static_cast<const Serializer::Player*>(mobData));
+	case Serializer::Mob_Slime:
+		return Slime::unserialize(world, static_cast<const Serializer::Slime*>(mobData));
+	default:
+		throw std::runtime_error("Unknown mob type in saved world!");
+	}
+}
+
 Mob::Mob(World& world, float height, float radius, bool canFly, bool collidesWithBlocks, glm::vec3 pos, glm::vec3 orient)
 	: world(world), height(height), radius(radius), canFly(canFly), collidesWithBlocks(collidesWithBlocks), onGround(false),
 	  _pos(pos), _orient(orient), _speed(0.0) {}
@@ -114,4 +128,13 @@ flatbuffers::Offset<Serializer::MobBase> Mob::serializeMobBase(flatbuffers::Flat
 	auto orient = Serializer::Vec3(_orient.x, _orient.y, _orient.z);
 	auto speed = Serializer::Vec3(_speed.x, _speed.y, _speed.z);
 	return Serializer::CreateMobBase(builder, &pos, &orient, &speed);
+}
+
+void Mob::unserializeMobBase(const Serializer::MobBase* mobBase) {
+	auto pos = mobBase->pos();
+	auto orient = mobBase->orient();
+	auto speed = mobBase->speed();
+	_pos = glm::vec3(pos->x(), pos->y(), pos->z());
+	_orient = glm::vec3(orient->x(), orient->y(), orient->z());
+	_speed = glm::vec3(speed->x(), speed->y(), speed->z());
 }

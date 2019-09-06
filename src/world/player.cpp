@@ -116,3 +116,14 @@ flatbuffers::Offset<void> Player::serialize(flatbuffers::FlatBufferBuilder& buil
 uint8_t Player::serializedType() {
 	return Serializer::Mob_Player;
 }
+
+std::unique_ptr<Player> Player::unserialize(World& world, const Serializer::Player* playerData) {
+	std::unique_ptr<Player> player(new Player(world, glm::vec3(0.0,0.0,0.0)));
+	player->unserializeMobBase(playerData->mob());
+	switch(playerData->movement_mode()) {
+	case Serializer::MovementMode_Normal: player->_movementMode = MovementMode::normal; break;
+	case Serializer::MovementMode_Flying: player->_movementMode = MovementMode::flying; break;
+	case Serializer::MovementMode_NoClip: player->_movementMode = MovementMode::noClip; break;
+	}
+	return player;
+}
