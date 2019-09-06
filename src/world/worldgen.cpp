@@ -9,8 +9,12 @@
 
 using namespace PixCraft;
 
-WorldGenerator::WorldGenerator()
-	: seed(generateSeed()), terrainHeightNoise(getFeatureSeed(seed, FeatureType::terrainHeight)) { }
+WorldGenerator::WorldGenerator(uint64_t seed)
+	: _seed(seed), terrainHeightNoise(getFeatureSeed(seed, FeatureType::terrainHeight)) { }
+
+WorldGenerator::WorldGenerator() : WorldGenerator(generateSeed()) { }
+
+uint64_t WorldGenerator::seed() { return _seed; }
 
 void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ) {
 	for(uint8_t relX = 0; relX < CHUNK_SIZE; ++relX) {
@@ -34,7 +38,7 @@ void WorldGenerator::generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ)
 		}
 	}
 	
-	std::vector<float> trees = distributeObjects(getFeatureSeed(seed, FeatureType::trees),
+	std::vector<float> trees = distributeObjects(getFeatureSeed(_seed, FeatureType::trees),
 		chunkX*CHUNK_SIZE - 0.5, chunkZ*CHUNK_SIZE - 0.5, CHUNK_SIZE, 6, 2.5);
 	for(size_t i = 0; i < trees.size(); i += 2) {
 		int32_t x = round(trees[i]);

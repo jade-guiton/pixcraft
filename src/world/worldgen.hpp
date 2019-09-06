@@ -9,12 +9,15 @@
 namespace PixCraft {
 	class WorldGenerator {
 	public:
+		WorldGenerator(uint64_t seed);
 		WorldGenerator();
+		
+		uint64_t seed();
 		
 		void generateChunk(Chunk& chunk, int32_t chunkX, int32_t chunkZ);
 
 	private:
-		uint64_t seed;
+		uint64_t _seed;
 		OpenSimplexNoise terrainHeightNoise;
 		
 		static const uint8_t WATER_LEVEL = 30;

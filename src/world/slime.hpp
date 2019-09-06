@@ -14,5 +14,7 @@ namespace PixCraft {
 		
 		flatbuffers::Offset<void> serialize(flatbuffers::FlatBufferBuilder& builder) override;
 		uint8_t serializedType() override;
+		
+		static std::unique_ptr<Slime> unserialize(World& world, const Serializer::Slime* slimeData);
 	};
 }

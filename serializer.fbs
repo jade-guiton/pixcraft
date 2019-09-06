@@ -46,6 +46,7 @@ table Chunk {
 table World {
   chunks:[Chunk];
   mobs:[Mob];
+  seed:uint64;
 }
 
 root_type World;
