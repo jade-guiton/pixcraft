@@ -36,13 +36,13 @@ pixcraft.exe: getCommitHash $(OBJ_FILES)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
-$(SRC_DIR)/client/shaders_src.cpp: include_shader_code.py $(GLSL_DIR)/*
+$(SRC_DIR)/pixcraft/client/shaders_src.cpp: include_shader_code.py $(GLSL_DIR)/*
 	python include_shader_code.py
 
 getCommitHash: get_commit_hash.py
 	python get_commit_hash.py
 
-$(SRC_DIR)/serializer_generated.h: serializer.fbs
+$(SRC_DIR)/pixcraft/util/serializer_generated.h: serializer.fbs
 	flatc -c -o $(SRC_DIR) serializer.fbs
 
 -include $(OBJ_FILES:.o=.d)

@@ -66,6 +66,30 @@ const std::array<unsigned int, 24> blockOverlayIndices = {
 	3, 5,  3, 6
 };
 
+const std::array<unsigned int, 54> buttonIndices = {
+	0, 1, 2,     2, 1, 3,
+	1, 5, 3,     3, 5, 7,
+	5, 4, 7,     7, 4, 6,
+	7, 6, 15,    15, 6, 14,
+	15, 14, 13,  13, 14, 12,
+	11, 15, 9,   9, 15, 13,
+	10, 11, 8,   8, 11, 9,
+	2, 3, 10,    10, 3, 11,
+	3, 7, 11,    11, 7, 15
+};
+
+void createButtonBuffer(IndexBuffer<glm::vec2, glm::vec2>& buffer, float x, float y, float w, float h, float cs) {
+	const std::array<float, 64> buttonVertices {
+		-w, -h, 0, 0,  -w+cs, -h, 0.5, 0,  -w, -h+cs, 0, 0.5,  -w+cs, -h+cs, 0.5, 0.5,
+		 w, -h, 1, 0,   w-cs, -h, 0.5, 0,   w, -h+cs, 1, 0.5,   w-cs, -h+cs, 0.5, 0.5,
+		-w,  h, 0, 1,  -w+cs,  h, 0.5, 1,  -w,  h-cs, 0, 0.5,  -w+cs,  h-cs, 0.5, 0.5,
+		 w,  h, 1, 1,   w-cs,  h, 0.5, 1,   w,  h-cs, 1, 0.5,   w-cs,  h-cs, 0.5, 0.5,
+	};
+	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
+	buffer.loadData(buttonVertices.data(), buttonVertices.size()/4, GL_STATIC_DRAW);
+	buffer.loadIndices(buttonIndices.data(), buttonIndices.size());
+}
+
 GameClient::GameClient()
 	: showDebug(false), paused(false), showCommandLine(false), chunkRenderer(world, faceRenderer), hotbar(faceRenderer),
 	  frameNo(0), FPS(0.0) {
@@ -110,6 +134,10 @@ GameClient::GameClient()
 	blockOverlayBuffer.loadData(blockOverlayVertices.data(), blockOverlayVertices.size()/3, GL_STATIC_DRAW);
 	blockOverlayBuffer.loadIndices(blockOverlayIndices.data(), blockOverlayIndices.size());
 	checkGlErrors("block overlay initialization");
+	
+	buttonProgram.init(ShaderSources::buttonVS, ShaderSources::textureFS);
+	createButtonBuffer(buttonBuffer, 0, 0, 100, 16, 16);
+	checkGlErrors("button rendering initialization");
 	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
@@ -424,6 +452,17 @@ void GameClient::render() {
 		colorOverlayBuffer.unbind();
 		colorOverlayProgram.unuse();
 		checkGlErrors("pause menu overlay rendering");
+		
+		buttonProgram.use();
+		buttonProgram.setUniform("winSize", (float) width, (float) height);
+		buttonProgram.setUniform("tex", (uint32_t) 0);
+		TextureManager::bindOtherTextures(TextureManager::BUTTON);
+		buttonBuffer.bind();
+		glDrawElements(GL_TRIANGLES, buttonBuffer.indexCount(), GL_UNSIGNED_INT, 0);
+		buttonBuffer.unbind();
+		buttonProgram.unuse();
+		textRenderer.renderText("Test Button", width/2 - 43, height/2 + 3, 1.0, glm::vec3(0.0, 0.0, 0.0));
+		checkGlErrors("button rendering");
 	}
 	
 	if(showDebug) {

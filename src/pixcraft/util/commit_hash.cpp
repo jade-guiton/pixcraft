@@ -1,3 +1,3 @@
 #include "pixcraft/util/version.hpp"
 
-const char* PixCraft::COMMIT_HASH = "e7fc3b";
+const char* PixCraft::COMMIT_HASH = "048f56";

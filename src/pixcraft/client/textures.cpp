@@ -42,6 +42,8 @@ namespace PixCraft::TextureManager {
 	
 	const TexId SLIME = requireTexture("entity/slime");
 	
+	const TexId BUTTON = requireTexture("gui/button");
+	
 	void loadTextures() {
 		glGenTextures(1, &blockTextureArray);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, blockTextureArray);
