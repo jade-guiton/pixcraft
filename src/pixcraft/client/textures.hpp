@@ -26,5 +26,7 @@ namespace PixCraft {
 		
 		// Other textures
 		extern const TexId SLIME;
+		
+		extern const TexId BUTTON;
 	};
 }

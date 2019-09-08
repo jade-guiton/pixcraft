@@ -63,6 +63,8 @@ namespace PixCraft {
 		VertexBuffer<glm::vec2> colorOverlayBuffer;
 		ShaderProgram blockOverlayProgram;
 		IndexBuffer<glm::vec3> blockOverlayBuffer;
+		ShaderProgram buttonProgram;
+		IndexBuffer<glm::vec2, glm::vec2> buttonBuffer;
 		
 		int frameNo;
 		int FPS;

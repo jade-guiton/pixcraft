@@ -1,6 +1,6 @@
-with open("src/pixcraft/shaders_src.cpp", "w") as out:
+with open("src/pixcraft/client/shaders_src.cpp", "w") as out:
 	out.write("#include \"shaders.hpp\"\n\n")
-	out.write("namespace ShaderSources {\n\n")
+	out.write("namespace PixCraft::ShaderSources {\n\n")
 	
 	def include(path, shaderName):
 		with open(path) as f:
@@ -22,6 +22,8 @@ with open("src/pixcraft/shaders_src.cpp", "w") as out:
 	include("glsl/cursor.vs", "cursorVS")
 	include("glsl/overlay.vs", "overlayVS")
 	include("glsl/block_overlay.vs", "blockOverlayVS")
+	include("glsl/button.vs", "buttonVS")
 	include("glsl/color.fs", "colorFS")
+	include("glsl/texture.fs", "textureFS")
 	
 	out.write("}\n")

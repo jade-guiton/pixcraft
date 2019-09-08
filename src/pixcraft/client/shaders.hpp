@@ -14,7 +14,9 @@ namespace PixCraft {
 		extern const char *cursorVS;
 		extern const char *overlayVS;
 		extern const char *blockOverlayVS;
+		extern const char *buttonVS;
 		extern const char *colorFS;
+		extern const char *textureFS;
 	}
 	
 	class ShaderProgram {
