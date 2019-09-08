@@ -1,4 +1,4 @@
-with open("src/shaders_src.cpp", "w") as out:
+with open("src/pixcraft/shaders_src.cpp", "w") as out:
 	out.write("#include \"shaders.hpp\"\n\n")
 	out.write("namespace ShaderSources {\n\n")
 	
