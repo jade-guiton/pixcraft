@@ -37,14 +37,12 @@ namespace PixCraft {
 		void renderText(std::string str, float x, float y, float scale, glm::vec3 color);
 		
 	private:
-		static const int FONT_COUNT = 4;
-		
 		static const size_t QUAD_SIZE = 24;
 		static const int BUFFER_SIZE = 32;
 		
 		FT_Library ft;
 		FT_Stroker stroker;
-		FT_Face faces[FONT_COUNT];
+		std::vector<FT_Face> faces;
 		TextureAtlas glyphAtlas;
 		std::unordered_map<uint32_t, CharacterData> characters;
 		
@@ -53,7 +51,7 @@ namespace PixCraft {
 		VertexBuffer<glm::vec2, glm::vec2> buffer;
 		int fontHeight;
 		
-		void loadFont(size_t priority, const char* filename);
+		void loadFont(const char* filename);
 		
 		void prerenderCharacter(uint32_t c);
 		

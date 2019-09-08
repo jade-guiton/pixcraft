@@ -18,13 +18,13 @@ void TextRenderer::init() {
 	FT_Stroker_New(ft, &stroker);
 	FT_Stroker_Set(stroker, 64 * 3/2, FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
 	
-	loadFont(0, "res/font/NotoSans-Regular.ttf");
-	loadFont(1, "res/font/NotoEmoji-Regular.ttf");
-	loadFont(2, "res/font/NotoSansCJKjp-Regular.otf");
-	loadFont(3, "res/font/LastResort.ttf");
+	loadFont("res/font/NotoSans-Regular.ttf");
+	loadFont("res/font/NotoEmoji-Regular.ttf");
+	loadFont("res/font/NotoSansCJKjp-Regular.otf");
+	loadFont("res/font/LastResort.ttf");
 	
 	fontHeight = 16;
-	for(int i = 0; i < FONT_COUNT; ++i) {
+	for(int i = 0; i < faces.size(); ++i) {
 		FT_Set_Pixel_Sizes(faces[i], 0, fontHeight);
 	}
 	
@@ -45,7 +45,7 @@ void TextRenderer::init() {
 }
 
 void TextRenderer::free() {
-	for(int i = 0; i < FONT_COUNT; ++i) {
+	for(int i = 0; i < faces.size(); ++i) {
 		FT_Done_Face(faces[i]);
 	}
 	FT_Done_FreeType(ft);
@@ -108,8 +108,9 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 	program.unuse();
 }
 
-void TextRenderer::loadFont(size_t priority, const char* filename) {
-	if(FT_New_Face(ft, filename, 0, &faces[priority])) {
+void TextRenderer::loadFont(const char* filename) {
+	faces.emplace_back();
+	if(FT_New_Face(ft, filename, 0, &faces.back())) {
 		std::stringstream errorMsg;
 		errorMsg << "Failed to load font " << filename << "." << std::endl;
 		throw std::runtime_error(errorMsg.str());
@@ -119,11 +120,11 @@ void TextRenderer::loadFont(size_t priority, const char* filename) {
 void TextRenderer::prerenderCharacter(uint32_t cp) {
 	int i = 0;
 	FT_UInt glyphIdx;
-	while(i < FONT_COUNT && (glyphIdx = FT_Get_Char_Index(faces[i], cp)) == 0) {
+	while(i < faces.size() && (glyphIdx = FT_Get_Char_Index(faces[i], cp)) == 0) {
 		++i;
 	}
 	
-	if(i == FONT_COUNT || FT_Load_Glyph(faces[i], glyphIdx, FT_LOAD_DEFAULT)) {
+	if(i == faces.size() || FT_Load_Glyph(faces[i], glyphIdx, FT_LOAD_DEFAULT)) {
 		std::stringstream errorMsg;
 		errorMsg << "Failed to load glyph for U+" << std::hex << cp << "." << std::endl;
 		throw std::runtime_error(errorMsg.str());
