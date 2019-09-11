@@ -11,6 +11,7 @@
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
+#include "gui.hpp"
 
 #include "pixcraft/server/world_module.hpp"
 #include "pixcraft/server/world.hpp"
@@ -63,8 +64,8 @@ namespace PixCraft {
 		VertexBuffer<glm::vec2> colorOverlayBuffer;
 		ShaderProgram blockOverlayProgram;
 		IndexBuffer<glm::vec3> blockOverlayBuffer;
-		ShaderProgram buttonProgram;
-		IndexBuffer<glm::vec2, glm::vec2> buttonBuffer;
+		
+		Button testButton;
 		
 		int frameNo;
 		int FPS;

@@ -11,6 +11,8 @@ namespace PixCraft {
 		void loadTextures();
 		void bindBlockTextureArray();
 		void bindOtherTextures(TexId texId);
+		int getTextureWidth(TexId texId);
+		int getTextureHeight(TexId texId);
 		
 		// Block textures
 		extern const TexId PLACEHOLDER;

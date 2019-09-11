@@ -8,6 +8,7 @@
 
 #include <stb_image.h>
 #include "glfw.hpp"
+#include "../util/glm.hpp"
 
 namespace PixCraft::TextureManager {
 	namespace {
@@ -17,6 +18,7 @@ namespace PixCraft::TextureManager {
 		
 		std::vector<std::string> otherTextureFiles;
 		std::vector<GlId> otherTextures;
+		std::vector<glm::uvec2> otherTextureDim;
 		
 		TexId requireBlockTexture(const char* filename) {
 			blockTextureFiles.push_back(std::string(filename));
@@ -86,6 +88,8 @@ namespace PixCraft::TextureManager {
 			glGenerateMipmap(GL_TEXTURE_2D);
 			
 			stbi_image_free(data);
+			
+			otherTextureDim.emplace_back(width, height);
 		}
 		checkGlErrors("texture loading");
 	}
@@ -99,4 +103,7 @@ namespace PixCraft::TextureManager {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, otherTextures[texId]);
 	}
+	
+	int getTextureWidth(TexId texId) { return otherTextureDim[texId].x; }
+	int getTextureHeight(TexId texId) { return otherTextureDim[texId].y; }
 }

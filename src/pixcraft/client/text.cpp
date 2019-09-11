@@ -24,7 +24,8 @@ void TextRenderer::init() {
 	loadFont("res/font/LastResort.ttf");
 	
 	fontHeight = 16;
-	for(int i = 0; i < faces.size(); ++i) {
+	xHeight = 0;
+	for(unsigned int i = 0; i < faces.size(); ++i) {
 		FT_Set_Pixel_Sizes(faces[i], 0, fontHeight);
 	}
 	
@@ -45,7 +46,7 @@ void TextRenderer::init() {
 }
 
 void TextRenderer::free() {
-	for(int i = 0; i < faces.size(); ++i) {
+	for(unsigned int i = 0; i < faces.size(); ++i) {
 		FT_Done_Face(faces[i]);
 	}
 	FT_Done_FreeType(ft);
@@ -55,7 +56,40 @@ void TextRenderer::setViewport(int width, int height) {
 	winWidth = width; winHeight = height;
 }
 
-void TextRenderer::renderText(std::string str, float startX, float startY, float scale, glm::vec3 color) {
+int TextRenderer::getTextWidth(std::string str) {
+	std::string::const_iterator it = str.begin();
+	std::string::const_iterator end = str.end();
+	uint32_t cp;
+	
+	int width = 0;
+	int lineWidth = 0;
+	
+	while(it != end) {
+		cp = utf8::next(it, end);
+		if(cp == '\n') {
+			lineWidth = 0;
+			continue;
+		}
+		
+		if(characters.count(cp) == 0) prerenderCharacter(cp);
+		CharacterData characterData = characters[cp];
+		
+		lineWidth += (characterData.advance >> 6);
+		if(lineWidth > width) width = lineWidth;
+	}
+	
+	return width;
+}
+
+int TextRenderer::getTextHeight() {
+	if(xHeight == 0) {
+		if(characters.count('X') == 0) prerenderCharacter('X');
+		xHeight = characters['X'].height >> 6;
+	}
+	return xHeight;
+}
+
+void TextRenderer::renderText(std::string str, float startX, float startY, glm::vec3 color) {
 	program.use();
 	buffer.bind();
 	
@@ -87,7 +121,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 		if(characters.count(cp) == 0) prerenderCharacter(cp);
 		CharacterData characterData = characters[cp];
 		
-		renderGlyphData(bufferIt, characterData.glyphData, x, y, scale);
+		renderGlyphData(bufferIt, characterData.glyphData, x, y);
 		
 		if(bufferIt == quadBuffer.end()) {
 			bufferIt = quadBuffer.begin();
@@ -95,7 +129,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, float
 			glDrawArrays(GL_TRIANGLES, 0, quadBuffer.size()/4);
 		}
 		
-		x += (characterData.advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+		x += characterData.advance >> 6; // Bitshift by 6 to get value in pixels (2^6 = 64)
 	}
 	
 	if(bufferIt != quadBuffer.begin()) {
@@ -118,7 +152,7 @@ void TextRenderer::loadFont(const char* filename) {
 }
 
 void TextRenderer::prerenderCharacter(uint32_t cp) {
-	int i = 0;
+	unsigned int i = 0;
 	FT_UInt glyphIdx;
 	while(i < faces.size() && (glyphIdx = FT_Get_Char_Index(faces[i], cp)) == 0) {
 		++i;
@@ -132,6 +166,7 @@ void TextRenderer::prerenderCharacter(uint32_t cp) {
 	
 	FT_GlyphSlot glyphSlot = faces[i]->glyph;
 	int32_t advanceX = glyphSlot->advance.x;
+	int32_t height = glyphSlot->metrics.height;
 	
 	FT_Glyph glyph;
 	FT_Get_Glyph(glyphSlot, &glyph);
@@ -170,20 +205,20 @@ void TextRenderer::prerenderCharacter(uint32_t cp) {
 	
 	characters[cp] = CharacterData {
 		glyphData,
-		advanceX
+		advanceX, height
 	};
 }
 
-void TextRenderer::renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y, float scale) {
+void TextRenderer::renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y) {
 	float l = glyphAtlas.getL(data.atlasId);
 	float r = glyphAtlas.getR(data.atlasId);
 	float t = glyphAtlas.getT(data.atlasId);
 	float b = glyphAtlas.getB(data.atlasId);
 	
-	float w = data.size.x * scale;
-	float h = data.size.y * scale;
-	float xpos = x + data.bearing.x * scale;
-	float ypos = y - data.bearing.y * scale;
+	float w = data.size.x;
+	float h = data.size.y;
+	float xpos = x + data.bearing.x;
+	float ypos = y - data.bearing.y;
 	
 	float vertices[QUAD_SIZE] = {
 		xpos,     ypos,       l, b,

@@ -24,6 +24,7 @@ namespace PixCraft {
 	struct CharacterData {
 		GlyphData glyphData;
 		int32_t advance;
+		int32_t height;
 	};
 	
 	class TextRenderer {
@@ -34,7 +35,10 @@ namespace PixCraft {
 		
 		void setViewport(int width, int height);
 		
-		void renderText(std::string str, float x, float y, float scale, glm::vec3 color);
+		int getTextWidth(std::string str);
+		int getTextHeight();
+		
+		void renderText(std::string str, float x, float y, glm::vec3 color);
 		
 	private:
 		static const size_t QUAD_SIZE = 24;
@@ -50,11 +54,12 @@ namespace PixCraft {
 		ShaderProgram program;
 		VertexBuffer<glm::vec2, glm::vec2> buffer;
 		int fontHeight;
+		int xHeight;
 		
 		void loadFont(const char* filename);
 		
 		void prerenderCharacter(uint32_t c);
 		
-		void renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y, float scale);
+		void renderGlyphData(float*& bufferIt, GlyphData& data, float x, float y);
 	};
 }
