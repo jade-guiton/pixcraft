@@ -61,8 +61,6 @@ void EntityModel::render() {
 }
 
 
-EntityRenderer::EntityRenderer() {}
-
 void EntityRenderer::init() {
 	program.init(ShaderSources::entityVS, ShaderSources::entityFS);
 	

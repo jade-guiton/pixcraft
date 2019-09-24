@@ -123,6 +123,11 @@ void VertexArray::genBuffers() {}
 void VertexArray::setVAO() {}
 
 template<>
+void PixCraft::setAttributePointer<float>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribPointer(location, 1, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
+}
+
+template<>
 void PixCraft::setAttributePointer<glm::vec2>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }
@@ -130,6 +135,11 @@ void PixCraft::setAttributePointer<glm::vec2>(int location, size_t offset, size_
 template<>
 void PixCraft::setAttributePointer<glm::vec3>(int location, size_t offset, size_t totalSize) {
 	glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
+}
+
+template<>
+void PixCraft::setAttributePointer<glm::vec4>(int location, size_t offset, size_t totalSize) {
+	glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, totalSize, (void*) offset);
 }
 
 template<>

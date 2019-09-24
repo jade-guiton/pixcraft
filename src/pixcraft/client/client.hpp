@@ -8,6 +8,7 @@
 #include "face_renderer.hpp"
 #include "chunk_renderer.hpp"
 #include "entity_renderer.hpp"
+#include "particle_renderer.hpp"
 #include "hotbar.hpp"
 #include "input.hpp"
 #include "text.hpp"
@@ -55,6 +56,7 @@ namespace PixCraft {
 		FaceRenderer faceRenderer;
 		ChunkRenderer chunkRenderer;
 		EntityRenderer entityRenderer;
+		ParticleRenderer particleRenderer;
 		Hotbar hotbar;
 		TextRenderer textRenderer;
 		

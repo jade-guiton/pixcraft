@@ -116,6 +116,7 @@ GameClient::GameClient()
 	faceRenderer.init();
 	textRenderer.init();
 	entityRenderer.init();
+	particleRenderer.init();
 	hotbar.init();
 	
 	Button::initRendering();
@@ -380,6 +381,9 @@ void GameClient::render() {
 		blockOverlayProgram.unuse();
 		checkGlErrors("block overlay rendering");
 	}
+	
+	particleRenderer.render(proj, view, fovy, height);
+	checkGlErrors("particle rendering");
 	
 	faceRenderer.startRendering(proj, view, params);
 	chunkRenderer.renderTranslucent(camChunkX, camChunkZ, renderDist, vf);

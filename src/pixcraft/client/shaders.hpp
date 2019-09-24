@@ -10,6 +10,7 @@ namespace PixCraft {
 		extern const char *blockVS, *blockGS, *blockFS;
 		extern const char *entityVS, *entityFS;
 		extern const char *textVS, *textFS;
+		extern const char *particleVS, *particleFS;
 		
 		extern const char *cursorVS;
 		extern const char *overlayVS;
