@@ -21,7 +21,7 @@ namespace PixCraft {
 		std::vector<T> data();
 		
 		void insert(T element);
-		void deleteMin();
+		void removeMin();
 		
 	private:
 		Compare comp;
