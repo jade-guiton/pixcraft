@@ -21,8 +21,16 @@ void ParticleRenderer::init() {
 		1, 0, 0, 1,
 		0.1,
 		0, 0, 0,
+		800
+	});
+	particles.insert(Particle {
+		0, 39.75, 0,
+		0, 1, 0, 1,
+		0.1,
+		0, 0, 0,
 		1000
 	});
+	particles.removeMin();
 }
 
 void ParticleRenderer::render(glm::mat4 proj, glm::mat4 view, float fovy, int height) {

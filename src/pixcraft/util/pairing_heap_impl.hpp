@@ -1,8 +1,29 @@
 #pragma once
 
 #include <stdexcept>
+#include <iterator>
+#include <memory>
 
 namespace PixCraft {
+	template<typename T, typename Compare>
+	PairingHeapNode<T>* meldHeapNodes(PairingHeapNode<T>& node1, PairingHeapNode<T>& node2, Compare& comp) {
+		if(comp(node1.root, node2.root)) {
+			auto newNode = new PairingHeapNode<T> {
+				node1.root,
+				std::forward_list<PairingHeapNode<T>>(node1.subheaps)
+			};
+			newNode->subheaps.push_front(node2);
+			return newNode;
+		} else {
+			auto newNode = new PairingHeapNode<T> {
+				node2.root,
+				std::forward_list<PairingHeapNode<T>>(node1.subheaps)
+			};
+			newNode->subheaps.push_front(node1);
+			return newNode;
+		}
+	}
+	
 	template<typename T, typename Compare>
 	PairingHeap<T, Compare>::PairingHeap() : node(nullptr) {}
 
@@ -54,8 +75,33 @@ namespace PixCraft {
 	}
 
 	template<typename T, typename Compare>
-	void PairingHeap<T, Compare>::deleteMin() {
-		throw std::logic_error("Not yet implemented");
+	void PairingHeap<T, Compare>::removeMin() {
+		if(empty()) throw std::logic_error("Cannot remove the min of empty pairing heap");
+		std::vector<std::unique_ptr<PairingHeapNode<T>>> meldedPairs;
+		auto it = node->subheaps.begin();
+		auto end = node->subheaps.end();
+		while(it != end) {
+			PairingHeapNode<T>& first = *it;
+			++it;
+			if(it == end) { // 'first' is unpaired
+				meldedPairs.emplace_back(new PairingHeapNode<T>(first));
+			} else {
+				PairingHeapNode<T>& second = *it;
+				meldedPairs.emplace_back(meldHeapNodes(first, second, comp));
+			}
+		}
+		delete node;
+		node = nullptr;
+		for(auto it = std::make_move_iterator(meldedPairs.rbegin()), end = std::make_move_iterator(meldedPairs.rend()); it != end; ++it) {
+			std::unique_ptr<PairingHeapNode<T>> node2 = *it; // move unique_ptr to local variable
+			if(node) {
+				auto newNode = meldHeapNodes(*node, *node2, comp);
+				delete node;
+				node = newNode;
+			} else {
+				node = node2.release();
+			}
+		}
 	}
 
 	template<typename T, typename Compare>
@@ -64,20 +110,8 @@ namespace PixCraft {
 			// nothing to do
 		} else if(empty()) { // just copy other's contents
 			node = new PairingHeapNode<T>(*other.node);
-		} else if(comp(node->root, other.node->root)) {
-			auto newNode = new PairingHeapNode<T> {
-				node->root,
-				std::forward_list<PairingHeapNode<T>>(node->subheaps)
-			};
-			newNode->subheaps.push_front(*other.node);
-			delete node;
-			node = newNode;
 		} else {
-			auto newNode = new PairingHeapNode<T> {
-				other.node->root,
-				std::forward_list<PairingHeapNode<T>>(other.node->subheaps)
-			};
-			newNode->subheaps.push_front(*node);
+			auto newNode = meldHeapNodes(*node, *other.node, comp);
 			delete node;
 			node = newNode;
 		}
