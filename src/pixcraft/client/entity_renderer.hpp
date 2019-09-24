@@ -30,7 +30,6 @@ namespace PixCraft {
 	
 	class EntityRenderer {
 	public:
-		EntityRenderer();
 		void init();
 		
 		void renderEntities(World& world, glm::mat4 proj, glm::mat4 view, RenderParams params);

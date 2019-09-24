@@ -19,6 +19,9 @@ with open("src/pixcraft/client/shaders_src.cpp", "w") as out:
 	include("glsl/text.vs", "textVS")
 	include("glsl/text.fs", "textFS")
 	
+	include("glsl/particle.vs", "particleVS")
+	include("glsl/particle.fs", "particleFS")
+	
 	include("glsl/cursor.vs", "cursorVS")
 	include("glsl/overlay.vs", "overlayVS")
 	include("glsl/block_overlay.vs", "blockOverlayVS")
