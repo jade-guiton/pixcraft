@@ -81,4 +81,6 @@ namespace PixCraft {
 	
 	// checks if a cylinder with base (center, radius) and given height collides with block at (x,y,z)
 	bool cylinderBlockCollision(glm::vec3 center, float radius, float height, int32_t x, int32_t y, int32_t z);
+	
+	glm::vec3 hslToRgb(glm::vec3 hsl);
 }

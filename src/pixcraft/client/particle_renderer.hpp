@@ -13,7 +13,7 @@ namespace PixCraft {
 		float r, g, b, a;
 		float size;
 		float vx, vy, vz;
-		float deathTime;
+		uint32_t deathTime;
 		
 		bool operator<(const Particle other) const;
 	};
@@ -21,6 +21,8 @@ namespace PixCraft {
 	class ParticleRenderer {
 	public:
 		void init();
+		
+		void update(float dt);
 		
 		void render(glm::mat4 proj, glm::mat4 view, float fovy, int height);
 		
@@ -31,5 +33,6 @@ namespace PixCraft {
 		VertexBuffer<glm::vec3, glm::vec4, float> buffer;
 		
 		PairingHeap<Particle> particles;
+		uint32_t elapsedFrames;
 	};
 }

@@ -162,3 +162,18 @@ bool PixCraft::cylinderBlockCollision(glm::vec3 center, float radius, float heig
 	float dist2 = (relX - cornerX)*(relX - cornerX) + (relZ - cornerZ)*(relZ - cornerZ);
 	return dist2 <= radius*radius;
 }
+
+glm::vec3 PixCraft::hslToRgb(glm::vec3 hsl) {
+	float c = (1 - abs(2*hsl.z - 1)) * hsl.y;
+	float h2 = hsl.x * 6;
+	float x = c*(1 - abs(fmod(h2, 2) - 1));
+	float r1 = 0, g1 = 0, b1 = 0;
+	if(h2 <= 1)      { r1 = c; g1 = x; }
+	else if(h2 <= 2) { r1 = x; g1 = c; }
+	else if(h2 <= 3) { g1 = c; b1 = x; }
+	else if(h2 <= 4) { g1 = x; b1 = c; }
+	else if(h2 <= 5) { r1 = x; b1 = c; }
+	else { r1 = c; b1 = x; }
+	float m = hsl.z - c/2;
+	return glm::vec3(r1 + m, g1 + m, b1 + m);
+}
