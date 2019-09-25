@@ -17,7 +17,7 @@ namespace PixCraft {
 		} else {
 			auto newNode = new PairingHeapNode<T> {
 				node2.root,
-				std::forward_list<PairingHeapNode<T>>(node1.subheaps)
+				std::forward_list<PairingHeapNode<T>>(node2.subheaps)
 			};
 			newNode->subheaps.push_front(node1);
 			return newNode;
@@ -88,6 +88,7 @@ namespace PixCraft {
 			} else {
 				PairingHeapNode<T>& second = *it;
 				meldedPairs.emplace_back(meldHeapNodes(first, second, comp));
+				++it;
 			}
 		}
 		delete node;

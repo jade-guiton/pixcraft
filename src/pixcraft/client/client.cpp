@@ -317,6 +317,8 @@ void GameClient::update(float dt) {
 	chunkRenderer.updateBlocks();
 	
 	world.updateEntities(dt);
+	
+	particleRenderer.update(dt);
 }
 
 void printElapsedTime(const char* operation, double before) {
