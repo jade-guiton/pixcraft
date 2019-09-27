@@ -21,18 +21,40 @@ void ParticleRenderer::init() {
 	checkGlErrors("particle renderer initialization");
 }
 
+void ParticleRenderer::spawnBlockBits(glm::vec3 blockPos, TexId blockTex) {
+	int n = 1;
+	for(int dx = -n; dx <= n; ++dx) {
+		for(int dy = -n; dy <= n; ++dy) {
+			for(int dz = -n; dz <= n; ++dz) {
+				int tx = ((dx+n) + (dz+n)) % TextureManager::BLOCK_TEX_SIZE;
+				int ty = (dy+n) % TextureManager::BLOCK_TEX_SIZE;
+				particles.insert(Particle {
+					(float) (blockPos.x + dx/3.0), (float) (blockPos.y + dy/3.0), (float) (blockPos.z + dz/3.0),
+					(float) 0.1,
+					blockTex,
+					(float) tx / TextureManager::BLOCK_TEX_SIZE, (float) ty / TextureManager::BLOCK_TEX_SIZE,
+					0, 0, 0,
+					elapsedFrames + 60
+				});
+			}
+		}
+	}
+}
+
 void ParticleRenderer::update(float dt) {
 	float t = elapsedFrames / 60.0;
 	glm::vec3 color = hslToRgb(glm::vec3(std::fmod(t, 1.0), 1.0, 0.5));
 	float phi = t * 6.2832;
-	particles.insert(Particle {
-		(float) (0 + 0.5*cos(phi)), (float) (39 + 0.5*sin(phi)), (float) (0 + 0.5*sin(phi/2)),
-		(float) 0.1,
-		TextureManager::LEAVES,
-		(float) (0.5 + 0.4*cos(phi)), (float) (0.5 + 0.4*sin(phi)),
-		0, 0, 0,
-		elapsedFrames + 110
-	});
+	if(elapsedFrames % 2 == 0) {
+		particles.insert(Particle {
+			(float) (0 + 0.5*cos(phi)), (float) (39 + 0.5*sin(phi)), (float) (0 + 0.5*sin(phi/2)),
+			(float) 0.1,
+			TextureManager::LEAVES,
+			(float) (0.5 + 0.4*cos(phi)), (float) (0.5 + 0.4*sin(phi)),
+			0, 0, 0,
+			elapsedFrames + 110
+		});
+	}
 	while(!particles.empty() && particles.min().deathTime <= elapsedFrames) {
 		particles.removeMin();
 	}
