@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <random>
 
 #include "glfw.hpp"
 #include "shaders.hpp"
@@ -31,10 +32,12 @@ namespace PixCraft {
 		void render(glm::mat4 proj, glm::mat4 view, float fovy, int height);
 		
 	private:
-		const unsigned int MAX_PARTICLES = 256;
+		const unsigned int MAX_PARTICLES = 512;
 		
 		ShaderProgram program;
 		VertexBuffer<glm::vec3, float, TexId, glm::vec2> buffer;
+		
+		std::mt19937 random;
 		
 		PairingHeap<Particle> particles;
 		uint32_t elapsedFrames;
