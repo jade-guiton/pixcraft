@@ -2,10 +2,13 @@
 
 #include <iostream>
 #include <cmath>
+#include <random>
 
 #include "../util/util.hpp"
 
 using namespace PixCraft;
+
+constexpr float GRAVITY = 16.0f;
 
 bool Particle::operator<(const Particle other) const {
 	return deathTime < other.deathTime;
@@ -19,6 +22,9 @@ void ParticleRenderer::init() {
 		offsetof(Particle, blockTex), offsetof(Particle, tx), sizeof(Particle));
 	buffer.loadData(nullptr, MAX_PARTICLES, GL_STREAM_DRAW);
 	checkGlErrors("particle renderer initialization");
+	
+	std::random_device randDev;
+	random.seed(randDev());
 }
 
 void ParticleRenderer::spawnBlockBits(glm::vec3 blockPos, TexId blockTex) {
@@ -28,13 +34,17 @@ void ParticleRenderer::spawnBlockBits(glm::vec3 blockPos, TexId blockTex) {
 			for(int dz = -n; dz <= n; ++dz) {
 				int tx = ((dx+n) + (dz+n)) % TextureManager::BLOCK_TEX_SIZE;
 				int ty = (dy+n) % TextureManager::BLOCK_TEX_SIZE;
+				std::uniform_real_distribution<float> realDistr(-1, 1);
+				float x = blockPos.x + (float) dx/(2*n+1) + realDistr(random)/12;
+				float y = blockPos.y + (float) dy/(2*n+1) + realDistr(random)/12;
+				float z = blockPos.z + (float) dz/(2*n+1) + realDistr(random)/12;
 				particles.insert(Particle {
-					(float) (blockPos.x + dx/3.0), (float) (blockPos.y + dy/3.0), (float) (blockPos.z + dz/3.0),
-					(float) 0.1,
+					x, y, z,
+					(float) 0.2,
 					blockTex,
 					(float) tx / TextureManager::BLOCK_TEX_SIZE, (float) ty / TextureManager::BLOCK_TEX_SIZE,
-					0, 0, 0,
-					elapsedFrames + 60
+					0.3f*dx/n + 0.3f*realDistr(random), 1.5f + 0.5f*realDistr(random), 0.3f*dz/n + 0.3f*realDistr(random),
+					elapsedFrames + 40 + (int) (realDistr(random)*10)
 				});
 			}
 		}
@@ -55,14 +65,26 @@ void ParticleRenderer::update(float dt) {
 			elapsedFrames + 110
 		});
 	}
-	while(!particles.empty() && particles.min().deathTime <= elapsedFrames) {
+	
+	while(!particles.empty() && (particles.size() > MAX_PARTICLES || particles.min().deathTime <= elapsedFrames)) {
 		particles.removeMin();
 	}
+	
+	for(auto it = particles.iter(); !it.done(); ++it) {
+		it->vy -= GRAVITY * dt;
+		it->x += it->vx * dt;
+		it->y += it->vy * dt;
+		it->z += it->vz * dt;
+	}
+	
 	elapsedFrames++;
 }
 
 void ParticleRenderer::render(glm::mat4 proj, glm::mat4 view, float fovy, int height) {
-	auto particlesVector = particles.data();
+	std::vector<Particle> particlesVector;
+	for(auto it = particles.iter(); !it.done(); ++it) {
+		particlesVector.push_back(*it);
+	}
 	auto particleCount = particlesVector.size();
 	if(particleCount > MAX_PARTICLES) {
 		particleCount = MAX_PARTICLES;
@@ -79,7 +101,6 @@ void ParticleRenderer::render(glm::mat4 proj, glm::mat4 view, float fovy, int he
 	program.setUniform("winH", (float) height);
 	
 	program.setUniform("texArray", (uint32_t) 0);
-	program.setUniform("blockTexSize", (float) TextureManager::BLOCK_TEX_SIZE);
 	TextureManager::bindBlockTextureArray();
 	buffer.bind();
 	glDrawArrays(GL_POINTS, 0, particleCount);
