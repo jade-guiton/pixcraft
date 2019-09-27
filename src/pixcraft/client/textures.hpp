@@ -14,6 +14,8 @@ namespace PixCraft {
 		int getTextureWidth(TexId texId);
 		int getTextureHeight(TexId texId);
 		
+		const unsigned int BLOCK_TEX_SIZE = 16;
+		
 		// Block textures
 		extern const TexId PLACEHOLDER;
 		extern const TexId STONE;
