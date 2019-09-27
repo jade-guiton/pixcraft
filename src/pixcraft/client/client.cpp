@@ -279,7 +279,9 @@ void GameClient::update(float dt) {
 					if(!world.hasSolidBlock(x, y, z) && !world.containsMobs(x, y, z))
 						world.setBlock(x, y, z, Block::fromId(hotbar.held()));
 				} else {
+					auto blockTex = world.getBlock(x, y, z)->mainTexture();
 					world.removeBlock(x, y, z);
+					particleRenderer.spawnBlockBits(glm::vec3((float) x, (float) y, (float) z), blockTex);
 				}
 			}
 		}

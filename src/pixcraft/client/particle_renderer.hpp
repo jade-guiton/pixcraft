@@ -24,12 +24,14 @@ namespace PixCraft {
 	public:
 		void init();
 		
+		void spawnBlockBits(glm::vec3 blockPos, TexId blockTex);
+		
 		void update(float dt);
 		
 		void render(glm::mat4 proj, glm::mat4 view, float fovy, int height);
 		
 	private:
-		const unsigned int MAX_PARTICLES = 128;
+		const unsigned int MAX_PARTICLES = 256;
 		
 		ShaderProgram program;
 		VertexBuffer<glm::vec3, float, TexId, glm::vec2> buffer;
