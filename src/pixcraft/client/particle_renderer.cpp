@@ -55,7 +55,9 @@ void ParticleRenderer::render(glm::mat4 proj, glm::mat4 view, float fovy, int he
 	program.setUniform("proj", proj);
 	program.setUniform("fovY", (float) fovy);
 	program.setUniform("winH", (float) height);
+	
 	program.setUniform("texArray", (uint32_t) 0);
+	program.setUniform("blockTexSize", (float) TextureManager::BLOCK_TEX_SIZE);
 	TextureManager::bindBlockTextureArray();
 	buffer.bind();
 	glDrawArrays(GL_POINTS, 0, particleCount);

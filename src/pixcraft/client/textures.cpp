@@ -12,7 +12,6 @@
 
 namespace PixCraft::TextureManager {
 	namespace {
-		const unsigned int BLOCK_TEX_SIZE = 16;
 		std::vector<std::string> blockTextureFiles;
 		GlId blockTextureArray;
 		
