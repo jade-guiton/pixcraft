@@ -44,7 +44,7 @@ void ParticleRenderer::spawnBlockBits(glm::vec3 blockPos, TexId blockTex) {
 					blockTex,
 					(float) tx / TextureManager::BLOCK_TEX_SIZE, (float) ty / TextureManager::BLOCK_TEX_SIZE,
 					0.3f*dx/n + 0.3f*realDistr(random), 1.5f + 0.5f*realDistr(random), 0.3f*dz/n + 0.3f*realDistr(random),
-					elapsedFrames + 40 + (int) (realDistr(random)*10)
+					elapsedFrames + 40 + (int) (realDistr(random)*20)
 				});
 			}
 		}
