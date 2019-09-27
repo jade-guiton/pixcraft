@@ -4,14 +4,16 @@
 
 #include "glfw.hpp"
 #include "shaders.hpp"
+#include "textures.hpp"
 
 #include "../util/pairing_heap.hpp"
 
 namespace PixCraft {
 	struct Particle {
 		float x, y, z;
-		float r, g, b, a;
 		float size;
+		TexId blockTex;
+		float tx, ty;
 		float vx, vy, vz;
 		uint32_t deathTime;
 		
@@ -30,7 +32,7 @@ namespace PixCraft {
 		const unsigned int MAX_PARTICLES = 128;
 		
 		ShaderProgram program;
-		VertexBuffer<glm::vec3, glm::vec4, float> buffer;
+		VertexBuffer<glm::vec3, float, TexId, glm::vec2> buffer;
 		
 		PairingHeap<Particle> particles;
 		uint32_t elapsedFrames;

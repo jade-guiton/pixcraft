@@ -7,14 +7,17 @@ uniform float fovY;
 uniform float winH;
 
 layout(location = 0) in vec3 attrPos;
-layout(location = 1) in vec4 attrColor;
-layout(location = 2) in float attrSize;
+layout(location = 1) in float attrSize;
+layout(location = 2) in int attrTexId;
+layout(location = 3) in vec2 attrTexCoord;
 
-out vec4 partColor;
+flat out int texId;
+out vec2 texCoord;
 
 void main() {
 	vec4 cameraSpace = view * vec4(attrPos, 1.0);
 	gl_Position = proj * cameraSpace;
 	gl_PointSize = atan(attrSize/2 / (-cameraSpace.z))/fovY*winH;
-	partColor = attrColor;
+	texId = attrTexId;
+	texCoord = attrTexCoord;
 }
