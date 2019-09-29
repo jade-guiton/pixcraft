@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "play_state.hpp"
+#include "menu_state.hpp"
 
 #include "pixcraft/util/version.hpp"
 
@@ -49,7 +50,11 @@ GameClient::GameClient() : frameNo(0), FPS(0.0) {
 	textRenderer.init();
 	input.init(window);
 	
-	gameState.reset(new PlayState(*this));
+	TextureManager::loadTextures();
+	BlockRegistry::defineBlocks();
+	Button::initRendering();
+	
+	gameState.reset(new MenuState(*this));
 	
 	glfwSetTime(0.0);
 }
@@ -69,8 +74,15 @@ void GameClient::run() {
 	double lastFrame = now;
 	double lastSecond = now;
 	while(!glfwWindowShouldClose(window)) {
+		glfwPollEvents();
 		gameState->update(dt);
-		gameState->render();
+		input.clearJustClicked();
+		input.clearJustScrolled();
+		input.clearJustPressed();
+		
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+		gameState->render(width, height);
 		
 		now = glfwGetTime();
 		if(frameNo != 0) {
@@ -100,10 +112,6 @@ void GameClient::run() {
 
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
-
-void GameClient::getWindowSize(int* width, int* height) {
-	glfwGetWindowSize(window, width, height);
-}
 
 int GameClient::getFPS() {
 	return FPS;

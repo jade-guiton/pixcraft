@@ -75,14 +75,11 @@ PlayState::PlayState(GameClient& client)
 	blockOverlayBuffer.loadIndices(blockOverlayIndices.data(), blockOverlayIndices.size());
 	checkGlErrors("block overlay initialization");
 	
-	TextureManager::loadTextures();
-	BlockRegistry::defineBlocks();
 	faceRenderer.init();
 	entityRenderer.init();
 	particleRenderer.init();
 	hotbar.init();
 	
-	Button::initRendering();
 	testButton.prerender();
 	
 	world.mobs.emplace_back(new Player(world, glm::vec3(8.0f, 50.0f, 8.0f)));
@@ -136,8 +133,6 @@ void PlayState::executeCommand() {
 }
 
 void PlayState::update(float dt) {
-	glfwPollEvents();
-	
 	InputManager& input = client.getInputManager();
 	std::string inputText = input.retrieveInputBuffer();
 	if(showCommandLine) {
@@ -199,9 +194,6 @@ void PlayState::update(float dt) {
 		input.getMouseMovement();
 		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
-	input.clearJustClicked();
-	input.clearJustScrolled();
-	input.clearJustPressed();
 	
 	int32_t camX, camY, camZ;
 	std::tie(camX, camY, camZ) = getBlockCoordsAt(player->pos());
@@ -237,12 +229,10 @@ void printElapsedTime(const char* operation, double before) {
 	std::cout << operation << ": " << round((glfwGetTime() - before)*10000) / 10.0 << " ms" << std::endl;
 }
 
-void PlayState::render() {
+void PlayState::render(int winWidth, int winHeight) {
 	// Compute some rendering data based on player position
-	int width, height;
-	client.getWindowSize(&width, &height);
 	float fovy = glm::radians(90.0f);
-	float aspect = ((float) width) / height;
+	float aspect = ((float) winWidth) / winHeight;
 	float near = 0.001f;
 	float far = 1000.0f;
 	glm::vec3 playerPos = player->eyePos();
@@ -296,7 +286,7 @@ void PlayState::render() {
 		checkGlErrors("block overlay rendering");
 	}
 	
-	particleRenderer.render(proj, view, fovy, height);
+	particleRenderer.render(proj, view, fovy, winHeight);
 	checkGlErrors("particle rendering");
 	
 	faceRenderer.startRendering(proj, view, params);
@@ -328,7 +318,7 @@ void PlayState::render() {
 	// Draw cursor
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
 	cursorProgram.use();
-	cursorProgram.setUniform("winSize", (float) width, (float) height);
+	cursorProgram.setUniform("winSize", (float) winWidth, (float) winHeight);
 	cursorProgram.setUniform("color", 1.0f, 1.0f, 1.0f, 1.0f);
 	cursorBuffer.bind();
 	glDrawElements(GL_TRIANGLES, cursorBuffer.indexCount(), GL_UNSIGNED_INT, 0);
@@ -348,7 +338,7 @@ void PlayState::render() {
 		colorOverlayProgram.unuse();
 		checkGlErrors("pause menu overlay rendering");
 		
-		testButton.render(textRenderer, width, height);
+		testButton.render(textRenderer, winWidth, winHeight);
 		checkGlErrors("test button rendering");
 	}
 	
@@ -367,7 +357,7 @@ void PlayState::render() {
 	}
 	
 	if(showCommandLine) {
-		textRenderer.renderText(">> " + commandBuffer, 5, height - 5, glm::vec3(1.0, 1.0, 1.0));
+		textRenderer.renderText(">> " + commandBuffer, 5, winHeight - 5, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("command line rendering");
 	}
 }

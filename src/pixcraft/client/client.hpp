@@ -15,7 +15,7 @@ namespace PixCraft {
 		GameState(GameClient& client);
 		
 		virtual void update(float dt) = 0;
-		virtual void render() = 0;
+		virtual void render(int winWidth, int winHeight) = 0;
 		
 	protected:
 		GameClient& client;
@@ -31,7 +31,6 @@ namespace PixCraft {
 		InputManager& getInputManager();
 		TextRenderer& getTextRenderer();
 		
-		void getWindowSize(int* width, int* height);
 		int getFPS();
 		
 	private:
