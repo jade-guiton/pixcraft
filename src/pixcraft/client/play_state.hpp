@@ -20,7 +20,7 @@ namespace PixCraft {
 		PlayState(GameClient& client);
 		
 		void update(float dt) override;
-		void render() override;
+		void render(int winWidth, int winHeight) override;
 		
 	private:
 		static constexpr float SKY_COLOR[3] = {0.75f, 0.9f, 1.0f};
