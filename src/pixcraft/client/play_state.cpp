@@ -9,6 +9,7 @@
 #include "shaders.hpp"
 #include "textures.hpp"
 #include "view_frustum.hpp"
+#include "menu_state.hpp"
 
 #include "pixcraft/server/blocks.hpp"
 #include "pixcraft/server/player.hpp"
@@ -80,8 +81,14 @@ PlayState::PlayState(GameClient& client)
 	particleRenderer.init();
 	hotbar.init();
 	
-	menuButtons.emplace_back(0, 0, 200, 30, "Test Button");
-	menuButtons.back().prerender();
+	menuButtons.emplace_back(0, 0, 200, 30, "Back to menu");
+	menuButtons.back().setCallback([&client]() {
+		client.setGameState(std::unique_ptr<MenuState>(new MenuState(client)));
+	});
+	
+	for(auto& button : menuButtons) {
+		button.prerender();
+	}
 	
 	world.mobs.emplace_back(new Player(world, glm::vec3(8.0f, 50.0f, 8.0f)));
 	player = (Player*) world.mobs.back().get();
