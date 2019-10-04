@@ -43,6 +43,7 @@ namespace PixCraft::TextureManager {
 	
 	const TexId SLIME = requireTexture("entity/slime");
 	
+	const TexId LOGO = requireTexture("gui/logo");
 	const TexId BUTTON = requireTexture("gui/button");
 	
 	void loadTextures() {

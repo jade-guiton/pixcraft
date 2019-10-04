@@ -1,9 +1,26 @@
 #pragma once
 
 #include "shaders.hpp"
+#include "textures.hpp"
 #include "text.hpp"
 
 namespace PixCraft {
+	class Image {
+	public:
+		static void initRendering();
+		
+		Image(int x, int y, int w, TexId tex);
+		void prerender();
+		void render(int winW, int winH);
+		
+	private:
+		static ShaderProgram program;
+		
+		float x, y, w, h;
+		TexId tex;
+		VertexBuffer<glm::vec2, glm::vec2> buffer;
+	};
+	
 	class Button {
 	public:
 		static void initRendering();
