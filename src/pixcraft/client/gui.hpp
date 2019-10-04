@@ -29,6 +29,9 @@ namespace PixCraft {
 		void prerender();
 		void render(TextRenderer& textRenderer, int winW, int winH);
 		
+		bool hits(int x, int y);
+		void click();
+		
 	private:
 		static ShaderProgram program;
 		static constexpr float sh = 6; // shadow height

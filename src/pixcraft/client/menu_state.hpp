@@ -13,6 +13,6 @@ namespace PixCraft {
 		
 	private:
 		Image logo;
-		Button playButton;
+		std::vector<Button> buttons;
 	};
 }

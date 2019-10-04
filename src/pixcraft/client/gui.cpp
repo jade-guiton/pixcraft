@@ -1,5 +1,7 @@
 #include "gui.hpp"
 
+#include <iostream>
+
 #include "textures.hpp"
 #include "glfw.hpp"
 
@@ -59,15 +61,15 @@ void Button::initRendering() {
 }
 
 Button::Button(int x, int y, int w, int h, std::string label)
-	: x(x), y(y), w(w/2), h(h/2), label(label) {
+	: x(x), y(y), w(w), h(h), label(label) {
 }
 
 void Button::prerender() {
 	const std::array<float, 64> buttonVertices {
-		x-w, y-h, 0, 0,     x-w+cs, y-h, 0.5, 0,     x-w, y-h+cs, 0, 0.5,     x-w+cs, y-h+cs, 0.5, 0.5,
-		x+w, y-h, 1, 0,     x+w-cs, y-h, 0.5, 0,     x+w, y-h+cs, 1, 0.5,     x+w-cs, y-h+cs, 0.5, 0.5,
-		x-w, y+h+sh, 0, 1,  x-w+cs, y+h+sh, 0.5, 1,  x-w, y+h+sh-cs, 0, 0.5,  x-w+cs, y+h+sh-cs, 0.5, 0.5,
-		x+w, y+h+sh, 1, 1,  x+w-cs, y+h+sh, 0.5, 1,  x+w, y+h+sh-cs, 1, 0.5,  x+w-cs, y+h+sh-cs, 0.5, 0.5,
+		x-w/2, y-h/2-sh, 0, 0,  x-w/2+cs, y-h/2-sh, 0.5, 0,  x-w/2, y-h/2-sh+cs, 0, 0.5,  x-w/2+cs, y-h/2-sh+cs, 0.5, 0.5,
+		x+w/2, y-h/2-sh, 1, 0,  x+w/2-cs, y-h/2-sh, 0.5, 0,  x+w/2, y-h/2-sh+cs, 1, 0.5,  x+w/2-cs, y-h/2-sh+cs, 0.5, 0.5,
+		x-w/2, y+h/2,    0, 1,  x-w/2+cs, y+h/2,    0.5, 1,  x-w/2, y+h/2-cs,    0, 0.5,  x-w/2+cs, y+h/2-cs,    0.5, 0.5,
+		x+w/2, y+h/2,    1, 1,  x+w/2-cs, y+h/2,    0.5, 1,  x+w/2, y+h/2-cs,    1, 0.5,  x+w/2-cs, y+h/2-cs,    0.5, 0.5,
 	};
 	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
 	buffer.loadData(buttonVertices.data(), buttonVertices.size()/4, GL_STATIC_DRAW);
@@ -85,6 +87,14 @@ void Button::render(TextRenderer& textRenderer, int winW, int winH) {
 	buffer.unbind();
 	program.unuse();
 	int textX = winW/2 + x - textRenderer.getTextWidth(label)/2;
-	int textY = winH/2 + y;
+	int textY = winH/2 + y - textRenderer.getTextHeight()/2;
 	textRenderer.renderText(label, textX, textY, glm::vec3(0.0, 0.0, 0.0));
+}
+
+bool Button::hits(int hx, int hy) {
+	return x - w/2 <= hx && hx < x + w/2 && y - h/2 <= hy && hy < y + h/2 ;
+}
+
+void Button::click() {
+	std::cout << "Just clicked on button '" << label << "'" << std::endl;
 }

@@ -3,17 +3,33 @@
 using namespace PixCraft;
 
 MenuState::MenuState(GameClient& client)
-	: GameState(client), logo(0, 100, 100, TextureManager::LOGO), playButton(0, 0, 300, 30, "Play") {
+	: GameState(client), logo(0, 60, 100, TextureManager::LOGO) {
 	client.getInputManager().capturingMouse(false);
+	buttons.emplace_back(0, -40, 300, 30, "Play");
 	
 	Image::initRendering();
 	
 	logo.prerender();
-	playButton.prerender();
+	for(auto& button : buttons) {
+		button.prerender();
+	}
 }
 
 void MenuState::update(float dt) {
-	
+	InputManager& input = client.getInputManager();
+	if(input.justClicked(1)) {
+		glm::ivec2 pos = input.getMousePosition();
+		Button* hit = nullptr;
+		for(auto& button : buttons) {
+			if(button.hits(pos.x, pos.y)) {
+				hit = &button;
+				break;
+			}
+		}
+		if(hit) {
+			hit->click();
+		}
+	}
 }
 
 void MenuState::render(int winWidth, int winHeight) {
@@ -27,6 +43,8 @@ void MenuState::render(int winWidth, int winHeight) {
 	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	playButton.render(textRenderer, winWidth, winHeight);
-	checkGlErrors("play button rendering");
+	for(auto& button : buttons) {
+		button.render(textRenderer, winWidth, winHeight);
+	}
+	checkGlErrors("button rendering");
 }
