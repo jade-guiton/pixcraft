@@ -1,11 +1,21 @@
 #include "menu_state.hpp"
 
+#include <iostream>
+#include <memory>
+
+#include "play_state.hpp"
+
 using namespace PixCraft;
 
 MenuState::MenuState(GameClient& client)
 	: GameState(client), logo(0, 60, 100, TextureManager::LOGO) {
 	client.getInputManager().capturingMouse(false);
+	
 	buttons.emplace_back(0, -40, 300, 30, "Play");
+	buttons.back().setCallback([&client]() {
+		std::cout << "Let's play!" << std::endl;
+		client.setGameState(std::unique_ptr<PlayState>(new PlayState(client)));
+	});
 	
 	Image::initRendering();
 	

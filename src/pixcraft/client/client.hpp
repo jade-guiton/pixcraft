@@ -31,6 +31,8 @@ namespace PixCraft {
 		InputManager& getInputManager();
 		TextRenderer& getTextRenderer();
 		
+		void setGameState(std::unique_ptr<GameState> gameState);
+		
 		int getFPS();
 		
 	private:

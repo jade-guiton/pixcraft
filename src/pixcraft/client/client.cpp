@@ -113,6 +113,10 @@ void GameClient::run() {
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
+void GameClient::setGameState(std::unique_ptr<GameState> newGameState) {
+	gameState.swap(newGameState);
+}
+
 int GameClient::getFPS() {
 	return FPS;
 }

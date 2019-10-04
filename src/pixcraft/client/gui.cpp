@@ -1,7 +1,5 @@
 #include "gui.hpp"
 
-#include <iostream>
-
 #include "textures.hpp"
 #include "glfw.hpp"
 
@@ -95,6 +93,12 @@ bool Button::hits(int hx, int hy) {
 	return x - w/2 <= hx && hx < x + w/2 && y - h/2 <= hy && hy < y + h/2 ;
 }
 
+void Button::setCallback(std::function<void()> newCallback) {
+	callback = newCallback;
+}
+
 void Button::click() {
-	std::cout << "Just clicked on button '" << label << "'" << std::endl;
+	if(callback) {
+		callback();
+	}
 }
