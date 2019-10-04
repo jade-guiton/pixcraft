@@ -84,8 +84,8 @@ void Button::render(TextRenderer& textRenderer, int winW, int winH) {
 	glDrawElements(GL_TRIANGLES, buffer.indexCount(), GL_UNSIGNED_INT, 0);
 	buffer.unbind();
 	program.unuse();
-	int textX = winW/2 + x - textRenderer.getTextWidth(label)/2;
-	int textY = winH/2 + y - textRenderer.getTextHeight()/2;
+	int textX = x - textRenderer.getTextWidth(label)/2;
+	int textY = y - textRenderer.getTextHeight()/2;
 	textRenderer.renderText(label, textX, textY, glm::vec3(0.0, 0.0, 0.0));
 }
 

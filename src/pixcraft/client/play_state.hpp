@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "client.hpp"
 #include "pixcraft/util/glm.hpp"
 
@@ -53,7 +55,7 @@ namespace PixCraft {
 		ShaderProgram blockOverlayProgram;
 		IndexBuffer<glm::vec3> blockOverlayBuffer;
 		
-		Button testButton;
+		std::vector<Button> menuButtons;
 		
 		void setAntialiasing(bool enabled);
 		void setRenderDistance(int renderDist);

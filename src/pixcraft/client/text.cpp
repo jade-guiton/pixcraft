@@ -39,7 +39,7 @@ void TextRenderer::init() {
 		prerenderCharacter(c);
 	}
 	
-	program.init(ShaderSources::textVS, ShaderSources::textFS);
+	program.init(ShaderSources::guiVS, ShaderSources::textFS);
 	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
 	buffer.loadData(nullptr, 6*BUFFER_SIZE, GL_STREAM_DRAW);
 	checkGlErrors("text renderer initialization");
@@ -114,7 +114,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, glm::
 		cp = utf8::next(it, end);
 		if(cp == '\n') {
 			x = startX;
-			y += lineHeight;
+			y -= lineHeight;
 			continue;
 		}
 		
