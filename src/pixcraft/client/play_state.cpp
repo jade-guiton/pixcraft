@@ -53,7 +53,7 @@ const std::array<unsigned int, 24> blockOverlayIndices = {
 
 PlayState::PlayState(GameClient& client)
 	: GameState(client), showDebug(false), paused(false), showCommandLine(false), chunkRenderer(world, faceRenderer),
-	  hotbar(faceRenderer), testButton(0, 0, 200, 30, "Test Button") {
+	  hotbar(faceRenderer) {
 	setAntialiasing(false);
 	setRenderDistance(8);
 	client.getInputManager().capturingMouse(!paused);
@@ -80,7 +80,8 @@ PlayState::PlayState(GameClient& client)
 	particleRenderer.init();
 	hotbar.init();
 	
-	testButton.prerender();
+	menuButtons.emplace_back(0, 0, 200, 30, "Test Button");
+	menuButtons.back().prerender();
 	
 	world.mobs.emplace_back(new Player(world, glm::vec3(8.0f, 50.0f, 8.0f)));
 	player = (Player*) world.mobs.back().get();
@@ -193,6 +194,22 @@ void PlayState::update(float dt) {
 	} else {
 		input.getMouseMovement();
 		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
+		
+		if(paused) {
+			if(input.justClicked(1)) {
+				glm::ivec2 pos = input.getMousePosition();
+				Button* hit = nullptr;
+				for(auto& button : menuButtons) {
+					if(button.hits(pos.x, pos.y)) {
+						hit = &button;
+						break;
+					}
+				}
+				if(hit) {
+					hit->click();
+				}
+			}
+		}
 	}
 	
 	int32_t camX, camY, camZ;
@@ -338,8 +355,10 @@ void PlayState::render(int winWidth, int winHeight) {
 		colorOverlayProgram.unuse();
 		checkGlErrors("pause menu overlay rendering");
 		
-		testButton.render(textRenderer, winWidth, winHeight);
-		checkGlErrors("test button rendering");
+		for(auto& button : menuButtons) {
+			button.render(textRenderer, winWidth, winHeight);
+		}
+		checkGlErrors("button rendering");
 	}
 	
 	if(showDebug) {
@@ -352,12 +371,12 @@ void PlayState::render(int winWidth, int winHeight) {
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 		debugStream << "Antialiasing: " << (antialiasing ? "enabled" : "disabled") << std::endl;
 		//debugStream << "Unicode test: AéǄ‰₪ℝψЯאصखଇணఔฌ갃ば亶〠㊆😎😂" << std::endl;
-		textRenderer.renderText(debugStream.str(), 5, 20, glm::vec3(1.0, 1.0, 1.0));
+		textRenderer.renderText(debugStream.str(), -winWidth/2 + 5, winHeight/2 - 20, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
 	}
 	
 	if(showCommandLine) {
-		textRenderer.renderText(">> " + commandBuffer, 5, winHeight - 5, glm::vec3(1.0, 1.0, 1.0));
+		textRenderer.renderText(">> " + commandBuffer, -winWidth/2 + 10, -winHeight/2 + 10, glm::vec3(1.0, 1.0, 1.0));
 		checkGlErrors("command line rendering");
 	}
 }
