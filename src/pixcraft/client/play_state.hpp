@@ -13,6 +13,7 @@
 #include "pixcraft/server/world_module.hpp"
 #include "pixcraft/server/world.hpp"
 #include "pixcraft/server/chunk.hpp"
+#include "pixcraft/server/mob.hpp"
 
 namespace PixCraft {
 	class PlayState : public GameState {

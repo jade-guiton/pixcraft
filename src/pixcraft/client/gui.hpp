@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "shaders.hpp"
 #include "textures.hpp"
 #include "text.hpp"
@@ -30,6 +32,7 @@ namespace PixCraft {
 		void render(TextRenderer& textRenderer, int winW, int winH);
 		
 		bool hits(int x, int y);
+		void setCallback(std::function<void()> callback);
 		void click();
 		
 	private:
@@ -40,5 +43,7 @@ namespace PixCraft {
 		float x, y, w, h;
 		std::string label;
 		IndexBuffer<glm::vec2, glm::vec2> buffer;
+		
+		std::function<void()> callback;
 	};
 }
