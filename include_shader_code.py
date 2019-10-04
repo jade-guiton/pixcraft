@@ -25,7 +25,7 @@ with open("src/pixcraft/client/shaders_src.cpp", "w") as out:
 	include("glsl/cursor.vs", "cursorVS")
 	include("glsl/overlay.vs", "overlayVS")
 	include("glsl/block_overlay.vs", "blockOverlayVS")
-	include("glsl/button.vs", "buttonVS")
+	include("glsl/gui.vs", "guiVS")
 	include("glsl/color.fs", "colorFS")
 	include("glsl/texture.fs", "textureFS")
 	

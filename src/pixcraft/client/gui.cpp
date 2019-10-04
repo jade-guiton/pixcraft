@@ -1,8 +1,42 @@
 #include "gui.hpp"
 
 #include "textures.hpp"
+#include "glfw.hpp"
 
 using namespace PixCraft;
+
+ShaderProgram Image::program;
+
+void Image::initRendering() {
+	program.init(ShaderSources::guiVS, ShaderSources::textureFS);
+}
+
+Image::Image(int x, int y, int w, TexId tex) : x(x), y(y), w(w), tex(tex) {
+	h = TextureManager::getTextureHeight(tex) * w / TextureManager::getTextureWidth(tex);
+}
+
+void Image::prerender() {
+	const std::array<float, 16> imageVertices {
+		x-w/2, y-h/2, 0, 0,  x+w/2, y-h/2, 1, 0,
+		x-w/2, y+h/2, 0, 1,  x+w/2, y+h/2, 1, 1,
+	};
+	buffer.init(0, 2*sizeof(float), 4*sizeof(float));
+	buffer.loadData(imageVertices.data(), imageVertices.size()/4, GL_STATIC_DRAW);
+	checkGlErrors("image prerendering");
+}
+
+void Image::render(int winW, int winH) {
+	program.use();
+	checkGlErrors("program activation");
+	program.setUniform("winSize", (float) winW, (float) winH);
+	program.setUniform("tex", (uint32_t) 0);
+	checkGlErrors("uniform setting");
+	TextureManager::bindOtherTextures(tex);
+	buffer.bind();
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, buffer.vertexCount());
+	buffer.unbind();
+	program.unuse();
+}
 
 const std::array<unsigned int, 54> buttonIndices = {
 	0, 1, 2,     2, 1, 3,
@@ -20,7 +54,7 @@ ShaderProgram Button::program;
 float Button::cs;
 
 void Button::initRendering() {
-	program.init(ShaderSources::buttonVS, ShaderSources::textureFS);
+	program.init(ShaderSources::guiVS, ShaderSources::textureFS);
 	cs = TextureManager::getTextureWidth(TextureManager::BUTTON) / 2;
 }
 

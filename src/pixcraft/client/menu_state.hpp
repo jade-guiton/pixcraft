@@ -12,6 +12,7 @@ namespace PixCraft {
 		void render(int winWidth, int winHeight) override;
 		
 	private:
+		Image logo;
 		Button playButton;
 	};
 }
