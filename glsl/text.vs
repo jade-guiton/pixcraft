@@ -9,7 +9,6 @@ out vec2 vertUV;
 
 void main() {
 	vec2 screenPos = attrPos / winSize * 2 - 1;
-	screenPos.y = -screenPos.y;
 	gl_Position = vec4(screenPos, 0.0, 1.0);
 	vertUV = attrUV;
 }

@@ -20,6 +20,7 @@ namespace PixCraft {
 		bool justClicked(int button);
 		void clearJustClicked();
 		glm::vec2 getMouseMovement();
+		glm::ivec2 getMousePosition();
 		
 		void keyPressed(int key);
 		bool justPressed(int key);

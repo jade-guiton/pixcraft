@@ -83,6 +83,14 @@ glm::vec2 InputManager::getMouseMovement() {
 	return mouseSensitivity * mvt;
 }
 
+glm::ivec2 InputManager::getMousePosition() {
+	double mouseX, mouseY;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	return glm::ivec2((int) mouseX - width/2, height/2 - (int) mouseY);
+}
+
 
 void InputManager::keyPressed(int key) {
 	_justPressed.insert(key);

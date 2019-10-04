@@ -218,15 +218,15 @@ void TextRenderer::renderGlyphData(float*& bufferIt, GlyphData& data, float x, f
 	float w = data.size.x;
 	float h = data.size.y;
 	float xpos = x + data.bearing.x;
-	float ypos = y - data.bearing.y;
+	float ypos = y + data.bearing.y;
 	
 	float vertices[QUAD_SIZE] = {
 		xpos,     ypos,       l, b,
-		xpos,     ypos + h,   l, t,
+		xpos,     ypos - h,   l, t,
 		xpos + w, ypos,       r, b,
 		xpos + w, ypos,       r, b,
-		xpos,     ypos + h,   l, t,
-		xpos + w, ypos + h,   r, t
+		xpos,     ypos - h,   l, t,
+		xpos + w, ypos - h,   r, t
 	};
 	std::copy(vertices, vertices + QUAD_SIZE, bufferIt);
 	bufferIt += QUAD_SIZE;
