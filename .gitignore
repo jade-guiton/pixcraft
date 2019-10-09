@@ -4,6 +4,7 @@ src/pixcraft/util/commit_hash.cpp
 src/pixcraft/util/serializer_generated.h
 obj
 data
+dev
 *.exe
 *.sublime-project
 *.sublime-workspace
