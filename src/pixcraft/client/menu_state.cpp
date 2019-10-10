@@ -17,7 +17,15 @@ MenuState::MenuState(GameClient& client)
 		client.setGameState(std::unique_ptr<PlayState>(new PlayState(client)));
 	});
 	
+	bgProgram.init(ShaderSources::menuBgVS, ShaderSources::menuBgFS);
 	Image::initRendering();
+	
+	const std::array<float, 8> bgVertices {
+		-1, -1,  1, -1,
+		-1,  1,  1,  1,
+	};
+	bgBuffer.init(0, 2*sizeof(float));
+	bgBuffer.loadData(bgVertices.data(), bgVertices.size()/2, GL_STATIC_DRAW);
 	
 	logo.prerender();
 	for(auto& button : buttons) {
@@ -50,6 +58,20 @@ void MenuState::render(int winWidth, int winHeight) {
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	
+	bgProgram.use();
+	bgProgram.setUniform("texArray", (uint32_t) 0);
+	TextureManager::bindBlockTextureArray();
+	bgProgram.setUniform("texId", (uint32_t) TextureManager::DIRT);
+	bgProgram.setUniform("winSize", (float) winWidth, (float) winHeight);
+	bgProgram.setUniform("tileSize", (float) TextureManager::BLOCK_TEX_SIZE*4);
+	float t = client.getFrameNo() / 60.0f;
+	bgProgram.setUniform("offset", t * 0.5f, -t * 0.3f);
+	bgBuffer.bind();
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, bgBuffer.vertexCount());
+	bgBuffer.unbind();
+	bgProgram.unuse();
+	checkGlErrors("menu background rendering");
 	
 	logo.render(winWidth, winHeight);
 	checkGlErrors("logo rendering");

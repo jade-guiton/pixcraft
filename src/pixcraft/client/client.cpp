@@ -117,9 +117,8 @@ void GameClient::setGameState(std::unique_ptr<GameState> newGameState) {
 	gameState.swap(newGameState);
 }
 
-int GameClient::getFPS() {
-	return FPS;
-}
+int GameClient::getFrameNo() { return frameNo; }
+int GameClient::getFPS() { return FPS; }
 
 int main() {
 	glfwSetErrorCallback(glfwErrorCallback);
