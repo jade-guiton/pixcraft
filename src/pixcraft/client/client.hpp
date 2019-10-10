@@ -33,6 +33,7 @@ namespace PixCraft {
 		
 		void setGameState(std::unique_ptr<GameState> gameState);
 		
+		int getFrameNo();
 		int getFPS();
 		
 	private:

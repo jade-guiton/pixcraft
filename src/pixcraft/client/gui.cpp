@@ -27,10 +27,8 @@ void Image::prerender() {
 
 void Image::render(int winW, int winH) {
 	program.use();
-	checkGlErrors("program activation");
 	program.setUniform("winSize", (float) winW, (float) winH);
 	program.setUniform("tex", (uint32_t) 0);
-	checkGlErrors("uniform setting");
 	TextureManager::bindOtherTextures(tex);
 	buffer.bind();
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, buffer.vertexCount());
