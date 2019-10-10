@@ -81,7 +81,7 @@ void GameClient::run() {
 		input.clearJustPressed();
 		
 		int width, height;
-		glfwGetWindowSize(window, &width, &height);
+		glfwGetFramebufferSize(window, &width, &height);
 		gameState->render(width, height);
 		
 		now = glfwGetTime();
