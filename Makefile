@@ -8,7 +8,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 LDFLAGS   := -static -lglfw3 -lopengl32 \
 	-lfreetype -lharfbuzz -lfreetype -lpng16 -lz -lbz2 -lgraphite2 -lgdi32 -lrpcrt4
 CPPFLAGS  := 
-CXXFLAGS  := -MD -MP -std=c++11 -Wall -Wno-unused \
+CXXFLAGS  := -MD -MP -std=c++17 -Wall -Wno-unused \
 	-Isrc -Ilib -IC:/lib/utf8-cpp-2.3.4 -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
 
 run: release
