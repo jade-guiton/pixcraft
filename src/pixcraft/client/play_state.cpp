@@ -83,7 +83,7 @@ PlayState::PlayState(GameClient& client)
 	
 	menuButtons.emplace_back(0, 0, 200, 30, "Back to menu");
 	menuButtons.back().setCallback([&client]() {
-		client.setGameState(std::unique_ptr<MenuState>(new MenuState(client)));
+		client.setGameState(new MenuState(client));
 	});
 	
 	for(auto& button : menuButtons) {

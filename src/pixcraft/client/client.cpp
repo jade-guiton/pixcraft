@@ -24,7 +24,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	client.getTextRenderer().setViewport(width, height);
 }
 
-GameClient::GameClient() : frameNo(0), FPS(0.0) {
+GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -74,6 +74,11 @@ void GameClient::run() {
 	double lastFrame = now;
 	double lastSecond = now;
 	while(!glfwWindowShouldClose(window)) {
+		if(nextGameState) {
+			gameState.reset(nextGameState);
+			nextGameState = nullptr;
+		}
+		
 		glfwPollEvents();
 		gameState->update(dt);
 		input.clearJustClicked();
@@ -117,8 +122,8 @@ void GameClient::stop() {
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
-void GameClient::setGameState(std::unique_ptr<GameState> newGameState) {
-	gameState.swap(newGameState);
+void GameClient::setGameState(GameState* newGameState) {
+	nextGameState = newGameState;
 }
 
 int GameClient::getFrameNo() { return frameNo; }

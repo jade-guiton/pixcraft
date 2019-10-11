@@ -13,7 +13,7 @@ MenuState::MenuState(GameClient& client)
 	
 	buttons.emplace_back(0, -50, 300, 30, "Play");
 	buttons.back().setCallback([&client]() {
-		client.setGameState(std::unique_ptr<PlayState>(new PlayState(client)));
+		client.setGameState(new PlayState(client));
 	});
 	buttons.emplace_back(0, -90, 300, 30, "Exit");
 	buttons.back().setCallback([&client]() {
