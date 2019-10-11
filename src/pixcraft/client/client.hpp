@@ -27,6 +27,7 @@ namespace PixCraft {
 		~GameClient();
 		
 		void run();
+		void stop();
 		
 		InputManager& getInputManager();
 		TextRenderer& getTextRenderer();
