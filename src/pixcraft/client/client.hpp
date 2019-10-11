@@ -13,6 +13,7 @@ namespace PixCraft {
 	class GameState {
 	public:
 		GameState(GameClient& client);
+		virtual ~GameState() = default;
 		
 		virtual void update(float dt) = 0;
 		virtual void render(int winWidth, int winHeight) = 0;
@@ -32,7 +33,7 @@ namespace PixCraft {
 		InputManager& getInputManager();
 		TextRenderer& getTextRenderer();
 		
-		void setGameState(std::unique_ptr<GameState> gameState);
+		void setGameState(GameState* gameState);
 		
 		int getFrameNo();
 		int getFPS();
@@ -46,6 +47,7 @@ namespace PixCraft {
 		TextRenderer textRenderer;
 		
 		std::unique_ptr<GameState> gameState;
+		GameState* nextGameState;
 		
 		int frameNo;
 		int FPS;
