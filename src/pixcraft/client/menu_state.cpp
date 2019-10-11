@@ -11,10 +11,13 @@ MenuState::MenuState(GameClient& client)
 	: GameState(client), logo(0, 60, 100, TextureManager::LOGO) {
 	client.getInputManager().capturingMouse(false);
 	
-	buttons.emplace_back(0, -40, 300, 30, "Play");
+	buttons.emplace_back(0, -50, 300, 30, "Play");
 	buttons.back().setCallback([&client]() {
-		std::cout << "Let's play!" << std::endl;
 		client.setGameState(std::unique_ptr<PlayState>(new PlayState(client)));
+	});
+	buttons.emplace_back(0, -90, 300, 30, "Exit");
+	buttons.back().setCallback([&client]() {
+		client.stop();
 	});
 	
 	bgProgram.init(ShaderSources::menuBgVS, ShaderSources::menuBgFS);

@@ -110,6 +110,10 @@ void GameClient::run() {
 	}
 }
 
+void GameClient::stop() {
+	glfwSetWindowShouldClose(window, true);
+}
+
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
 
