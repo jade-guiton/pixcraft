@@ -51,12 +51,12 @@ void InputManager::init(GLFWwindow* newWindow) {
 }
 
 void InputManager::capturingMouse(bool capturingMouse) {
-	_capturingMouse = capturingMouse;
-	glfwSetInputMode(window, GLFW_CURSOR, capturingMouse ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	glfwSetCursorPos(window, width/2, height/2);
-	if(capturingMouse) {
+	if(capturingMouse != _capturingMouse) {
+		_capturingMouse = capturingMouse;
+		glfwSetInputMode(window, GLFW_CURSOR, capturingMouse ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+		glfwSetCursorPos(window, width/2, height/2);
 		oldMouseX = width/2;
 		oldMouseY = height/2;
 	}
