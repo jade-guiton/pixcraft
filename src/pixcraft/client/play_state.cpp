@@ -165,7 +165,6 @@ void PlayState::setRenderDistance(int renderDist2) {
 void PlayState::update(float dt) {
 	InputManager& input = client.getInputManager();
 	
-	console.update(input);
 	if(!console.isOpen()) {
 		if(input.justPressed(GLFW_KEY_ESCAPE)) {
 			paused = !paused;
@@ -188,6 +187,8 @@ void PlayState::update(float dt) {
 			}
 		}
 	}
+	
+	console.update(input);
 	
 	if(!paused && !console.isOpen()) {
 		player->handleKeys(input.getMovementKeys(), dt);
