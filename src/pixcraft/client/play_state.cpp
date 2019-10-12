@@ -86,25 +86,39 @@ PlayState::PlayState(GameClient& client)
 	});
 	console.addCommand("fly", [&]() {
 		player->movementMode(MovementMode::flying);
+		console.write("Flight mode enabled.");
 	});
 	console.addCommand("fall", [&]() {
 		player->movementMode(MovementMode::normal);
+		console.write("Flight mode disabled.");
 	});
 	console.addCommand("noclip", [&]() {
 		player->movementMode(MovementMode::noClip);
+		console.write("Noclip mode enabled.");
 	});
 	console.addCommand("debug", [&]() {
 		showDebug = !showDebug;
 	});
 	console.addCommand("antialias", [&]() {
 		setAntialiasing(!antialiasing);
+		if(antialiasing) {
+			console.write("Antialiasing enabled.");
+		} else {
+			console.write("Antialiasing disabled.");
+		}
 	});
 	console.addCommand("further", [&]() {
 		setRenderDistance(renderDist + 1);
+		std::stringstream ss;
+		ss << "Set render distance to " << renderDist << ".";
+		console.write(ss.str());
 	});
 	console.addCommand("closer", [&]() {
 		if(renderDist > 1)
 			setRenderDistance(renderDist - 1);
+		std::stringstream ss;
+		ss << "Set render distance to " << renderDist << ".";
+		console.write(ss.str());
 	});
 	console.addCommand("rerender", [&]() {
 		chunkRenderer.reset();
@@ -114,7 +128,7 @@ PlayState::PlayState(GameClient& client)
 		console.write("Saved world to file.");
 	});
 	console.addCommand("load", [&]() {
-		world.loadFromFile("data/world.bin");
+		player = world.loadFromFile("data/world.bin");
 		chunkRenderer.reset();
 		console.write("Loaded world from file.");
 	});
