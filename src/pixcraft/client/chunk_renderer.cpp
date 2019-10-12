@@ -88,15 +88,15 @@ void RenderedChunk::renderTranslucent(FaceRenderer& faceRenderer) {
 }
 
 
-void RenderedChunk::prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t relZ) {
+void RenderedChunk::prerenderBlock(Chunk& chunk, uint8_t relX, uint8_t y, uint8_t relZ) {
 	Block* block = chunk.getBlock(relX, y, relZ);
 	if(block == nullptr) return;
 	
 	for(uint8_t side = 0; side < 6; ++side) {
-		int8_t x2 = relX + sideVectors[side][0];
-		int8_t y2 = y + sideVectors[side][1];
-		int8_t z2 = relZ + sideVectors[side][2];
-		
+		int32_t x2 = (int32_t) relX + sideVectors[side][0];
+		int32_t y2 = (int32_t) y + sideVectors[side][1];
+		int32_t z2 = (int32_t) relZ + sideVectors[side][2];
+	
 		bool renderFace;
 		if(INVALID_BLOCK_POS(x2, y2, z2)) {
 			int32_t x3 = chunkX*CHUNK_SIZE + x2;
