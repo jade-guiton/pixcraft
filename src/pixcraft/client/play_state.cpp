@@ -81,8 +81,42 @@ PlayState::PlayState(GameClient& client)
 	particleRenderer.init();
 	hotbar.init();
 	
-	console.addCommand("hello", [this]() {
-		this->console.write("Hello!");
+	console.addCommand("clear", [&]() {
+		console.clearHistory();
+	});
+	console.addCommand("fly", [&]() {
+		player->movementMode(MovementMode::flying);
+	});
+	console.addCommand("fall", [&]() {
+		player->movementMode(MovementMode::normal);
+	});
+	console.addCommand("noclip", [&]() {
+		player->movementMode(MovementMode::noClip);
+	});
+	console.addCommand("debug", [&]() {
+		showDebug = !showDebug;
+	});
+	console.addCommand("antialias", [&]() {
+		setAntialiasing(!antialiasing);
+	});
+	console.addCommand("further", [&]() {
+		setRenderDistance(renderDist + 1);
+	});
+	console.addCommand("closer", [&]() {
+		if(renderDist > 1)
+			setRenderDistance(renderDist - 1);
+	});
+	console.addCommand("rerender", [&]() {
+		chunkRenderer.reset();
+	});
+	console.addCommand("save", [&]() {
+		world.saveToFile("data/world.bin");
+		console.write("Saved world to file.");
+	});
+	console.addCommand("load", [&]() {
+		world.loadFromFile("data/world.bin");
+		chunkRenderer.reset();
+		console.write("Loaded world from file.");
 	});
 	
 	menuButtons.emplace_back(0, 0, 200, 30, "Back to menu");
@@ -112,36 +146,6 @@ void PlayState::setRenderDistance(int renderDist2) {
 	renderDist = renderDist2;
 	fogEnd = renderDist * CHUNK_SIZE;
 	fogStart = fogEnd * 0.9;
-}
-
-void PlayState::executeCommand(std::string command) {
-	if(command.compare("fly") == 0) {
-		player->movementMode(MovementMode::flying);
-	} else if(command.compare("fall") == 0) {
-		player->movementMode(MovementMode::normal);
-	} else if(command.compare("noclip") == 0) {
-		player->movementMode(MovementMode::noClip);
-	} else if(command.compare("debug") == 0) {
-		showDebug = !showDebug;
-	} else if(command.compare("antialias") == 0) {
-		setAntialiasing(!antialiasing);
-	} else if(command.compare("further") == 0) {
-		setRenderDistance(renderDist + 1);
-	} else if(command.compare("closer") == 0) {
-		if(renderDist > 1)
-			setRenderDistance(renderDist - 1);
-	} else if(command.compare("rerender") == 0) {
-		chunkRenderer.reset();
-	} else if(command.compare("save") == 0) {
-		world.saveToFile("data/world.bin");
-		std::cout << "Saved world to file." << std::endl;
-	} else if(command.compare("load") == 0) {
-		player = world.loadFromFile("data/world.bin");
-		chunkRenderer.reset();
-		std::cout << "Loaded world from file." << std::endl;
-	} else {
-		std::cout << "Unrecognized command: " << command << std::endl;
-	}
 }
 
 void PlayState::update(float dt) {

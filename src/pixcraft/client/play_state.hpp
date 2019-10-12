@@ -59,6 +59,5 @@ namespace PixCraft {
 		
 		void setAntialiasing(bool enabled);
 		void setRenderDistance(int renderDist);
-		void executeCommand(std::string command);
 	};
 }

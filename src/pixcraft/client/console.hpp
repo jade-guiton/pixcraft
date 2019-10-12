@@ -19,6 +19,7 @@ namespace PixCraft {
 		void addCommand(std::string command, std::function<void()> callback);
 		
 		void write(std::string line);
+		void clearHistory();
 		
 		void update(InputManager& input);
 		void render(TextRenderer& textRenderer, int winW, int winH);
