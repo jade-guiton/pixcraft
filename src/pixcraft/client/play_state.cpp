@@ -53,7 +53,7 @@ const std::array<unsigned int, 24> blockOverlayIndices = {
 };
 
 PlayState::PlayState(GameClient& client)
-	: GameState(client), showDebug(false), paused(false), showCommandLine(false), chunkRenderer(world, faceRenderer),
+	: GameState(client), showDebug(false), paused(false), chunkRenderer(world, faceRenderer),
 	  hotbar(faceRenderer) {
 	setAntialiasing(false);
 	setRenderDistance(8);
@@ -80,6 +80,10 @@ PlayState::PlayState(GameClient& client)
 	entityRenderer.init();
 	particleRenderer.init();
 	hotbar.init();
+	
+	console.addCommand("hello", [this]() {
+		this->console.write("Hello!");
+	});
 	
 	menuButtons.emplace_back(0, 0, 200, 30, "Back to menu");
 	menuButtons.back().setCallback([&client]() {
@@ -110,61 +114,64 @@ void PlayState::setRenderDistance(int renderDist2) {
 	fogStart = fogEnd * 0.9;
 }
 
-void PlayState::executeCommand() {
-	if(commandBuffer.compare("fly") == 0) {
+void PlayState::executeCommand(std::string command) {
+	if(command.compare("fly") == 0) {
 		player->movementMode(MovementMode::flying);
-	} else if(commandBuffer.compare("fall") == 0) {
+	} else if(command.compare("fall") == 0) {
 		player->movementMode(MovementMode::normal);
-	} else if(commandBuffer.compare("noclip") == 0) {
+	} else if(command.compare("noclip") == 0) {
 		player->movementMode(MovementMode::noClip);
-	} else if(commandBuffer.compare("debug") == 0) {
+	} else if(command.compare("debug") == 0) {
 		showDebug = !showDebug;
-	} else if(commandBuffer.compare("antialias") == 0) {
+	} else if(command.compare("antialias") == 0) {
 		setAntialiasing(!antialiasing);
-	} else if(commandBuffer.compare("further") == 0) {
+	} else if(command.compare("further") == 0) {
 		setRenderDistance(renderDist + 1);
-	} else if(commandBuffer.compare("closer") == 0) {
+	} else if(command.compare("closer") == 0) {
 		if(renderDist > 1)
 			setRenderDistance(renderDist - 1);
-	} else if(commandBuffer.compare("rerender") == 0) {
+	} else if(command.compare("rerender") == 0) {
 		chunkRenderer.reset();
-	} else if(commandBuffer.compare("save") == 0) {
+	} else if(command.compare("save") == 0) {
 		world.saveToFile("data/world.bin");
 		std::cout << "Saved world to file." << std::endl;
-	} else if(commandBuffer.compare("load") == 0) {
+	} else if(command.compare("load") == 0) {
 		player = world.loadFromFile("data/world.bin");
 		chunkRenderer.reset();
 		std::cout << "Loaded world from file." << std::endl;
 	} else {
-		std::cout << "Unrecognized command: " << commandBuffer << std::endl;
+		std::cout << "Unrecognized command: " << command << std::endl;
 	}
 }
 
 void PlayState::update(float dt) {
 	InputManager& input = client.getInputManager();
-	std::string inputText = input.retrieveInputBuffer();
-	if(showCommandLine) {
-		if(inputText.size() > 0) {
-			commandBuffer.append(inputText);
-		}
-		if(input.justPressed(GLFW_KEY_ENTER)) {
-			executeCommand();
-		}
-		if(input.justPressed(GLFW_KEY_ESCAPE) || input.justPressed(GLFW_KEY_ENTER)) {
-			showCommandLine = false;
-			commandBuffer.clear();
-		}
-	} else {
-		if(input.justPressed(GLFW_KEY_T)) {
-			showCommandLine = true;
-		}
+	
+	console.update(input);
+	if(!console.isOpen()) {
 		if(input.justPressed(GLFW_KEY_ESCAPE)) {
 			paused = !paused;
 			client.getInputManager().capturingMouse(!paused);
 		}
+		
+		if(paused) {
+			if(input.justClicked(1)) {
+				glm::ivec2 pos = input.getMousePosition();
+				Button* hit = nullptr;
+				for(auto& button : menuButtons) {
+					if(button.hits(pos.x, pos.y)) {
+						hit = &button;
+						break;
+					}
+				}
+				if(hit) {
+					hit->click();
+				}
+			}
+		}
 	}
 	
-	if(!paused && !showCommandLine) {
+	if(!paused && !console.isOpen()) {
 		player->handleKeys(input.getMovementKeys(), dt);
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
@@ -201,22 +208,6 @@ void PlayState::update(float dt) {
 	} else {
 		input.getMouseMovement();
 		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
-		
-		if(paused) {
-			if(input.justClicked(1)) {
-				glm::ivec2 pos = input.getMousePosition();
-				Button* hit = nullptr;
-				for(auto& button : menuButtons) {
-					if(button.hits(pos.x, pos.y)) {
-						hit = &button;
-						break;
-					}
-				}
-				if(hit) {
-					hit->click();
-				}
-			}
-		}
 	}
 	
 	int32_t camX, camY, camZ;
@@ -382,8 +373,5 @@ void PlayState::render(int winWidth, int winHeight) {
 		checkGlErrors("debug text rendering");
 	}
 	
-	if(showCommandLine) {
-		textRenderer.renderText(">> " + commandBuffer, -winWidth/2 + 10, -winHeight/2 + 10, glm::vec3(1.0, 1.0, 1.0));
-		checkGlErrors("command line rendering");
-	}
+	console.render(textRenderer, winWidth, winHeight);
 }

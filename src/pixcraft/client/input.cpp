@@ -70,11 +70,6 @@ bool InputManager::justClicked(int button) {
 	return _justClicked[button - 1];
 }
 
-void InputManager::clearJustClicked() {
-	_justClicked[0] = false;
-	_justClicked[1] = false;
-}
-
 glm::vec2 InputManager::getMouseMovement() {
 	double newMouseX, newMouseY;
 	glfwGetCursorPos(window, &newMouseX, &newMouseY);
@@ -100,10 +95,6 @@ bool InputManager::justPressed(int key) {
 	return _justPressed.count(key) == 1;
 }
 
-void InputManager::clearJustPressed() {
-	_justPressed.clear();
-}
-
 std::tuple<int,int,bool,bool> InputManager::getMovementKeys() {
 	int dx = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
 	int dz = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) - (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
@@ -113,16 +104,21 @@ std::tuple<int,int,bool,bool> InputManager::getMovementKeys() {
 }
 
 void InputManager::inputCharacter(uint32_t codepoint) {
-	utf8::append(codepoint, std::back_inserter(inputBuffer));
+	utf8::append(codepoint, std::back_inserter(_inputBuffer));
 }
 
-std::string InputManager::retrieveInputBuffer() {
-	std::string res;
-	inputBuffer.swap(res);
-	return res;
+std::string InputManager::inputBuffer() {
+	return _inputBuffer;
 }
 
 void InputManager::scrolled(int offset) { _justScrolled += offset; }
 
 int InputManager::justScrolled() { return _justScrolled; }
-void InputManager::clearJustScrolled() { _justScrolled = 0; }
+
+void InputManager::clearAll() {
+	_justClicked[0] = false;
+	_justClicked[1] = false;
+	_justPressed.clear();
+	_justScrolled = 0;
+	_inputBuffer.clear();
+}
