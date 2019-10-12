@@ -1,6 +1,7 @@
 #include "player.hpp"
 
 #include <cmath>
+#include <iostream>
 
 #include "pixcraft/util/util.hpp"
 
@@ -121,9 +122,9 @@ std::unique_ptr<Player> Player::unserialize(World& world, const Serializer::Play
 	std::unique_ptr<Player> player(new Player(world, glm::vec3(0.0,0.0,0.0)));
 	player->unserializeMobBase(playerData->mob());
 	switch(playerData->movement_mode()) {
-	case Serializer::MovementMode_Normal: player->_movementMode = MovementMode::normal; break;
-	case Serializer::MovementMode_Flying: player->_movementMode = MovementMode::flying; break;
-	case Serializer::MovementMode_NoClip: player->_movementMode = MovementMode::noClip; break;
+	case Serializer::MovementMode_Normal: player->movementMode(MovementMode::normal); break;
+	case Serializer::MovementMode_Flying: player->movementMode(MovementMode::flying); break;
+	case Serializer::MovementMode_NoClip: player->movementMode(MovementMode::noClip); break;
 	}
 	return player;
 }
