@@ -31,7 +31,7 @@ namespace PixCraft {
 		FaceBuffer translucentBuffer;
 		int32_t chunkX, chunkZ;
 		
-		void prerenderBlock(Chunk& chunk, int8_t relX, int8_t y, int8_t relZ);
+		void prerenderBlock(Chunk& chunk, uint8_t relX, uint8_t y, uint8_t relZ);
 	};
 	
 	class ChunkRenderer {

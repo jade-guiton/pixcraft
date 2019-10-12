@@ -22,13 +22,13 @@ void Chunk::init(World* world2) { world = world2; }
 
 flatbuffers::Offset<Serializer::Chunk> Chunk::serialize(int32_t chunkX, int32_t chunkZ, flatbuffers::FlatBufferBuilder& builder) {
 	auto blockVector = builder.CreateVector(blocks, CHUNK_BLOCKS);
-	std::vector<uint32_t> scheduledUpdates(scheduledUpdates.begin(), scheduledUpdates.end());
-	auto updateVector = builder.CreateVector(scheduledUpdates);
-	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector, updateVector);
+	std::vector<uint32_t> updateVector(scheduledUpdates.begin(), scheduledUpdates.end());
+	auto updateVector2 = builder.CreateVector(updateVector);
+	return Serializer::CreateChunk(builder, chunkX, chunkZ, blockVector, updateVector2);
 }
 
 void Chunk::unserialize(const Serializer::Chunk* chunkData) {
-	if(chunkData->blocks()->Length() != CHUNK_BLOCKS) {
+	if(chunkData->blocks()->size() != CHUNK_BLOCKS) {
 		throw std::runtime_error("Wrong number of blocks in loaded chunk");
 	}
 	std::copy(chunkData->blocks()->begin(), chunkData->blocks()->end(), blocks);

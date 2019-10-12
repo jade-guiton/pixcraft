@@ -64,7 +64,7 @@ Player* World::loadFromFile(std::string path) {
 	gen = WorldGenerator(world->seed());
 	
 	auto chunks = world->chunks();
-	auto chunkCount = chunks->Length();
+	auto chunkCount = chunks->size();
 	for(unsigned int i = 0; i < chunkCount; ++i) {
 		const Serializer::Chunk* chunkData = chunks->Get(i);
 		int32_t chunkX = chunkData->chunk_x();
@@ -73,14 +73,14 @@ Player* World::loadFromFile(std::string path) {
 		Chunk& chunk = loadedChunks[key];
 		chunk.init(this);
 		chunk.unserialize(chunkData);
-		if(chunkData->scheduled_updates()->Length() != 0) {
+		if(chunkData->scheduled_updates()->size() != 0) {
 			scheduledUpdates.insert(key);
 		}
 	}
 	
 	auto mobsData = world->mobs();
 	auto mobsType = world->mobs_type();
-	auto mobCount = mobsData->Length();
+	auto mobCount = mobsData->size();
 	Player* player = nullptr;
 	for(unsigned int i = 0; i < mobCount; ++i) {
 		auto mobType = mobsType->Get(i);
@@ -88,6 +88,10 @@ Player* World::loadFromFile(std::string path) {
 		if(player == nullptr && mobType == Serializer::Mob_Player) {
 			player = static_cast<Player*>(mobs.back().get());
 		}
+	}
+	
+	if(!player) {
+		throw std::logic_error("No player was found in loaded world file");
 	}
 	
 	return player;
