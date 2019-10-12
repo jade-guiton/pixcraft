@@ -18,21 +18,20 @@ namespace PixCraft {
 		
 		void mouseClicked(int button);
 		bool justClicked(int button);
-		void clearJustClicked();
 		glm::vec2 getMouseMovement();
 		glm::ivec2 getMousePosition();
 		
 		void keyPressed(int key);
 		bool justPressed(int key);
-		void clearJustPressed();
 		std::tuple<int,int,bool,bool> getMovementKeys();
 		
 		void inputCharacter(uint32_t codepoint);
-		std::string retrieveInputBuffer();
+		std::string inputBuffer();
 		
 		void scrolled(int offset);
 		int justScrolled();
-		void clearJustScrolled();
+		
+		void clearAll();
 		
 	private:
 		static constexpr float mouseSensitivity = 0.005f;
@@ -47,6 +46,6 @@ namespace PixCraft {
 		
 		int _justScrolled;
 		
-		std::string inputBuffer;
+		std::string _inputBuffer;
 	};
 }

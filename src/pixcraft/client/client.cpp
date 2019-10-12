@@ -81,9 +81,7 @@ void GameClient::run() {
 		
 		glfwPollEvents();
 		gameState->update(dt);
-		input.clearJustClicked();
-		input.clearJustScrolled();
-		input.clearJustPressed();
+		input.clearAll();
 		
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);

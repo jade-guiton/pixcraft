@@ -11,6 +11,7 @@
 #include "particle_renderer.hpp"
 #include "hotbar.hpp"
 #include "gui.hpp"
+#include "console.hpp"
 
 #include "pixcraft/server/world_module.hpp"
 #include "pixcraft/server/world.hpp"
@@ -36,8 +37,7 @@ namespace PixCraft {
 		int renderDist;
 		float fogStart, fogEnd;
 		
-		bool showCommandLine;
-		std::string commandBuffer;
+		Console console;
 		
 		World world;
 		Player* player;
@@ -59,6 +59,6 @@ namespace PixCraft {
 		
 		void setAntialiasing(bool enabled);
 		void setRenderDistance(int renderDist);
-		void executeCommand();
+		void executeCommand(std::string command);
 	};
 }
