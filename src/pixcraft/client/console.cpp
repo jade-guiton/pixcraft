@@ -20,6 +20,10 @@ void Console::write(std::string line) {
 	history.push_back(line);
 }
 
+void Console::clearHistory() {
+	history.clear();
+}
+
 void Console::update(InputManager& input) {
 	if(open) {
 		std::string inputText = input.inputBuffer();
