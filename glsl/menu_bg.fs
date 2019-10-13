@@ -12,5 +12,5 @@ in vec2 vertPos;
 out vec4 fragColor;
 
 void main() {
-	fragColor = texture(texArray, vec3(vertPos*winSize/2/tileSize + offset, texId));
+	fragColor = texture(texArray, vec3(mod(vertPos*winSize/2/tileSize + offset, 1), texId));
 }
