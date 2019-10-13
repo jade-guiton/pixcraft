@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
 
 #include "play_state.hpp"
 #include "menu_state.hpp"
@@ -24,7 +25,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	client.getTextRenderer().setViewport(width, height);
 }
 
-GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0) {
+GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0), fullscreen(false) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -43,12 +44,12 @@ GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0) {
 	
 	std::cout << "Using OpenGL version " << GLVersion.major << "." << GLVersion.minor << std::endl;
 	
+	input.init(window);
+	textRenderer.init();
+	
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
 	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
 	glfwSwapInterval(-1);
-	
-	textRenderer.init();
-	input.init(window);
 	
 	TextureManager::loadTextures();
 	BlockRegistry::defineBlocks();
@@ -62,6 +63,36 @@ GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0) {
 GameClient::~GameClient() {
 	textRenderer.free();
 	glfwDestroyWindow(window);
+}
+
+GLFWmonitor* getCurrentMonitor(GLFWwindow *window) {
+	int wx, wy, ww, wh;
+	glfwGetWindowPos(window, &wx, &wy);
+	glfwGetWindowSize(window, &ww, &wh);
+	
+	int nmonitors;
+	GLFWmonitor** monitors = glfwGetMonitors(&nmonitors);
+	
+	GLFWmonitor* bestmonitor = nullptr;
+	int bestoverlap = 0;
+	
+	for(int i = 0; i < nmonitors; ++i) {
+		const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+		int mx, my, mw, mh;
+		glfwGetMonitorPos(monitors[i], &mx, &my);
+		mw = mode->width;
+		mh = mode->height;
+		
+		int overlap = std::max(0, std::min(wx + ww, mx + mw) - std::max(wx, mx))
+			* std::max(0, std::min(wy + wh, my + mh) - std::max(wy, my));
+		
+		if(bestoverlap < overlap) {
+			bestoverlap = overlap;
+			bestmonitor = monitors[i];
+		}
+	}
+
+	return bestmonitor;
 }
 
 void GameClient::run() {
@@ -81,10 +112,25 @@ void GameClient::run() {
 		
 		glfwPollEvents();
 		gameState->update(dt);
+		if(input.justPressed(GLFW_KEY_F)) {
+			fullscreen = !fullscreen;
+			if(fullscreen) {
+				glfwGetFramebufferSize(window, &windowedWidth, &windowedHeight);
+				GLFWmonitor* monitor = getCurrentMonitor(window);
+				const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+			} else {
+				GLFWmonitor* monitor = glfwGetWindowMonitor(window);
+				const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+				glfwSetWindowMonitor(window, nullptr, (mode->width - windowedWidth)/2, (mode->height - windowedHeight)/2,
+					windowedWidth, windowedHeight, GLFW_DONT_CARE);
+			}
+		}
 		input.clearAll();
 		
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
+		
 		gameState->render(width, height);
 		
 		now = glfwGetTime();

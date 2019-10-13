@@ -7,7 +7,7 @@
 using namespace PixCraft;
 
 InputManager::InputManager()
-	: window(nullptr), _capturingMouse(false), oldMouseX(0), oldMouseY(0), _justPressed(), _justClicked {false, false},
+	: window(nullptr), _capturingMouse(false), oldMousePos(0, 0), _justPressed(), _justClicked {false, false},
 	  _justScrolled(0) { }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -57,8 +57,7 @@ void InputManager::capturingMouse(bool capturingMouse) {
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		glfwSetCursorPos(window, width/2, height/2);
-		oldMouseX = width/2;
-		oldMouseY = height/2;
+		oldMousePos = glm::ivec2(width/2, height/2);
 	}
 }
 
@@ -71,10 +70,9 @@ bool InputManager::justClicked(int button) {
 }
 
 glm::vec2 InputManager::getMouseMovement() {
-	double newMouseX, newMouseY;
-	glfwGetCursorPos(window, &newMouseX, &newMouseY);
-	glm::vec2 mvt(newMouseX - oldMouseX, newMouseY - oldMouseY);
-	oldMouseX = newMouseX; oldMouseY = newMouseY;
+	glm::ivec2 newMousePos = getMousePosition();
+	glm::vec2 mvt = newMousePos - oldMousePos;
+	oldMousePos = newMousePos;
 	return mouseSensitivity * mvt;
 }
 
