@@ -39,7 +39,7 @@ namespace PixCraft {
 		GLFWwindow* window;
 		
 		bool _capturingMouse;
-		double oldMouseX, oldMouseY;
+		glm::ivec2 oldMousePos;
 		
 		std::unordered_set<int> _justPressed;
 		bool _justClicked[2];

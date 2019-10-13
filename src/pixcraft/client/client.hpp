@@ -51,6 +51,8 @@ namespace PixCraft {
 		
 		int frameNo;
 		int FPS;
+		bool fullscreen;
+		int windowedWidth, windowedHeight;
 		
 		friend void windowResizeCallback(GLFWwindow* window, int width, int height);
 	};

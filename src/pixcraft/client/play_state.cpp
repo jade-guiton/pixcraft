@@ -194,7 +194,7 @@ void PlayState::update(float dt) {
 		player->handleKeys(input.getMovementKeys(), dt);
 		
 		glm::vec2 mouseMvt = input.getMouseMovement();
-		player->rotate(glm::vec3(-mouseMvt.y, -mouseMvt.x, 0));
+		player->rotate(glm::vec3(mouseMvt.y, -mouseMvt.x, 0));
 		
 		int scroll = input.justScrolled();
 		if(scroll > 0) {
