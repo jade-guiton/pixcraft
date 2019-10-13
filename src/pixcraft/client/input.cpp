@@ -57,7 +57,7 @@ void InputManager::capturingMouse(bool capturingMouse) {
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		glfwSetCursorPos(window, width/2, height/2);
-		oldMousePos = glm::ivec2(width/2, height/2);
+		oldMousePos = glm::ivec2(0, 0);
 	}
 }
 
