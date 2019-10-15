@@ -89,7 +89,7 @@ int TextRenderer::getTextHeight() {
 	return xHeight;
 }
 
-void TextRenderer::renderText(std::string str, float startX, float startY, glm::vec3 color) {
+void TextRenderer::renderText(std::string str, float startX, float startY, glm::vec4 color) {
 	program.use();
 	buffer.bind();
 	
@@ -97,7 +97,7 @@ void TextRenderer::renderText(std::string str, float startX, float startY, glm::
 	
 	program.setUniform("winSize", (float) winWidth, (float) winHeight);
 	program.setUniform("tex", (uint32_t) 0);
-	program.setUniform("textColor", color.r, color.g, color.b);
+	program.setUniform("textColor", color.r, color.g, color.b, color.a);
 	
 	float x = startX;
 	float y = startY;

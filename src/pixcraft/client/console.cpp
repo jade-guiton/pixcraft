@@ -6,7 +6,7 @@
 
 using namespace PixCraft;
 
-Console::Console() : open(false), cursorPos(0) {}
+Console::Console() : open(false), cursorPos(0), framesSinceUpdate(0) {}
 
 bool Console::isOpen() { return open; }
 
@@ -20,6 +20,7 @@ void Console::addCommand(std::string command, std::function<void()> callback) {
 
 void Console::write(std::string line) {
 	history.push_back(line);
+	framesSinceUpdate = 0;
 }
 
 void Console::clearHistory() {
@@ -76,23 +77,29 @@ void Console::update(InputManager& input) {
 }
 
 void Console::render(TextRenderer& textRenderer, int winW, int winH) {
-	int lineHeight = textRenderer.getTextHeight()*2;
-	int x = -winW/2 + 10;
-	int y = -winH/2 + 10 + history.size()*lineHeight;
-	for(auto& line : history) {
-		textRenderer.renderText(line, x, y, glm::vec3(1.0, 1.0, 1.0));
-		y -= lineHeight;
+	int x0 = -winW/2 + 10;
+	int y0 = -winH/2 + 10;
+	if(open || framesSinceUpdate < 100) {
+		float alpha = (open || framesSinceUpdate < 80) ? 1.0f : (100-framesSinceUpdate)/20.0f;
+		int lineHeight = textRenderer.getTextHeight()*2;
+		int y = y0 + history.size()*lineHeight;
+		for(auto& line : history) {
+			textRenderer.renderText(line, x0, y, glm::vec4(1.0, 1.0, 1.0, alpha));
+			y -= lineHeight;
+		}
 	}
 	if(open) {
 		std::string prompt = ">> ";
 		std::string inputLine = prompt + inputBuffer;
-		textRenderer.renderText(inputLine, x, y, glm::vec3(1.0, 1.0, 1.0));
+		textRenderer.renderText(inputLine, x0, y0, glm::vec4(1.0, 1.0, 1.0, 1.0));
 		std::string beforeCursor = inputLine.substr(0, prompt.size() + cursorPos);
 		std::string cursor = "|";
-		int cursorX = x + textRenderer.getTextWidth(beforeCursor) - textRenderer.getTextWidth(cursor)/2;
-		textRenderer.renderText(cursor, cursorX, y, glm::vec3(1.0, 1.0, 1.0));
+		int x = x0 + textRenderer.getTextWidth(beforeCursor) - textRenderer.getTextWidth(cursor)/2;
+		textRenderer.renderText(cursor, x, y0, glm::vec4(1.0, 1.0, 1.0, 1.0));
 	}
 	checkGlErrors("command line rendering");
+	
+	framesSinceUpdate++;
 }
 
 void Console::executeCommand(std::string command) {

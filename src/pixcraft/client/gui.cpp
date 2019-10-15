@@ -84,7 +84,7 @@ void Button::render(TextRenderer& textRenderer, int winW, int winH) {
 	program.unuse();
 	int textX = x - textRenderer.getTextWidth(label)/2;
 	int textY = y - textRenderer.getTextHeight()/2;
-	textRenderer.renderText(label, textX, textY, glm::vec3(0.0, 0.0, 0.0));
+	textRenderer.renderText(label, textX, textY, glm::vec4(0.0, 0.0, 0.0, 1.0));
 }
 
 bool Button::hits(int hx, int hy) {

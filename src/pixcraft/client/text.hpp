@@ -38,7 +38,7 @@ namespace PixCraft {
 		int getTextWidth(std::string str);
 		int getTextHeight();
 		
-		void renderText(std::string str, float x, float y, glm::vec3 color);
+		void renderText(std::string str, float x, float y, glm::vec4 color);
 		
 	private:
 		static const size_t QUAD_SIZE = 24;
