@@ -27,8 +27,10 @@ namespace PixCraft {
 	private:
 		bool open;
 		std::deque<std::string> history;
-		std::string inputBuffer;
 		std::unordered_map<std::string, std::function<void()>> commands;
+		
+		std::string inputBuffer;
+		int cursorPos;
 		
 		void executeCommand(std::string command);
 	};

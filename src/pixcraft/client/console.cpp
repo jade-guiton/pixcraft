@@ -2,9 +2,11 @@
 
 #include <iostream>
 
+#include "utf8.h"
+
 using namespace PixCraft;
 
-Console::Console() : open(false) {}
+Console::Console() : open(false), cursorPos(0) {}
 
 bool Console::isOpen() { return open; }
 
@@ -27,7 +29,31 @@ void Console::clearHistory() {
 void Console::update(InputManager& input) {
 	if(open) {
 		std::string inputText = input.inputBuffer();
-		if(inputText.size() > 0) inputBuffer.append(inputText);
+		if(inputText.size() > 0) {
+			inputBuffer.insert(cursorPos, inputText);
+			cursorPos += inputText.size();
+		}
+		
+		bool left = input.justPressed(GLFW_KEY_LEFT);
+		bool backspace = input.justPressed(GLFW_KEY_BACKSPACE);
+		if((left || backspace) && cursorPos > 0) {
+			auto it = inputBuffer.begin() + cursorPos;
+			utf8::prior(it, inputBuffer.begin());
+			if(backspace)
+				inputBuffer.erase(it, inputBuffer.begin() + cursorPos);
+			cursorPos = it - inputBuffer.begin();
+		}
+		
+		bool right = input.justPressed(GLFW_KEY_RIGHT);
+		bool delete_ = input.justPressed(GLFW_KEY_DELETE);
+		if((right || delete_) && cursorPos < inputBuffer.size()) {
+			auto it = inputBuffer.begin() + cursorPos;
+			utf8::next(it, inputBuffer.end());
+			if(delete_)
+				inputBuffer.erase(inputBuffer.begin() + cursorPos, it);
+			else
+				cursorPos = it - inputBuffer.begin();
+		}
 		
 		if(input.justPressed(GLFW_KEY_ENTER)) {
 			std::string command = inputBuffer;
@@ -38,9 +64,14 @@ void Console::update(InputManager& input) {
 		if(input.justPressed(GLFW_KEY_ESCAPE) || input.justPressed(GLFW_KEY_ENTER)) {
 			open = false;
 			inputBuffer.clear();
+			cursorPos = 0;
+			input.capturingMouse(true);
 		}
 	} else {
-		if(input.justPressed(GLFW_KEY_ENTER)) open = true;
+		if(input.justPressed(GLFW_KEY_ENTER)) {
+			open = true;
+			input.capturingMouse(false);
+		}
 	}
 }
 
@@ -53,7 +84,13 @@ void Console::render(TextRenderer& textRenderer, int winW, int winH) {
 		y -= lineHeight;
 	}
 	if(open) {
-		textRenderer.renderText(">> " + inputBuffer, x, y, glm::vec3(1.0, 1.0, 1.0));
+		std::string prompt = ">> ";
+		std::string inputLine = prompt + inputBuffer;
+		textRenderer.renderText(inputLine, x, y, glm::vec3(1.0, 1.0, 1.0));
+		std::string beforeCursor = inputLine.substr(0, prompt.size() + cursorPos);
+		std::string cursor = "|";
+		int cursorX = x + textRenderer.getTextWidth(beforeCursor) - textRenderer.getTextWidth(cursor)/2;
+		textRenderer.renderText(cursor, cursorX, y, glm::vec3(1.0, 1.0, 1.0));
 	}
 	checkGlErrors("command line rendering");
 }

@@ -112,7 +112,7 @@ void GameClient::run() {
 		
 		glfwPollEvents();
 		gameState->update(dt);
-		if(input.justPressed(GLFW_KEY_F)) {
+		if(input.justPressed(GLFW_KEY_F11)) {
 			fullscreen = !fullscreen;
 			if(fullscreen) {
 				glfwGetFramebufferSize(window, &windowedWidth, &windowedHeight);
