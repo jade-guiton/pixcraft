@@ -388,7 +388,7 @@ void PlayState::render(int winWidth, int winHeight) {
 		debugStream << "Rendered chunks: " << chunkRenderer.renderedChunkCount() << std::endl;
 		debugStream << "Antialiasing: " << (antialiasing ? "enabled" : "disabled") << std::endl;
 		//debugStream << "Unicode test: AéǄ‰₪ℝψЯאصखଇணఔฌ갃ば亶〠㊆😎😂" << std::endl;
-		textRenderer.renderText(debugStream.str(), -winWidth/2 + 5, winHeight/2 - 20, glm::vec3(1.0, 1.0, 1.0));
+		textRenderer.renderText(debugStream.str(), -winWidth/2 + 5, winHeight/2 - 20, glm::vec4(1.0, 1.0, 1.0, 1.0));
 		checkGlErrors("debug text rendering");
 	}
 	

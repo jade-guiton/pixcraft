@@ -30,7 +30,9 @@ namespace PixCraft {
 		std::unordered_map<std::string, std::function<void()>> commands;
 		
 		std::string inputBuffer;
-		int cursorPos;
+		uint32_t cursorPos;
+		
+		int framesSinceUpdate;
 		
 		void executeCommand(std::string command);
 	};
