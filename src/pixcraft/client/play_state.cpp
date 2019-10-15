@@ -165,66 +165,66 @@ void PlayState::setRenderDistance(int renderDist2) {
 void PlayState::update(float dt) {
 	InputManager& input = client.getInputManager();
 	
-	if(!console.isOpen()) {
-		if(input.justPressed(GLFW_KEY_ESCAPE)) {
-			paused = !paused;
-			client.getInputManager().capturingMouse(!paused);
-		}
-		
-		if(paused) {
-			if(input.justClicked(1)) {
-				glm::ivec2 pos = input.getMousePosition();
-				Button* hit = nullptr;
-				for(auto& button : menuButtons) {
-					if(button.hits(pos.x, pos.y)) {
-						hit = &button;
-						break;
-					}
+	if(!console.isOpen() && input.justPressed(GLFW_KEY_ESCAPE)) {
+		paused = !paused;
+		client.getInputManager().capturingMouse(!paused);
+	}
+	
+	if(paused) {
+		if(input.justClicked(1)) {
+			glm::ivec2 pos = input.getMousePosition();
+			Button* hit = nullptr;
+			for(auto& button : menuButtons) {
+				if(button.hits(pos.x, pos.y)) {
+					hit = &button;
+					break;
 				}
-				if(hit) {
-					hit->click();
+			}
+			if(hit) {
+				hit->click();
+			}
+		}
+	} else {
+		console.update(input);
+		
+		if(!console.isOpen()) {
+			player->handleKeys(input.getMovementKeys(), dt);
+			
+			glm::vec2 mouseMvt = input.getMouseMovement();
+			player->rotate(glm::vec3(mouseMvt.y, -mouseMvt.x, 0));
+			
+			int scroll = input.justScrolled();
+			if(scroll > 0) {
+				for(int i = 0; i < scroll; i++) {
+					hotbar.next();
+				}
+			} else if(scroll < 0) {
+				for(int i = 0; i < -scroll; i++) {
+					hotbar.previous();
+				}
+			}
+			
+			bool click1 = input.justClicked(1);
+			bool click2 = input.justClicked(2);
+			if(click1 || click2) {
+				bool hit;
+				int x, y, z;
+				std::tie(hit, x, y, z) = player->castRay(PLAYER_REACH, !click1, false);
+				if(hit && World::isValidHeight(y)) {
+					if(click2) {
+						if(!world.hasSolidBlock(x, y, z) && !world.containsMobs(x, y, z))
+							world.setBlock(x, y, z, Block::fromId(hotbar.held()));
+					} else {
+						auto blockTex = world.getBlock(x, y, z)->mainTexture();
+						world.removeBlock(x, y, z);
+						particleRenderer.spawnBlockBits(glm::vec3((float) x, (float) y, (float) z), blockTex);
+					}
 				}
 			}
 		}
 	}
 	
-	console.update(input);
-	
-	if(!paused && !console.isOpen()) {
-		player->handleKeys(input.getMovementKeys(), dt);
-		
-		glm::vec2 mouseMvt = input.getMouseMovement();
-		player->rotate(glm::vec3(mouseMvt.y, -mouseMvt.x, 0));
-		
-		int scroll = input.justScrolled();
-		if(scroll > 0) {
-			for(int i = 0; i < scroll; i++) {
-				hotbar.next();
-			}
-		} else if(scroll < 0) {
-			for(int i = 0; i < -scroll; i++) {
-				hotbar.previous();
-			}
-		}
-		
-		bool click1 = input.justClicked(1);
-		bool click2 = input.justClicked(2);
-		if(click1 || click2) {
-			bool hit;
-			int x, y, z;
-			std::tie(hit, x, y, z) = player->castRay(PLAYER_REACH, !click1, false);
-			if(hit && World::isValidHeight(y)) {
-				if(click2) {
-					if(!world.hasSolidBlock(x, y, z) && !world.containsMobs(x, y, z))
-						world.setBlock(x, y, z, Block::fromId(hotbar.held()));
-				} else {
-					auto blockTex = world.getBlock(x, y, z)->mainTexture();
-					world.removeBlock(x, y, z);
-					particleRenderer.spawnBlockBits(glm::vec3((float) x, (float) y, (float) z), blockTex);
-				}
-			}
-		}
-	} else {
+	if(paused || console.isOpen()) {
 		input.getMouseMovement();
 		player->handleKeys(std::tuple<int,int,bool,bool>(0,0,false,false), dt);
 	}
