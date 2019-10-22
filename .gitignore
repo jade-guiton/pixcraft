@@ -1,4 +1,3 @@
-src/pixcraft/client/glad.cpp
 src/pixcraft/client/shaders_src.cpp
 src/pixcraft/util/commit_hash.cpp
 src/pixcraft/util/serializer_generated.h
