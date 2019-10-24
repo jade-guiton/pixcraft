@@ -33,6 +33,7 @@ namespace PixCraft {
 		InputManager& getInputManager();
 		TextRenderer& getTextRenderer();
 		
+		void setViewportSize(int width, int height);
 		void setGameState(GameState* gameState);
 		
 		int getFrameNo();
@@ -43,6 +44,8 @@ namespace PixCraft {
 		static const int START_HEIGHT = 600;
 		
 		GLFWwindow* window;
+		int width, height;
+		
 		InputManager input;
 		TextRenderer textRenderer;
 		

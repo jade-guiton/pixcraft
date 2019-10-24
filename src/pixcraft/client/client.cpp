@@ -18,14 +18,11 @@ void glfwErrorCallback(int error, const char* desc) {
 GameState::GameState(GameClient& client) : client(client) {}
 
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-	std::cout << "Window resized to " << width << "×" << height << std::endl;
-	
 	GameClient& client = *((GameClient*) glfwGetWindowUserPointer(window));
-	client.getTextRenderer().setViewport(width, height);
+	client.setViewportSize(width, height);
 }
 
-GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0), fullscreen(false) {
+GameClient::GameClient() : width(START_WIDTH), height(START_HEIGHT), nextGameState(nullptr), frameNo(0), FPS(0.0), fullscreen(false) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -33,7 +30,7 @@ GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0), fullscr
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	
 	std::string title = "PixCraft " + getVersionString();
-	window = glfwCreateWindow(START_WIDTH, START_HEIGHT, title.c_str(), nullptr, nullptr);
+	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 	if(window == nullptr)
 		throw std::runtime_error("Failed to create GLFW window");
 	glfwSetWindowUserPointer(window, (void*) this);
@@ -48,7 +45,7 @@ GameClient::GameClient() : nextGameState(nullptr), frameNo(0), FPS(0.0), fullscr
 	textRenderer.init();
 	
 	glfwSetFramebufferSizeCallback(window, windowResizeCallback);
-	windowResizeCallback(window, START_WIDTH, START_HEIGHT);
+	windowResizeCallback(window, width, height);
 	glfwSwapInterval(-1);
 	
 	TextureManager::loadTextures();
@@ -115,7 +112,8 @@ void GameClient::run() {
 		if(input.justPressed(GLFW_KEY_F11)) {
 			fullscreen = !fullscreen;
 			if(fullscreen) {
-				glfwGetFramebufferSize(window, &windowedWidth, &windowedHeight);
+				windowedWidth = width;
+				windowedHeight = height;
 				GLFWmonitor* monitor = getCurrentMonitor(window);
 				const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
@@ -127,9 +125,6 @@ void GameClient::run() {
 			}
 		}
 		input.clearAll();
-		
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
 		
 		gameState->render(width, height);
 		
@@ -165,6 +160,16 @@ void GameClient::stop() {
 
 InputManager& GameClient::getInputManager() { return input; }
 TextRenderer& GameClient::getTextRenderer() { return textRenderer; }
+
+void GameClient::setViewportSize(int width2, int height2) {
+	if(width2 > 0 && height2 > 0) { // Ignore dimensions = (0, 0) on minimize
+		width = width2;
+		height = height2;
+		glViewport(0, 0, width, height);
+		textRenderer.setViewport(width, height);
+		std::cout << "Window resized to " << width << "×" << height << std::endl;
+	}
+}
 
 void GameClient::setGameState(GameState* newGameState) {
 	nextGameState = newGameState;
