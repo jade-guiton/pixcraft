@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <cstdio>
+#include <limits>
+#include <stdexcept>
 
 using namespace PixCraft;
 
@@ -85,21 +87,34 @@ int PixCraft::getBlockCoordAt(float x) {
 }
 
 PixCraft::Ray::Ray(glm::vec3 startPos, glm::vec3 dir)
-	: tDeltaX(1 / abs(dir.x)), tDeltaY(1 / abs(dir.y)), tDeltaZ(1 / abs(dir.z)),
+	// To avoid /0 errors on some platforms, set to arbitrary value instead (it won't be used anyway)
+	: tDeltaX(dir.x == 0 ? 0 : 1/abs(dir.x)), tDeltaY(dir.y == 0 ? 0 : 1/abs(dir.y)), tDeltaZ(dir.z == 0 ? 0 : 1/abs(dir.z)),
 	  stepX(sign(dir.x)), stepY(sign(dir.y)), stepZ(sign(dir.z)),
 	  x(getBlockCoordAt(startPos.x)), y(getBlockCoordAt(startPos.y)), z(getBlockCoordAt(startPos.z)),
 	  dist(0.0f), lastFace(0) {
-	if(dir.x > 0) {
+	
+	if(dir.x == 0 && dir.y == 0 && dir.z == 0)
+		throw std::runtime_error("Trying to cast a ray with null direction vector");
+	
+	if(dir.x == 0) { // You will never reach the next X face. This is the power of parallel lines Requiem.
+		tMaxX = std::numeric_limits<float>::infinity();
+	} else if(dir.x > 0) {
 		tMaxX = (x + 0.5 - startPos.x) / dir.x;
 	} else {
 		tMaxX = (x - 0.5 - startPos.x) / dir.x;
 	}
-	if(dir.y > 0) {
+	
+	if(dir.y == 0) {
+		tMaxY = std::numeric_limits<float>::infinity();
+	} else if(dir.y > 0) {
 		tMaxY = (y + 0.5 - startPos.y) / dir.y;
 	} else {
 		tMaxY = (y - 0.5 - startPos.y) / dir.y;
 	}
-	if(dir.z > 0) {
+	
+	if(dir.z == 0) {
+		tMaxZ = std::numeric_limits<float>::infinity();
+	} else if(dir.z > 0) {
 		tMaxZ = (z + 0.5 - startPos.z) / dir.z;
 	} else {
 		tMaxZ = (z - 0.5 - startPos.z) / dir.z;
