@@ -18,7 +18,7 @@ Available commands:
 - fall: stop flying
 - noclip: start flying and disable collisions
 - save: save the world to data/world.bin (experimental)
-- load: loads the world from that same location
+- load: load the world from that same location
 - debug: enables/disables the debug printout
 - antialias: enables/disables antialiasing (initially disabled, not very visible)
 - further: increases render distance
