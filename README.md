@@ -1,6 +1,11 @@
 # PixCraft
 Yet Another Minecraft clone written in C++. Mostly for learning and practice purposes.
 
+To compile this, you will need to install the Flatbuffers compiler and development files, as well as the the libraries GLFW3, GLM, Freetype. On Linux, this can usually be done with the following command:
+`sudo apt install libglfw3 libglfw3-dev libglm-dev libfreetype6 libfreetype6-dev`
+
+You will probably also need to change the options at the top of the Makefile to match your current OS and installation.
+
 Basic controls:
 - F11 to enter/exit fullscreen mode
 - WASD for movement (or equivalent keys on other layouts)

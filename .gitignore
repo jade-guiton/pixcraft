@@ -5,6 +5,7 @@ obj
 data
 dev
 *.exe
+pixcraft
 *.sublime-project
 *.sublime-workspace
 *.zip

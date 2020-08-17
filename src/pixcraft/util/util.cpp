@@ -87,8 +87,7 @@ int PixCraft::getBlockCoordAt(float x) {
 }
 
 PixCraft::Ray::Ray(glm::vec3 startPos, glm::vec3 dir)
-	// To avoid /0 errors on some platforms, set to arbitrary value instead (it won't be used anyway)
-	: tDeltaX(dir.x == 0 ? 0 : 1/abs(dir.x)), tDeltaY(dir.y == 0 ? 0 : 1/abs(dir.y)), tDeltaZ(dir.z == 0 ? 0 : 1/abs(dir.z)),
+	: tDeltaX(1/fabs(dir.x)), tDeltaY(1/fabs(dir.y)), tDeltaZ(1/fabs(dir.z)),
 	  stepX(sign(dir.x)), stepY(sign(dir.y)), stepZ(sign(dir.z)),
 	  x(getBlockCoordAt(startPos.x)), y(getBlockCoordAt(startPos.y)), z(getBlockCoordAt(startPos.z)),
 	  dist(0.0f), lastFace(0) {
