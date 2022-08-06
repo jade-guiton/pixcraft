@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace PixCraft {
 	typedef uint16_t BlockId;
 	class Block;

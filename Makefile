@@ -1,26 +1,31 @@
+# WINDOWS FLAGS:
+
 # Library compilation flags (change based on OS / install folders)
 UTF8_CPP_C_FLAGS  := -Ilib/utf8-cpp-2.3.4
 FREETYPE2_C_FLAGS := -IC:/msys64/mingw64/include/freetype2 -IC:/msys64/mingw64/include/harfbuzz
+OTHER_C_FLAGS     := -IC:/msys64/mingw64/include/flatbuffers
 
 # Library linking flags (change based on OS)
 GLFW_LD_FLAGS     := -lglfw3 -lopengl32
 FREETYPE_LD_FLAGS := -lfreetype -lharfbuzz -lfreetype -lpng16 -lz -lbz2 -lgraphite2 -lusp10 -lgdi32 -lrpcrt4
-OTHER_LD_FLAGS    := -static
+OTHER_LD_FLAGS    := -static -lflatbuffers
 
 PYTHON3 := python
 OUTPUT := pixcraft.exe
 
 
-# # LINUX FLAGS (VERY EXPERIMENTAL):
+# LINUX FLAGS:
+
 # # Library compilation flags (change based on OS / install folders)
 # UTF8_CPP_C_FLAGS  := -Ilib/utf8-cpp-2.3.4
 # FREETYPE2_C_FLAGS := -I/usr/include/freetype2 -I/usr/include/libpng16
-# 
+# OTHER_C_FLAGS     := -I/usr/include/flatbuffers
+
 # # Library linking flags (change based on OS)
 # GLFW_LD_FLAGS     := -lglfw -lGL -lX11 -lpthread -lXrandr
 # FREETYPE_LD_FLAGS := -lfreetype -lharfbuzz -lfreetype -lpng16 -ldl -lm -pthread
-# OTHER_LD_FLAGS    := 
-# 
+# OTHER_LD_FLAGS    := -lflatbuffers
+
 # PYTHON3 := python3
 # OUTPUT := pixcraft
 
@@ -40,7 +45,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 CPPFLAGS  := 
 CXXFLAGS  := -MD -MP -std=c++17 -Wall -Wno-unused \
-	-I$(SRC_DIR) -I$(LIB_DIR) $(UTF8_CPP_C_FLAGS) $(FREETYPE2_C_FLAGS)
+	-I$(SRC_DIR) -I$(LIB_DIR) $(OTHER_C_FLAGS) $(UTF8_CPP_C_FLAGS) $(FREETYPE2_C_FLAGS)
 LDFLAGS   := $(OTHER_LD_FLAGS) $(GLFW_LD_FLAGS) $(FREETYPE_LD_FLAGS)
 
 run: release
